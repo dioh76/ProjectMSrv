@@ -1,4 +1,35 @@
-This is your new Play application
+ProjectMSrv
 =====================================
 
-This file will be packaged with your application, when using `play dist`.
+Server : PlayFramework ( www.playframework.com ) standalone ver
+Lang : Java & Scala(Akka)
+
+Protocol : Json message
+
+Structure
+
+UserManager : 처음 서버 연결시 유저 등록과 종료시 유저를 삭제한다.
+User : 웹소켓 메시지 처리를 담당하고 있다.
+RoomManager : 게임 진행시 방을 생성 관리하며 룸매니저는 Akka를 이용해서 메시징으로 쓰레드에 안전하게 동작하도록 한다.
+(유저가 룸생성/탈퇴시에도 RoomManager에 직접 접근하기 보단 메시지를 보낸다.)
+GameRoom : 주로 게임 관련 로직처리 및 브로드캐스팅을 담당한다.
+SrvMsg : 서버 프로토콜 관련 상위 클래스로 Json메시지로 변경할 수있도록 한다.
+Global : 해당 애플리케이션이 시작하거나 종료할 때 처리해야할 로직을 담아둔다.
+(현재는 RoomManager만 초기화 하고 있다.)
+Application : 웹 요청에 대한 매핑으로 연결을 처리하며 Entry Point에 해당한다.
+
+그외 Config
+conf/application.conf : 각종 애플리케이션 정보( 아마도 성능/로그 등에 관련된 수치를 변경하지 않을까 한다.)
+conf/routes : 웹호출 관련된 매핑을 한다.
+
+설치 방법:
+
+1.Playframework standalone을 받아서 적절한 곳에 다운 받고 해당 폴더를 윈도우 고급정보의 환경변수 PATH에 등록해준다.
+2.GitHub에서 서버 프로젝트를 다운 받고 해당 폴더에서 명령프롬프트로 들어가서 play를 누르면 playframework으 콘솔로 진입한다.
+3.playframework 콘솔에서는 run, compile 등을 할 수 있다.
+4.혹시 새 프로젝트를 만들고 싶으면 콘솔 밖에서 원하는 디렉토리에서 play new 를 하면 된다.
+5.콘솔에 안들어가고도 play run, play debug run등을 통해서 서비스를 올릴 수 있다.
+6.만약에 GitHub에서 다운 받은 프로젝트가 제대로 안뜨면(컴파일 에러?) 우선 ProjectMSrv를 우선 로컬에서 만들어서 GitHub에서 받은걸로 덮어쓰는게 속편하다.
+7.playframework의 설치폴더 외에 다른곳으로 move를 하면 classpath등이 깨지는 경우가 있는데 이건 그냥 수동으로 수정해줘야 할듯요.
+
+더 궁금한 내용이 있으면 저에게 문의주시기 바랍니다.
