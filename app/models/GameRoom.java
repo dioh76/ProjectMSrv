@@ -49,12 +49,22 @@ public class GameRoom {
 		return mUsers.size() == mMaxUser ? true : false;
 	}
 	
+	public synchronized boolean isEmpty()
+	{
+		return mUsers.size() == 0 ? true : false;
+	}
+	
+	public synchronized int count()
+	{
+		return mUsers.size();
+	}
+	
 	public synchronized void addUser( User user )
 	{
 		mUsers.add(user);
 	}
     
-    private synchronized User removeUser( long userId )
+    public synchronized User removeUser( long userId )
     {
     	for( int i = 0; i < mUsers.size(); i++ )
     	{
@@ -65,6 +75,11 @@ public class GameRoom {
     	}
     	
     	return null;
+    }
+    
+    public synchronized void Update(long currentmillisec)
+    {
+    	
     }
     
     // Send a Json event to all members

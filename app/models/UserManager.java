@@ -40,6 +40,20 @@ public class UserManager {
         
     }
     
+    public void onDisconnect(User user)
+    {
+    	synchronized(mUsers)
+    	{
+    		mUsers.remove(user.getUserId());
+    	}
+    	
+    	GameRoom room = user.getGameRoom();
+    	if( room != null )
+    	{
+    		RoomManager.leave(user, room.getRoomId());
+    	}
+    }
+    
     // Send a Json event to all members
     public synchronized void broadcastAll(String kind, String username, String text) {
         for(User user: mUsers.values()) {
