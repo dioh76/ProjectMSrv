@@ -1,12 +1,12 @@
-ProjectMSrv
-=====================================
+# ProjectMSrv
 
-Server : PlayFramework ( www.playframework.com ) standalone ver
+
+Server : PlayFramework ( www.playframework.com ) standalone ver 2.2.1
 Lang : Java & Scala(Akka)
 
 Protocol : Json message
 
-Structure
+# Structure
 
 UserManager : 처음 서버 연결시 유저 등록과 종료시 유저를 삭제한다.
 User : 웹소켓 메시지 처리를 담당하고 있다.
@@ -22,10 +22,10 @@ Application : 웹 요청에 대한 매핑으로 연결을 처리하며 Entry Poi
 conf/application.conf : 각종 애플리케이션 정보( 아마도 성능/로그 등에 관련된 수치를 변경하지 않을까 한다.)
 conf/routes : 웹호출 관련된 매핑을 한다.
 
-클라이언트:
+# 클라이언트:
 websocket-sharp, newtonsoft.json 라이브러리를 이용하였다.( 나름 고심끝에...)
 
-설치 방법:
+# 설치 방법:
 
 1.Playframework standalone을 받아서 적절한 곳에 다운 받고 해당 폴더를 윈도우 고급정보의 환경변수 PATH에 등록해준다.
 2.GitHub에서 서버 프로젝트를 다운 받고 해당 폴더에서 명령프롬프트로 들어가서 play를 누르면 playframework으 콘솔로 진입한다.
