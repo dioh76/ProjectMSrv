@@ -4,7 +4,6 @@
 
 # Home page
 GET     /                           		controllers.Application.index()
-GET     /room/chat                       	controllers.Application.chat(username)
 GET     /connect                       		controllers.Application.connect(username)
 
 # Map static resources from the /public folder to the /assets URL path

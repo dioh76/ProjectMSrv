@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<card_table>
+	<cards>
+		<card id="10001" name="슬라임" grade="0" type="1" hp="30" st="10" model="character/npc30001" atlas="Creature" spr="CD_01"/>
+		<card id="11001" name="메탈 슬라임" grade="1" type="1" hp="35" st="15" model="character/npc30001" atlas="Creature" spr="CC_01"/>
+		<card id="12001" name="포이즌 슬라임" grade="2" type="1" hp="40" st="20" model="character/npc30001" atlas="Creature" spr="CB_01"/>
+		<card id="13001" name="킹 슬라임" grade="3" type="1" hp="45" st="30" model="character/npc30001" atlas="Creature" spr="CA_01"/>
+		<card id="11002" name="오크" grade="1" type="1" hp="10" st="35" model="character/npc10001" atlas="Creature" spr="CS_01"/>
+		<card id="13002" name="오크 워리어" grade="3" type="1" hp="30" st="45" model="character/npc10001" atlas="Creature" spr="CD_01"/>
+		<card id="14001" name="레드 드래곤" grade="4" type="1" hp="35" st="50" model="character/npc10001" atlas="Creature" spr="CC_01"/>
+		<card id="20001" name="스켈레톤" grade="0" type="2" hp="30" st="10" model="character/npc40001" atlas="Creature" spr="CB_01"/>
+		<card id="21001" name="파이어 스켈레톤" grade="1" type="2" hp="35" st="15" model="character/npc40001" atlas="Creature" spr="CA_01"/>
+		<card id="22001" name="포이즌 스켈레톤" grade="2" type="2" hp="40" st="20" model="character/npc40001" atlas="Creature" spr="CS_01"/>
+		<card id="23001" name="스켈레톤 킹" grade="3" type="2" hp="45" st="30" model="character/npc40001" atlas="Creature" spr="CD_01"/>
+		<card id="21002" name="서큐버스" grade="1" type="2" hp="10" st="35" model="character/npc40001" atlas="Creature" spr="CC_01"/>
+		<card id="23002" name="스파이더킹" grade="3" type="2" hp="30" st="45" model="character/npc40001" atlas="Creature" spr="CB_01"/>
+		<card id="24001" name="이프리트" grade="4" type="2" hp="35" st="50" model="character/npc20001" atlas="Creature" spr="CA_01"/>
+		<card id="30001" name="신수-화이트유니콘" grade="0" type="3" hp="30" st="10" model="character/npc20001" atlas="Creature" spr="CS_01"/>
+		<card id="31001" name="신수-블랙유니콘" grade="1" type="3" hp="35" st="15" model="character/npc20001" atlas="Creature" spr="CD_01"/>
+		<card id="32001" name="천사" grade="2" type="3" hp="40" st="20" model="character/npc20001" atlas="Creature" spr="CC_01"/>
+		<card id="33001" name="대천사" grade="3" type="3" hp="45" st="30" model="character/npc20001" atlas="Creature" spr="CB_01"/>
+		<card id="31002" name="정령-실프" grade="1" type="3" hp="10" st="35" model="character/npc20001" atlas="Creature" spr="CA_01"/>
+		<card id="33002" name="정령-실라페" grade="3" type="3" hp="30" st="45" model="character/npc20001" atlas="Creature" spr="CS_01"/>
+		<card id="34001" name="천사장 가브리엘" grade="4" type="3" hp="35" st="50" model="character/npc20001" atlas="Creature" spr="CS_01"/>
+	</cards>
+</card_table>

@@ -7,9 +7,14 @@ import play.libs.Json;
 import play.libs.F.Callback;
 import play.libs.F.Callback0;
 import play.mvc.WebSocket;
+import protocol.ClientPacket;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import protocol.*;
+import protocol.client.*;
+import protocol.server.ServerPacketGameJoin;
 
 public class User implements Callback<JsonNode>,Callback0 {
 	
@@ -60,30 +65,22 @@ public class User implements Callback<JsonNode>,Callback0 {
 
 		try
 		{
-			String protocol = recvmsg.get("proto").asText();
-			Logger.info("proto="+protocol);
+			Logger.info("packet="+recvmsg.toString());
 			
+			int protocol = recvmsg.get("proto").asInt();
 			
-//			JSONObjectConvertor a = new JSONObjectConvertor();
-//			a.toJSON(arg0, arg1)
-			
-			if(protocol.equalsIgnoreCase("joinroom"))
+			if( protocol == ClientPacket.MCP_GAME_JOIN )
 			{
-				RoomManager.join(this, 4);
+				ClientPacketGameJoin packet = Json.fromJson(recvmsg, ClientPacketGameJoin.class);
+				//reply firstly
+				SendPacket(new ServerPacketGameJoin(0,getUserId(),packet.maxuser).toJson());
+				
+				RoomManager.join(this, packet.maxuser);
 			}
-			else if(protocol.equalsIgnoreCase("leaveroom"))
+			else if( mGameRoom != null )
 			{
-				RoomManager.leave(this, mGameRoom.getRoomId());
-			}
-			else
-			{
-				//switch( type == )
-				ObjectNode event = Json.newObject();
-		        //event.put("kind", kind);
-		        event.put("user", mUserName);
-		        event.put("id", mUserId);
-		        mChannel.write(event);
-			}        
+				mGameRoom.processPacket(protocol, recvmsg);
+			}     
 			
 		}catch(Exception e)
 		{

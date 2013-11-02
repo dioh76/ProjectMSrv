@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<card_eventzone>
+	<cards>
+		<card id="10001" weight="200" />
+		<card id="12004" weight="100" />
+		<card id="14005" weight="100" />
+		<card id="21003" weight="100" />
+		<card id="22007" weight="200" />
+		<card id="23005" weight="100" />
+		<card id="24001" weight="100" />
+		<card id="30001" weight="100" />
+		<card id="31002" weight="100" />
+		<card id="32007" weight="100" />
+		<card id="33005" weight="100" />
+		<card id="34001" weight="100" />
+	</cards>
+</card_eventzone>

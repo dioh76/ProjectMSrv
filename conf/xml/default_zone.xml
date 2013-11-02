@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<default_zone>
+  <zones>
+    <zone id="0" type="0" group="0" advanced="0" x="-24.4" y="-1.39" z="-18" pricedeck="0"/>
+	<zone id="1" type="1" group="1" advanced="0" x="-22.76" y="-1.39" z="-11.11" pricedeck="1"/>
+	<zone id="2" type="1" group="1" advanced="0" x="-22.76" y="-1.39" z="-5.91" pricedeck="1"/>
+	<zone id="3" type="1" group="1" advanced="0" x="-22.76" y="-1.39" z="-0.71" pricedeck="1"/>
+	<zone id="4" type="2" group="0" advanced="0" x="-22.76" y="-1.39" z="4.49" pricedeck="0"/>
+	<zone id="5" type="1" group="1" advanced="1" x="-22.76" y="-1.39" z="9.69" pricedeck="1"/>
+	<zone id="6" type="1" group="1" advanced="1" x="-22.76" y="-1.39" z="14.89" pricedeck="1"/>
+
+	<zone id="7" type="3" group="0" advanced="0" x="-22.76" y="-1.39" z="20.09" pricedeck="0"/>	
+	<zone id="8" type="1" group="2" advanced="0" x="-17.56" y="-1.39" z="20.09" pricedeck="2"/>
+	<zone id="9" type="1" group="2" advanced="0" x="-12.36" y="-1.39" z="20.09" pricedeck="2"/>
+	<zone id="10" type="1" group="2" advanced="1" x="-7.160002" y="-1.39" z="20.09" pricedeck="2"/>
+	<zone id="11" type="1" group="2" advanced="1" x="-1.960002" y="-1.39" z="20.09" pricedeck="2"/>
+	<zone id="12" type="2" group="0" advanced="0" x="3.239998" y="-1.39" z="20.09" pricedeck="0"/>
+	<zone id="13" type="1" group="2" advanced="0" x="8.439998" y="-1.39" z="20.09" pricedeck="2"/>
+
+	<zone id="14" type="4" group="0" advanced="0" x="15.22" y="-1.39" z="21.6" pricedeck="0"/>
+	<zone id="15" type="1" group="3" advanced="0" x="13.64" y="-1.39" z="14.89" pricedeck="3"/>
+	<zone id="16" type="5" group="0" advanced="0" x="13.64" y="-1.39" z="9.690001" pricedeck="0"/>
+	<zone id="17" type="1" group="3" advanced="1" x="13.64" y="-1.39" z="4.490001" pricedeck="3"/>
+	<zone id="18" type="1" group="3" advanced="1" x="13.64" y="-1.39" z="-0.7099991" pricedeck="3"/>
+	<zone id="19" type="1" group="3" advanced="0" x="13.64" y="-1.39" z="-5.909999" pricedeck="3"/>
+	<zone id="20" type="1" group="3" advanced="0" x="13.64" y="-1.39" z="-11.11" pricedeck="3"/>
+	
+	<zone id="21" type="6" group="0" advanced="1" x="13.64" y="-1.39" z="-16.31" pricedeck="0"/>
+	<zone id="22" type="1" group="4" advanced="1" x="8.439997" y="-1.39" z="-16.31" pricedeck="4"/>
+	<zone id="23" type="1" group="4" advanced="0" x="3.239997" y="-1.39" z="-16.31" pricedeck="4"/>
+	<zone id="24" type="2" group="0" advanced="0" x="-1.960003" y="-1.39" z="-16.31" pricedeck="0"/>
+	<zone id="25" type="1" group="4" advanced="0" x="-7.160003" y="-1.39" z="-16.31" pricedeck="4"/>
+	<zone id="26" type="1" group="4" advanced="0" x="-12.36" y="-1.39" z="-16.31" pricedeck="4"/>
+	<zone id="27" type="1" group="4" advanced="0" x="-17.56" y="-1.39" z="-16.31" pricedeck="4"/>
+  </zones>
+  <zoneInfos>
+	<info race="1" advanced="0" model="board/zone_human" name="황야의요새" buy1="10" sell1="20" toll1="30" battle1="15" buy2="30" sell2="60" toll2="90" battle2="45" buy3="70" sell3="140" toll3="210" battle3="105"/>
+	<info race="1" advanced="0" model="board/zone_human" name="드워프의마인빌리지" buy1="10" sell1="20" toll1="30" battle1="15" buy2="30" sell2="60" toll2="90" battle2="45" buy3="70" sell3="140" toll3="210" battle3="105"/>
+	<info race="1" advanced="0" model="board/zone_human" name="세계수이그드라실" buy1="10" sell1="20" toll1="30" battle1="15" buy2="30" sell2="60" toll2="90" battle2="45" buy3="70" sell3="140" toll3="210" battle3="105"/>
+	<info race="1" advanced="1" model="board/zone_human" name="트리스탄제국(서)" buy1="20" sell1="40" toll1="60" battle1="30" buy2="50" sell2="100" toll2="150" battle2="75" buy3="100" sell3="200" toll3="300" battle3="150"/>	
+	<info race="1" advanced="1" model="board/zone_human" name="트리스탄제국(동)" buy1="20" sell1="40" toll1="60" battle1="30" buy2="50" sell2="100" toll2="150" battle2="75" buy3="100" sell3="200" toll3="300" battle3="150"/>	
+	
+	<info race="2" advanced="0" model="board/zone_devil" name="화염의대지" buy1="10" sell1="20" toll1="30" battle1="15" buy2="30" sell2="60" toll2="90" battle2="45" buy3="70" sell3="140" toll3="210" battle3="105"/>
+	<info race="2" advanced="0" model="board/zone_devil" name="환몽의대지" buy1="10" sell1="20" toll1="30" battle1="15" buy2="30" sell2="60" toll2="90" battle2="45" buy3="70" sell3="140" toll3="210" battle3="105"/>
+	<info race="2" advanced="0" model="board/zone_devil" name="칠흑의대지" buy1="10" sell1="20" toll1="30" battle1="15" buy2="30" sell2="60" toll2="90" battle2="45" buy3="70" sell3="140" toll3="210" battle3="105"/>
+	<info race="2" advanced="1" model="board/zone_devil" name="마신의시공(서)" buy1="20" sell1="40" toll1="60" battle1="30" buy2="50" sell2="100" toll2="150" battle2="75" buy3="100" sell3="200" toll3="300" battle3="150"/>
+	<info race="2" advanced="1" model="board/zone_devil" name="마신의시공(동)" buy1="20" sell1="40" toll1="60" battle1="30" buy2="50" sell2="100" toll2="150" battle2="75" buy3="100" sell3="200" toll3="300" battle3="150"/>
+
+	<info race="3" advanced="0" model="board/zone_angel" name="순백의호수" buy1="10" sell1="20" toll1="30" battle1="15" buy2="30" sell2="60" toll2="90" battle2="45" buy3="70" sell3="140" toll3="210" battle3="105"/>
+	<info race="3" advanced="0" model="board/zone_angel" name="천상의정원" buy1="10" sell1="20" toll1="30" battle1="15" buy2="30" sell2="60" toll2="90" battle2="45" buy3="70" sell3="140" toll3="210" battle3="105"/>
+	<info race="3" advanced="0" model="board/zone_angel" name="대천사의연무대" buy1="10" sell1="20" toll1="30" battle1="15" buy2="30" sell2="60" toll2="90" battle2="45" buy3="70" sell3="140" toll3="210" battle3="105"/>
+	<info race="3" advanced="1" model="board/zone_angel" name="라미아의품(서)" buy1="20" sell1="40" toll1="60" battle1="30" buy2="50" sell2="100" toll2="150" battle2="75" buy3="100" sell3="200" toll3="300" battle3="150"/>
+	<info race="3" advanced="1" model="board/zone_angel" name="라미아의품(동)" buy1="20" sell1="40" toll1="60" battle1="30" buy2="50" sell2="100" toll2="150" battle2="75" buy3="100" sell3="200" toll3="300" battle3="150"/>
+
+	<info race="4" advanced="0" model="board/zone_neutral" name="HD" buy1="15" sell1="30" toll1="45" battle1="23" buy2="45" sell2="90" toll2="135" battle2="68" buy3="105" sell3="210" toll3="315" battle3="158"/>
+	<info race="4" advanced="0" model="board/zone_neutral" name="HN" buy1="15" sell1="30" toll1="45" battle1="23" buy2="45" sell2="90" toll2="135" battle2="68" buy3="105" sell3="210" toll3="315" battle3="158"/>
+	<info race="4" advanced="0" model="board/zone_neutral" name="DN" buy1="15" sell1="30" toll1="45" battle1="23" buy2="45" sell2="90" toll2="135" battle2="68" buy3="105" sell3="210" toll3="315" battle3="158"/>
+	<info race="4" advanced="1" model="board/zone_neutral" name="HND(서)" buy1="15" sell1="30" toll1="45" battle1="23" buy2="45" sell2="90" toll2="135" battle2="68" buy3="105" sell3="210" toll3="315" battle3="158"/>
+	<info race="4" advanced="1" model="board/zone_neutral" name="HND(동)" buy1="15" sell1="30" toll1="45" battle1="23" buy2="45" sell2="90" toll2="135" battle2="68" buy3="105" sell3="210" toll3="315" battle3="158"/>
+	
+	</zoneInfos>
+</default_zone>

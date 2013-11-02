@@ -21,6 +21,8 @@ import akka.actor.UntypedActor;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import protocol.server.*;
+
 public class RoomManager extends UntypedActor {
 	
     // Default RoomManager.
@@ -57,6 +59,11 @@ public class RoomManager extends UntypedActor {
     {
     	defaultRoomManager.tell(new Leave(roomId,user), null);
     }
+    
+    public static void ready(final long roomId)
+    {
+    	defaultRoomManager.tell( new Ready(roomId), null);
+    }
 
 	@Override
 	public void onReceive(Object message) throws Exception {
@@ -74,6 +81,7 @@ public class RoomManager extends UntypedActor {
             	{
             		if( mJoinRooms.size() > 0 )
             		{
+            			//TODO : check room status if room is playing or not
             			GameRoom room = mJoinRooms.get(0);
             			room.addUser(user);
             			
@@ -84,7 +92,7 @@ public class RoomManager extends UntypedActor {
             			}
             			
             			user.setGameRoom(room);
-            			user.SendPacket(new JoinMsg(room.getRoomId()).toJson());
+            			
             		}
             		else
             		{
@@ -95,7 +103,7 @@ public class RoomManager extends UntypedActor {
             			 mJoinRooms.add(room);
             			 
             			 user.setGameRoom(room);
-            			 user.SendPacket(new JoinMsg(room.getRoomId()).toJson());
+            			
             		}
             	}
         	}
@@ -109,10 +117,29 @@ public class RoomManager extends UntypedActor {
             	GameRoom room = this.get(leave.roomId);
             	room.removeUser(leave.user.getUserId());
             	leave.user.setGameRoom(null);
+            	
+            	mRooms.remove(room.getRoomId());
+            	
+            	//If user leave, notify others
             	leave.user.SendPacket(new LeaveMsg(room.getRoomId()).toJson());
             }
         
-        } else if(message instanceof UpdateTimer ){
+        } else if(message instanceof Ready) {
+        	Ready ready = (Ready)message;
+        	
+        	synchronized(mJoinRooms)
+        	{
+        		for(int i = 0; i < mJoinRooms.size(); i++)
+        		{
+        			if(mJoinRooms.get(i).getRoomId() == ready.roomId)
+        			{
+        				mJoinRooms.remove(i);
+        				break;
+        			}
+        		}
+        	}
+        }
+        else if(message instanceof UpdateTimer ){
         	UpdateTimer timer = (UpdateTimer)message;
         	Update(timer.currentMilliSec);
         }
@@ -161,7 +188,6 @@ public class RoomManager extends UntypedActor {
             this.user = user;
             this.maxuser = maxuser;
         }
-        
     }
     
     public static class Leave {
@@ -169,11 +195,18 @@ public class RoomManager extends UntypedActor {
     	final User user;
         final long roomId;
         
-        
         public Leave(long roomId, User user) {
             this.roomId = roomId;
             this.user = user;
         }
-        
-    }	
+    }
+    
+    public static class Ready {
+    	
+    	final long roomId;
+    	
+    	public Ready(long roomId) {
+    		this.roomId = roomId;
+    	}
+    }
 }
