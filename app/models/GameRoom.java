@@ -21,7 +21,7 @@ public class GameRoom {
 	private boolean mPlaying = false;
 	
 	private List<User> mUsers = new ArrayList<User>();
-	private Map<Integer, SrvCharacter> mCharacters = new HashMap<Integer, SrvCharacter>();
+	private SortedMap<Integer, SrvCharacter> mCharacters = new TreeMap<Integer, SrvCharacter>();
 	
 	//common
 	private long mCreatedTime = 0;
@@ -107,13 +107,20 @@ public class GameRoom {
 		
 		//initialize map for this user
 		user.SendPacket(new ServerPacketInitZone(0, maporders).toJson());
+		
+		for( SrvCharacter chr : mCharacters.values())
+		{
+			user.SendPacket(new ServerPacketCharAdd(chr.charId, chr.userId, chr.charId, chr.userName, true).toJson());
+		}
     	
 		addCharacter(user);
+		
+		//send existing character
 	}
 	
 	public void addCharacter(User user)
 	{
-		SrvCharacter chr = new SrvCharacter(user.getUserId(), getNewCharId(), true, 300, false );
+		SrvCharacter chr = new SrvCharacter(user.getUserId(), getNewCharId(), user.getName(), true, 300, false );
     	
     	synchronized(mCharacters)
     	{
@@ -129,7 +136,7 @@ public class GameRoom {
 		for( int i = 0; i < count; i++)
 		{
 			long randomUserId = getRandomUserId();
-			SrvCharacter chr = new SrvCharacter(randomUserId, getNewCharId(), false, 300, false );
+			SrvCharacter chr = new SrvCharacter(randomUserId, getNewCharId(), "AIPlayer"+(i+1), false, 300, false );
 	    	
 	    	synchronized(mCharacters)
 	    	{
@@ -137,7 +144,7 @@ public class GameRoom {
 	    	}
 	    	
 	    	//notify addchar for all
-	    	notifyAll(new ServerPacketCharAdd(chr.charId, randomUserId, chr.charId, "AIPlayer"+(i+1), false).toJson());
+	    	notifyAll(new ServerPacketCharAdd(chr.charId, randomUserId, chr.charId, chr.userName, false).toJson());
 		}
 	}
     
@@ -156,7 +163,6 @@ public class GameRoom {
     
     public void processPacket( int protocol, JsonNode node )
     {
-    	Logger.info(node.toString());
     	switch( protocol )
     	{
     	case ClientPacket.MCP_CHAR_ADD: onCharAdd(node); break;
@@ -210,6 +216,7 @@ public class GameRoom {
     
     private void autoStart()
     {
+    	Logger.info("ai player will be added randomly");
     	if(isPlaying() == false )
 		{
 			setPlaying(true);
@@ -229,7 +236,7 @@ public class GameRoom {
     	//not to be used in server
     	ClientPacketCharAdd pkt = Json.fromJson(node, ClientPacketCharAdd.class);
     	
-    	SrvCharacter chr = new SrvCharacter(pkt.userId, pkt.charId, pkt.userChar, 300, false );    	
+    	SrvCharacter chr = new SrvCharacter(pkt.userId, pkt.charId, pkt.name, pkt.userChar, 300, false );    	
     	mCharacters.put(pkt.charId, chr);
     	
     	notifyAll(new ServerPacketCharAdd(pkt.charId, pkt.userId, pkt.charId, pkt.name, pkt.userChar).toJson());   	

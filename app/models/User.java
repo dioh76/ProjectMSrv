@@ -65,7 +65,7 @@ public class User implements Callback<JsonNode>,Callback0 {
 
 		try
 		{
-			Logger.info("packet="+recvmsg.toString());
+			Logger.info(String.format("packet[user=%d] = %s",getUserId(), recvmsg.toString()));
 			
 			int protocol = recvmsg.get("proto").asInt();
 			

@@ -22,6 +22,7 @@ import akka.actor.UntypedActor;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import protocol.server.*;
+import models.*;
 
 public class RoomManager extends UntypedActor {
 	
@@ -35,14 +36,14 @@ public class RoomManager extends UntypedActor {
 		
 	private RoomManager()
 	{
-		Akka.system().scheduler().schedule(
+		/*Akka.system().scheduler().schedule(
 	            Duration.create(5000, MILLISECONDS),
 	            Duration.create(5000, MILLISECONDS),
 	            defaultRoomManager,
 	            new UpdateTimer(System.currentTimeMillis()),
 	            Akka.system().dispatcher(),
-	            /** sender **/ null
-	        );
+	             null
+	        );*/
 	}
 	
 	public synchronized GameRoom get( long roomId )
