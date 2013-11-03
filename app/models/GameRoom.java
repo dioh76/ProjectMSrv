@@ -189,12 +189,19 @@ public class GameRoom {
     		}
     	}
     	
+    	ArrayList<Integer> removes = new ArrayList<Integer>();
     	for(SrvCharacter chr : mCharacters.values())
     	{
     		if(chr.userId == userId)
     		{
     			notifyAll(new ServerPacketCharRemove(chr.charId, chr.userId).toJson());
+    			removes.add(chr.charId);
     		}
+    	}
+    	
+    	for(Integer charId : removes)
+    	{
+    		mCharacters.remove(charId);
     	}
     	
     	return user;
@@ -565,8 +572,49 @@ public class GameRoom {
     public void onCardDeckUse(JsonNode node)
     {
     	ClientPacketCardDeckUse pkt = Json.fromJson(node, ClientPacketCardDeckUse.class);
+    	notifyAll(new ServerPacketCardDeckUse(pkt.sender,pkt.acttype,pkt.index,pkt.card).toJson());
     	
-    	notifyAll(new ServerPacketCardDeckUse(pkt.sender,pkt.acttype,pkt.index,pkt.card).toJson());    	
+    	if(pkt.acttype == ServerPacketCardDeckUse.ACT_DISCARD)
+    	{
+    		boolean allready = true;
+    		
+    		synchronized(mCharacters)
+    		{
+    			SrvCharacter chr = mCharacters.get(pkt.sender);
+    	    	if( chr == null )
+    	    		return;
+    	    	
+    	    	chr.discardcard = true;
+    	    	for( SrvCharacter srvChr : mCharacters.values() )
+    	    	{
+    	    		if(srvChr.discardcard == false)
+    	    		{
+    	    			allready = false;
+    	    			break;
+    	    		}
+    	    	}
+    		}
+    		
+    		if(allready)
+    		{
+    			int nextcharId = 0;
+    			
+    			synchronized(mCharacters)
+    			{
+    				for( SrvCharacter srvChr : mCharacters.values() )
+        	    		srvChr.discardcard = false;
+    				
+        			//If start index is changed
+        			if(mCharacters.size() <= mStartCharIndex)
+        				mStartCharIndex = mCharacters.size() - 1;
+        			
+        			ArrayList<Integer> charIds = new ArrayList<Integer>(mCharacters.keySet());
+        			nextcharId = charIds.get(mStartCharIndex).intValue();
+    			}
+    			
+    			notifyAll(new ServerPacketRoundOver(pkt.sender,nextcharId).toJson());
+    		}
+    	}
     }
     
     public void onEventArenaReq(JsonNode node)
