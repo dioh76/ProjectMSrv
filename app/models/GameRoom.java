@@ -150,15 +150,25 @@ public class GameRoom {
     
     public synchronized User removeUser( long userId )
     {
+    	User user = null;
+    	
     	for( int i = 0; i < mUsers.size(); i++ )
     	{
     		if( mUsers.get(i).getUserId() == userId )
     		{
-    			return mUsers.remove(i); 
+    			user = mUsers.remove(i); 
     		}
     	}
     	
-    	return null;
+    	for(SrvCharacter chr : mCharacters.values())
+    	{
+    		if(chr.userId == userId)
+    		{
+    			notifyAll(new ServerPacketCharRemove(chr.charId, chr.userId).toJson());
+    		}
+    	}
+    	
+    	return user;
     }
     
     public void processPacket( int protocol, JsonNode node )

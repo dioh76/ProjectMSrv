@@ -119,10 +119,11 @@ public class RoomManager extends UntypedActor {
             	room.removeUser(leave.user.getUserId());
             	leave.user.setGameRoom(null);
             	
-            	mRooms.remove(room.getRoomId());
+            	if(room.isEmpty())
+            		mRooms.remove(room.getRoomId());
             	
             	//If user leave, notify others
-            	leave.user.SendPacket(new LeaveMsg(room.getRoomId()).toJson());
+            	//leave.user.SendPacket(new LeaveMsg(room.getRoomId()).toJson());
             }
         
         } else if(message instanceof Ready) {

@@ -40,6 +40,7 @@ public class ServerPacket
 	public static final int MSP_EQUIP_SPELL_USE_REPLY = 1310;
 	//for server only
 	public static final int MSP_INIT_ZONE = 1400;
+	public static final int MSP_CHAR_REMOVE = 1401;
 	
 	public int proto;
 	public int sender;
