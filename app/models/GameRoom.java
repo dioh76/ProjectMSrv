@@ -6,7 +6,9 @@ import play.libs.*;
 import protocol.*;
 import protocol.client.*;
 import protocol.server.*;
+import xml.BattleDiceTable;
 import xml.CardTable;
+import xml.CharTable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -85,7 +87,7 @@ public class GameRoom {
 		return mUsers.size();
 	}
 	
-	public long getRandomUserId()
+	public long getRandomOwnerId()
 	{
 		final Random random = new Random();
 		synchronized(mUsers)
@@ -110,7 +112,7 @@ public class GameRoom {
 		
 		for( SrvCharacter chr : mCharacters.values())
 		{
-			user.SendPacket(new ServerPacketCharAdd(chr.charId, chr.userId, chr.charId, chr.userName, true).toJson());
+			user.SendPacket(new ServerPacketCharAdd(chr.charId, chr.userId, chr.charId, chr.charType, chr.userName, true).toJson());
 		}
     	
 		addCharacter(user);
@@ -120,32 +122,59 @@ public class GameRoom {
 	
 	public void addCharacter(User user)
 	{
-		SrvCharacter chr = new SrvCharacter(user.getUserId(), getNewCharId(), user.getName(), true, 300, false );
+		boolean isFull = false;
+		
+		int charType = 1;
+		CharInfo charInfo = CharTable.getInstance().randomChar();		
+		if(charInfo != null)
+			charType = charInfo.charType;
+		
+		SrvCharacter chr = new SrvCharacter(user.getUserId(), getNewCharId(), charType, user.getName(), true, 300, false );
     	
     	synchronized(mCharacters)
     	{
     		mCharacters.put(chr.charId, chr);
+    		if(mCharacters.size() == mMaxUser) isFull = true;
     	}
     	
     	//notify addchar for all
-    	notifyAll(new ServerPacketCharAdd(chr.charId, user.getUserId(), chr.charId, user.getName(), true).toJson()); 		
+    	notifyAll(new ServerPacketCharAdd(chr.charId, user.getUserId(), chr.charId, chr.charType, user.getName(), true).toJson());
+    	
+    	if(isFull)
+    	{
+    		notifyAll(new ServerPacketGameReady(0).toJson());
+    	}
 	}
 	
 	public void addRandomAICharacter(int count)
 	{
+		boolean isFull = false;
+		
 		for( int i = 0; i < count; i++)
 		{
-			long randomUserId = getRandomUserId();
-			SrvCharacter chr = new SrvCharacter(randomUserId, getNewCharId(), "AIPlayer"+(i+1), false, 300, false );
+			long randomUserId = getRandomOwnerId();
+			
+			int charType = 1;
+			CharInfo charInfo = CharTable.getInstance().randomChar();		
+			if(charInfo != null)
+				charType = charInfo.charType;
+			
+			SrvCharacter chr = new SrvCharacter(randomUserId, getNewCharId(), charType, "AIPlayer"+(i+1), false, 300, false );
 	    	
 	    	synchronized(mCharacters)
 	    	{
 	    		mCharacters.put(chr.charId, chr);
+	    		if(mCharacters.size() == mMaxUser) isFull = true;
 	    	}
 	    	
 	    	//notify addchar for all
-	    	notifyAll(new ServerPacketCharAdd(chr.charId, randomUserId, chr.charId, chr.userName, false).toJson());
+	    	notifyAll(new ServerPacketCharAdd(chr.charId, randomUserId, chr.charId, chr.charType, chr.userName, false).toJson());
 		}
+		
+		if(isFull)
+    	{
+    		notifyAll(new ServerPacketGameReady(0).toJson());
+    	}
 	}
     
     public synchronized User removeUser( long userId )
@@ -226,9 +255,10 @@ public class GameRoom {
     
     private void autoStart()
     {
-    	Logger.info("ai player will be added randomly");
     	if(isPlaying() == false )
 		{
+    		Logger.info("ai player will be added randomly");
+    		
 			setPlaying(true);
 			RoomManager.ready(this.getRoomId());
 			
@@ -246,10 +276,10 @@ public class GameRoom {
     	//not to be used in server
     	ClientPacketCharAdd pkt = Json.fromJson(node, ClientPacketCharAdd.class);
     	
-    	SrvCharacter chr = new SrvCharacter(pkt.userId, pkt.charId, pkt.name, pkt.userChar, 300, false );    	
+    	SrvCharacter chr = new SrvCharacter(pkt.userId, pkt.charId, 1, pkt.name, pkt.userChar, 300, false );    	
     	mCharacters.put(pkt.charId, chr);
     	
-    	notifyAll(new ServerPacketCharAdd(pkt.charId, pkt.userId, pkt.charId, pkt.name, pkt.userChar).toJson());   	
+    	notifyAll(new ServerPacketCharAdd(pkt.charId, pkt.userId, pkt.charId, chr.charType, pkt.name, pkt.userChar).toJson());   	
     }
     
     private void onCharAddSoul(JsonNode node)
@@ -510,17 +540,26 @@ public class GameRoom {
     	
     	mLastBattle = new BattleInfo();
     	mLastBattle.zoneId = pkt.zoneId;
-    	mLastBattle.charId = pkt.attackId;
-    	mLastBattle.cardId = pkt.attackCard;
+    	mLastBattle.charId = pkt.sender; 
+    	mLastBattle.attackCard = pkt.attackCard;
+    	mLastBattle.defenseCard = pkt.defenseCard;
     	
-    	//notifyAll(new ServerPacketBattle(pkt.sender, pkt.index, card).toJson());    	
+    	int attackGrade = CardTable.getInstance().getCard(pkt.attackCard).grade;
+    	int defenseGrade = CardTable.getInstance().getCard(pkt.defenseCard).grade;
+    	
+    	int attackDice = BattleDiceTable.getInstance().getAttackDice(attackGrade, defenseGrade);
+    	int defenseDice = BattleDiceTable.getInstance().getDefenseDice(defenseGrade, attackGrade);
+    	
+    	//final Random = ( int sender, int attackCard, int zoneId, int attackDice, int defenseDice )
+    	
+    	notifyAll(new ServerPacketBattle(pkt.sender,pkt.attackCard,pkt.zoneId,attackDice,defenseDice).toJson());    	
     }    
 
     public void onBattleEnd(JsonNode node)
     {
     	ClientPacketBattleEnd pkt = Json.fromJson(node, ClientPacketBattleEnd.class);
     	
-    	notifyAll(new ServerPacketBattleEnd(pkt.sender,mLastBattle.charId,mLastBattle.cardId,pkt.attackwin,0,mLastBattle.zoneId).toJson());    	
+    	notifyAll(new ServerPacketBattleEnd(pkt.sender,mLastBattle.charId,mLastBattle.attackCard,pkt.attackwin,0,mLastBattle.zoneId).toJson());    	
     }
     
     public void onCardDeckUse(JsonNode node)
@@ -674,7 +713,8 @@ public class GameRoom {
     class BattleInfo {
     	public int zoneId;
     	public int charId;
-    	public int cardId;
+    	public int attackCard;
+    	public int defenseCard;
     }
     
     class BattleArena {

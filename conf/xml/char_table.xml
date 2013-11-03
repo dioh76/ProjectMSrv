@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<char_table>
+	<chars>
+		<char id="00001" hp="0" st="2"/>
+		<char id="00002" hp="2" st="0"/>
+		<char id="00003" hp="0" st="2"/>
+		<char id="00004" hp="1" st="1"/>
+	</chars>
+</char_table>

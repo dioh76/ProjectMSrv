@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<battledice_table>
+	<att_def>
+		<attack type="4">
+			<defense type="4" dice3="33" dice2="33" dice1="34" />
+			<defense type="3" dice3="33" dice2="33" dice1="34" />
+			<defense type="2" dice3="30" dice2="30" dice1="40" />
+			<defense type="1" dice3="30" dice2="30" dice1="40" />
+			<defense type="0" dice3="30" dice2="30" dice1="40" />
+		</attack>
+		<attack type="3">
+			<defense type="4" dice3="33" dice2="33" dice1="34" />
+			<defense type="3" dice3="33" dice2="33" dice1="34" />
+			<defense type="2" dice3="30" dice2="30" dice1="40" />
+			<defense type="1" dice3="30" dice2="30" dice1="40" />
+			<defense type="0" dice3="30" dice2="30" dice1="40" />
+		</attack>
+		<attack type="2">
+			<defense type="4" dice3="33" dice2="33" dice1="34" />
+			<defense type="3" dice3="33" dice2="33" dice1="34" />
+			<defense type="2" dice3="30" dice2="30" dice1="40" />
+			<defense type="1" dice3="30" dice2="30" dice1="40" />
+			<defense type="0" dice3="30" dice2="30" dice1="40" />
+		</attack>
+		<attack type="1">
+			<defense type="4" dice3="33" dice2="33" dice1="34" />
+			<defense type="3" dice3="33" dice2="33" dice1="34" />
+			<defense type="2" dice3="30" dice2="30" dice1="40" />
+			<defense type="1" dice3="30" dice2="30" dice1="40" />
+			<defense type="0" dice3="30" dice2="30" dice1="40" />
+		</attack>
+		<attack type="0">
+			<defense type="4" dice3="33" dice2="33" dice1="34" />
+			<defense type="3" dice3="33" dice2="33" dice1="34" />
+			<defense type="2" dice3="30" dice2="30" dice1="40" />
+			<defense type="1" dice3="30" dice2="30" dice1="40" />
+			<defense type="0" dice3="30" dice2="30" dice1="40" />
+		</attack>		
+	</att_def>
+	<def_att>
+		<defense type="4">
+			<attack type="4" dice3="33" dice2="33" dice1="34" />
+			<attack type="3" dice3="33" dice2="33" dice1="34" />
+			<attack type="2" dice3="30" dice2="30" dice1="40" />
+			<attack type="1" dice3="30" dice2="30" dice1="40" />
+			<attack type="0" dice3="30" dice2="30" dice1="40" />
+		</defense>
+		<defense type="3">
+			<attack type="4" dice3="33" dice2="33" dice1="34" />
+			<attack type="3" dice3="33" dice2="33" dice1="34" />
+			<attack type="2" dice3="30" dice2="30" dice1="40" />
+			<attack type="1" dice3="30" dice2="30" dice1="40" />
+			<attack type="0" dice3="30" dice2="30" dice1="40" />
+		</defense>
+		<defense type="2">
+			<attack type="4" dice3="33" dice2="33" dice1="34" />
+			<attack type="3" dice3="33" dice2="33" dice1="34" />
+			<attack type="2" dice3="30" dice2="30" dice1="40" />
+			<attack type="1" dice3="30" dice2="30" dice1="40" />
+			<attack type="0" dice3="30" dice2="30" dice1="40" />
+		</defense>
+		<defense type="1">
+			<attack type="4" dice3="33" dice2="33" dice1="34" />
+			<attack type="3" dice3="33" dice2="33" dice1="34" />
+			<attack type="2" dice3="30" dice2="30" dice1="40" />
+			<attack type="1" dice3="30" dice2="30" dice1="40" />
+			<attack type="0" dice3="30" dice2="30" dice1="40" />
+		</defense>
+		<defense type="0">
+			<attack type="4" dice3="33" dice2="33" dice1="34" />
+			<attack type="3" dice3="33" dice2="33" dice1="34" />
+			<attack type="2" dice3="30" dice2="30" dice1="40" />
+			<attack type="1" dice3="30" dice2="30" dice1="40" />
+			<attack type="0" dice3="30" dice2="30" dice1="40" />
+		</defense>		
+	</def_att>	
+</battledice_table>

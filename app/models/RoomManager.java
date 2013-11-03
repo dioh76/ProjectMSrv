@@ -119,9 +119,6 @@ public class RoomManager extends UntypedActor {
             	room.removeUser(leave.user.getUserId());
             	leave.user.setGameRoom(null);
             	
-            	if(room.isEmpty())
-            		mRooms.remove(room.getRoomId());
-            	
             	//If user leave, notify others
             	//leave.user.SendPacket(new LeaveMsg(room.getRoomId()).toJson());
             }
@@ -155,12 +152,12 @@ public class RoomManager extends UntypedActor {
 	{
 		synchronized(mRooms)
 		{
-			Logger.info("room count="+mRooms.size());
+			Logger.info("room count="+mRooms.size() + ", join ="+mJoinRooms.size());
 			ArrayList<Long> removes = new ArrayList<Long>();
 			for(GameRoom room : mRooms.values())
 			{
 				room.Update(currentmillisec);
-				if( room.isEmpty() && room.isPlaying() )
+				if(room.isEmpty() && room.isPlaying())
 					removes.add(room.getRoomId());
 			}
 			

@@ -41,6 +41,7 @@ public class ServerPacket
 	//for server only
 	public static final int MSP_INIT_ZONE = 1400;
 	public static final int MSP_CHAR_REMOVE = 1401;
+	public static final int MSP_GAME_READY = 1402;
 	
 	public int proto;
 	public int sender;

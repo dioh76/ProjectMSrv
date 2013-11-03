@@ -6,10 +6,6 @@ import java.io.*;
 import java.util.*;
 
 import org.w3c.dom.*;
-
-import play.api.Play;
-import play.api.Application;
-import play.*;
 import play.libs.XML;
 
 public class CardTable {

@@ -9,7 +9,7 @@ public class ServerPacketCharRemove extends ServerPacket{
 	public ServerPacketCharRemove( int sender, long userId )
 	{
 		this.sender = sender;
-		this.proto = ServerPacket.MSP_CHAR_ADD;
+		this.proto = ServerPacket.MSP_CHAR_REMOVE;
 		this.userId = userId;
 	}
 }
