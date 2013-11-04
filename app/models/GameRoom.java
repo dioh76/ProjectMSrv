@@ -24,11 +24,12 @@ public class GameRoom {
 	
 	private List<User> mUsers = new ArrayList<User>();
 	private SortedMap<Integer, SrvCharacter> mCharacters = new TreeMap<Integer, SrvCharacter>();
+	private List<Integer> mCharIds = null;
 	
 	//common
 	private long mCreatedTime = 0;
 	
-	private int mStartCharIndex = 0;
+	private int mStartCharId = 0;
 	private int mLastCharId = 0;
 	private int mCurrentTurn = 0;
 	
@@ -106,18 +107,8 @@ public class GameRoom {
 		{
 			mUsers.add(user);
 		}
-		
-		//initialize map for this user
-		user.SendPacket(new ServerPacketInitZone(0, maporders).toJson());
-		
-		for( SrvCharacter chr : mCharacters.values())
-		{
-			user.SendPacket(new ServerPacketCharAdd(chr.charId, chr.userId, chr.charId, chr.charType, chr.userName, true).toJson());
-		}
     	
 		addCharacter(user);
-		
-		//send existing character
 	}
 	
 	public void addCharacter(User user)
@@ -136,19 +127,15 @@ public class GameRoom {
     		mCharacters.put(chr.charId, chr);
     		if(mCharacters.size() == mMaxUser) isFull = true;
     	}
-    	
-    	//notify addchar for all
-    	notifyAll(new ServerPacketCharAdd(chr.charId, user.getUserId(), chr.charId, chr.charType, user.getName(), true).toJson());
-    	
+    		
     	if(isFull)
     	{
-    		notifyAll(new ServerPacketGameReady(0).toJson());
+    		initGame();
     	}
 	}
 	
 	public void addRandomAICharacter(int count)
 	{
-		boolean isFull = false;
 		
 		for( int i = 0; i < count; i++)
 		{
@@ -164,17 +151,8 @@ public class GameRoom {
 	    	synchronized(mCharacters)
 	    	{
 	    		mCharacters.put(chr.charId, chr);
-	    		if(mCharacters.size() == mMaxUser) isFull = true;
 	    	}
-	    	
-	    	//notify addchar for all
-	    	notifyAll(new ServerPacketCharAdd(chr.charId, randomUserId, chr.charId, chr.charType, chr.userName, false).toJson());
 		}
-		
-		if(isFull)
-    	{
-    		notifyAll(new ServerPacketGameReady(0).toJson());
-    	}
 	}
     
     public synchronized User removeUser( long userId )
@@ -202,9 +180,36 @@ public class GameRoom {
     	for(Integer charId : removes)
     	{
     		mCharacters.remove(charId);
+    		mCharIds.remove(charId);
     	}
     	
     	return user;
+    }
+    
+    private void initGame()
+    {
+    	
+    	RoomManager.ready(this.getRoomId());
+    	
+		if(mCharacters.size() < 4)
+    	{
+			Logger.info("ai player will be added randomly");
+			addRandomAICharacter(4 - mCharacters.size());
+    	}
+    	
+    	//initialize map for this user
+    	notifyAll(new ServerPacketInitZone(0, maporders).toJson());
+    	
+    	//init char
+		
+		for( SrvCharacter chr : mCharacters.values())
+		{
+			notifyAll(new ServerPacketCharAdd(chr.charId, chr.userId, chr.charId, chr.charType, chr.userName, chr.userChar).toJson());
+		}
+		
+		mCharIds = new ArrayList<Integer>(mCharacters.keySet());
+		
+		notifyAll(new ServerPacketGameReady(0).toJson());
     }
     
     public void processPacket( int protocol, JsonNode node )
@@ -247,7 +252,11 @@ public class GameRoom {
     {
     	if(mCreatedTime + 5000 < System.currentTimeMillis())
     	{
-    		autoStart();
+    		if(isPlaying() == false )
+    		{
+    			setPlaying(true);
+    			initGame();
+    		}
     	}
     }
     
@@ -259,22 +268,6 @@ public class GameRoom {
         	WebSocket.Out<JsonNode> channel = mUsers.get(i).getChannel();
             channel.write(node);
         }
-    }
-    
-    private void autoStart()
-    {
-    	if(isPlaying() == false )
-		{
-    		Logger.info("ai player will be added randomly");
-    		
-			setPlaying(true);
-			RoomManager.ready(this.getRoomId());
-			
-			if(mCharacters.size() < 4)
-	    	{
-				addRandomAICharacter(4 - mCharacters.size());
-	    	}	    	
-		}
     }
     
     //Packet Handle
@@ -330,9 +323,10 @@ public class GameRoom {
     	if( allready )
     	{
     		final Random random = new Random();
-    		mStartCharIndex = random.nextInt(mCharacters.size());
     		
-    		notifyAll(new ServerPacketGameStart(pkt.sender, mStartCharIndex).toJson());
+			mStartCharId = mCharIds.get(random.nextInt(mCharacters.size())).intValue();
+    		
+			notifyAll(new ServerPacketGameStart(pkt.sender, mStartCharId).toJson());
     	}
     }        
     
@@ -394,6 +388,20 @@ public class GameRoom {
     	
     	mLastCharId = pkt.sender;
     	
+    	//ArrayList<Integer> charIds = new ArrayList<Integer>(mCharacters.keySet());
+    	int nextIndex = 0;
+		for(int i=0; i < mCharIds.size(); i++)
+		{
+			if( mCharIds.get(i) == mLastCharId )
+			{
+				if( i+1 <= mCharIds.size() - 1 )
+					nextIndex = i+1;
+				break;
+			}
+		}
+		
+		int nextCharId = mCharIds.get(nextIndex);
+    	
     	boolean roundover = false;
     	if(pkt.doubledice == false)
     	{
@@ -406,7 +414,7 @@ public class GameRoom {
     		}
     	}
     	
-    	notifyAll(new ServerPacketCharTurnOver(pkt.sender,pkt.doubledice,roundover,mStartCharIndex).toJson());   	
+    	notifyAll(new ServerPacketCharTurnOver(pkt.sender,pkt.doubledice,roundover,nextCharId).toJson());   	
     }
     
     private void onCharAddBuff(JsonNode node)
@@ -604,23 +612,16 @@ public class GameRoom {
     		}
     		
     		if(allready)
-    		{
-    			int nextcharId = 0;
-    			
+    		{		
     			synchronized(mCharacters)
     			{
     				for( SrvCharacter srvChr : mCharacters.values() )
-        	    		srvChr.discardcard = false;
-    				
-        			//If start index is changed
-        			if(mCharacters.size() <= mStartCharIndex)
-        				mStartCharIndex = mCharacters.size() - 1;
-        			
-        			ArrayList<Integer> charIds = new ArrayList<Integer>(mCharacters.keySet());
-        			nextcharId = charIds.get(mStartCharIndex).intValue();
+        	    		srvChr.discardcard = false;        		
     			}
     			
-    			notifyAll(new ServerPacketRoundOver(pkt.sender,nextcharId).toJson());
+    			//Check if start char is changed
+    			
+    			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
     		}
     	}
     }

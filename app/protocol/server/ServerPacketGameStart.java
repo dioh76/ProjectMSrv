@@ -4,12 +4,12 @@ import protocol.ServerPacket;
 
 public class ServerPacketGameStart extends ServerPacket{
 
-	public int startIdx;
+	public int starter;
 	
-	public ServerPacketGameStart( int sender, int startIdx )
+	public ServerPacketGameStart( int sender, int starter )
 	{
 		this.sender = sender;
 		this.proto = ServerPacket.MSP_GAME_START;
-		this.startIdx = startIdx;
+		this.starter = starter;
 	}
 }
