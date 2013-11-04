@@ -221,6 +221,7 @@ public class GameRoom {
     	case ClientPacket.MCP_CHAR_PASSBY_START: onCharPassByStart(node); break;
     	case ClientPacket.MCP_CHAR_TURN_OVER: onCharTurnOver(node); break;
     	case ClientPacket.MCP_CHAR_ADD_BUFF: onCharAddBuff(node); break;
+    	case ClientPacket.MCP_CHAR_MOVE_BYSPELL: onCharMoveBySpell(node); break;
     	case ClientPacket.MCP_SPELL_OPEN: onSpellOpen(node); break;
     	case ClientPacket.MCP_SPELL_REQ_USE: onSpellReqUse(node); break;
     	case ClientPacket.MCP_SPELLUSE: onSpellUse(node); break;
@@ -443,6 +444,13 @@ public class GameRoom {
     	chr.mBuffs.add(buff);
     	
     	notifyAll(new ServerPacketCharAddBuff(pkt.sender,objectId,pkt.bufftype,pkt.targetvalue,pkt.targetchar,pkt.targetzone,pkt.remainturn,pkt.creature,pkt.spellid).toJson());   	
+    }
+    
+    private void onCharMoveBySpell(JsonNode node)
+    {
+    	ClientPacketCharMoveBySpell pkt = Json.fromJson(node, ClientPacketCharMoveBySpell.class);
+    	
+    	notifyAll(new ServerPacketCharMoveBySpell(pkt.sender,pkt.move,pkt.reverse,pkt.bonus).toJson());       	
     }
     
     private void onSpellOpen(JsonNode node)

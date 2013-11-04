@@ -20,6 +20,7 @@ public class ServerPacket
 	public static final int MSP_CHAR_ADD_BUFF = 1111;
 	public static final int MSP_CHAR_DEL_BUFF = 1112;
 	public static final int MSP_ROUND_OVER = 1113;
+	public static final int MSP_CHAR_MOVE_BYSPELL = 1114;
 	public static final int MSP_SPELL_OPEN = 1200;
 	public static final int MSP_SPELL_REQ_USE = 1201;
 	public static final int MSP_SPELLUSE = 1202;
