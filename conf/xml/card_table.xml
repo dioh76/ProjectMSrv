@@ -9,6 +9,7 @@
 		<card id="13002" name="오크 워리어" grade="3" type="1" hp="30" st="45" model="character/npc10001" atlas="Creature" spr="CD_01"/>
 		<card id="14001" name="레드 드래곤" grade="4" type="1" hp="35" st="50" model="character/npc10001" atlas="Creature" spr="CC_01"/>
 		<card id="20001" name="스켈레톤" grade="0" type="2" hp="30" st="10" model="character/npc40001" atlas="Creature" spr="CB_01"/>
+		<card id="20002" name="고블린" grade="0" type="2" hp="10" st="15" model="character/npc20001" atlas="Creature" spr="CA_01"/>
 		<card id="21001" name="파이어 스켈레톤" grade="1" type="2" hp="35" st="15" model="character/npc40001" atlas="Creature" spr="CA_01"/>
 		<card id="22001" name="포이즌 스켈레톤" grade="2" type="2" hp="40" st="20" model="character/npc40001" atlas="Creature" spr="CS_01"/>
 		<card id="23001" name="스켈레톤 킹" grade="3" type="2" hp="45" st="30" model="character/npc40001" atlas="Creature" spr="CD_01"/>
