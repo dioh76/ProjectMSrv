@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<game_rule>
+	<char soul="300" />
+	<bonus start="50" />
+	<gameend maxturn="30" />
+</game_rule>

@@ -19,8 +19,9 @@ public class ServerPacket
 	public static final int MSP_CHAR_TURN_OVER = 1110;
 	public static final int MSP_CHAR_ADD_BUFF = 1111;
 	public static final int MSP_CHAR_DEL_BUFF = 1112;
-	public static final int MSP_ROUND_OVER = 1113;
-	public static final int MSP_CHAR_MOVE_BYSPELL = 1114;
+	public static final int MSP_CHAR_MOVE_BYSPELL = 1113;
+	public static final int MSP_ROUND_DISCARD = 1114;		
+	public static final int MSP_ROUND_OVER = 1115;
 	public static final int MSP_SPELL_OPEN = 1200;
 	public static final int MSP_SPELL_REQ_USE = 1201;
 	public static final int MSP_SPELLUSE = 1202;
@@ -40,6 +41,8 @@ public class ServerPacket
 	public static final int MSP_EVENT_ARENA_REWARD = 1308;
 	public static final int MSP_EQUIP_SPELL_USE = 1309;
 	public static final int MSP_EQUIP_SPELL_USE_REPLY = 1310;
+	public static final int MSP_SERVER_DISCONNECT = 1311; // not used in server
+	public static final int MSP_GAME_OVER = 1312;
 	//for server only
 	public static final int MSP_INIT_ZONE = 1400;
 	public static final int MSP_CHAR_REMOVE = 1401;

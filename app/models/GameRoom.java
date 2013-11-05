@@ -9,6 +9,7 @@ import protocol.server.*;
 import xml.BattleDiceTable;
 import xml.CardTable;
 import xml.CharTable;
+import xml.GameRule;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -32,6 +33,7 @@ public class GameRoom {
 	private int mStartCharId = 0;
 	private int mLastCharId = 0;
 	private int mCurrentTurn = 0;
+	private int mCurrentRound = 0;
 	
 	private SpellUsed mLastSpellUsed;
 	private BattleInfo mLastBattle;
@@ -120,7 +122,8 @@ public class GameRoom {
 		if(charInfo != null)
 			charType = charInfo.charType;
 		
-		SrvCharacter chr = new SrvCharacter(user.getUserId(), getNewCharId(), charType, user.getName(), true, 300, false );
+		float initSoul = GameRule.getInstance().CHAR_INIT_SOUL;
+		SrvCharacter chr = new SrvCharacter(user.getUserId(), getNewCharId(), charType, user.getName(), true, initSoul, false );
     	
     	synchronized(mCharacters)
     	{
@@ -180,7 +183,7 @@ public class GameRoom {
     	for(Integer charId : removes)
     	{
     		mCharacters.remove(charId);
-    		mCharIds.remove(charId);
+    		if( mCharIds != null ) mCharIds.remove(charId);
     	}
     	
     	return user;
@@ -208,6 +211,7 @@ public class GameRoom {
 		}
 		
 		mCharIds = new ArrayList<Integer>(mCharacters.keySet());
+		mCurrentRound = 1;
 		
 		notifyAll(new ServerPacketGameReady(0).toJson());
     }
@@ -362,7 +366,15 @@ public class GameRoom {
     {
     	ClientPacketCharPassByStart pkt = Json.fromJson(node, ClientPacketCharPassByStart.class);
     	
-    	notifyAll(new ServerPacketCharPassByStart(pkt.sender).toJson());   	
+    	notifyAll(new ServerPacketCharPassByStart(pkt.sender).toJson());
+    	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	
+    	if( chr == null )
+    		return;
+    	
+    	chr.soul += GameRule.getInstance().BOUNS_START_SOUL;
+    	notifyAll(new ServerPacketCharAddSoul(pkt.sender, chr.soul, false).toJson());  
     }
     
     private void onCharTurnOver(JsonNode node)
@@ -414,7 +426,21 @@ public class GameRoom {
     		}
     	}
     	
-    	notifyAll(new ServerPacketCharTurnOver(pkt.sender,pkt.doubledice,roundover,nextCharId).toJson());   	
+    	if(roundover)
+    	{
+    		if( mCurrentRound == GameRule.getInstance().GAMEEND_MAX_TURN)
+    		{
+    			notifyAll(new ServerPacketGameOver(pkt.sender).toJson());
+    		}
+    		else
+    		{
+    			notifyAll(new ServerPacketRoundDiscard(pkt.sender).toJson());
+    		}
+    	}
+    	else
+    	{
+    		notifyAll(new ServerPacketCharTurnOver(pkt.sender,pkt.doubledice,roundover,nextCharId).toJson());
+    	}
     }
     
     private void onCharAddBuff(JsonNode node)
@@ -620,6 +646,7 @@ public class GameRoom {
     			}
     			
     			//Check if start char is changed
+    			mCurrentRound++;
     			
     			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
     		}

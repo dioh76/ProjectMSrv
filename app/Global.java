@@ -11,12 +11,14 @@ import system.TimeUtil;
 import xml.BattleDiceTable;
 import xml.CardTable;
 import xml.CharTable;
+import xml.GameRule;
 
 public class Global extends GlobalSettings {
 	  @Override
 	  public void onStart(Application app) {
 	    Logger.info("ProjectMSrv has started");
 	    
+	    GameRule.getInstance().init(app.resourceAsStream("xml/game_rule.xml"));
 	    CharTable.getInstance().init(app.resourceAsStream("xml/char_table.xml"));
 	    CardTable.getInstance().initCard(app.resourceAsStream("xml/card_table.xml"));
 	    CardTable.getInstance().initEvent(app.resourceAsStream("xml/card_eventzone.xml"));
