@@ -3,6 +3,8 @@ package game;
 import java.util.ArrayList;
 import java.util.List;
 
+import xml.SpellTable;
+
 public class SrvCharacter {
 
 	public long 	userId;
@@ -15,6 +17,7 @@ public class SrvCharacter {
 	public boolean	discardcard;
 	
 	public List<Buff> mBuffs;
+	public List<Integer> mEquipSpells;
 	
 	public SrvCharacter(long userId, int charId, int charType, String userName, boolean userChar, float soul, boolean checkdirection)
 	{
@@ -29,5 +32,39 @@ public class SrvCharacter {
 		this.discardcard = false; 
 		
 		mBuffs = new ArrayList<Buff>();
+		mEquipSpells = new ArrayList<Integer>();
+	}
+	
+	public boolean hasEquipSpell(int spellType)
+	{
+		for(int spellId : mEquipSpells)
+		{
+			SpellInfo info = SpellTable.getInstance().getSpell(spellId);
+			if(info.spellType == spellType)
+				return true;
+		}
+		
+		return false;
+	}
+	
+	public int removeEquipSpell(int spellType)
+	{
+		for(int i=0; i< mEquipSpells.size(); i++)
+		{
+			int spellId = mEquipSpells.get(i);
+			SpellInfo info = SpellTable.getInstance().getSpell(spellId);
+			if(info.spellType == spellType)
+			{
+				mEquipSpells.remove(i);
+				return spellId;
+			}
+		}
+		
+		return -1;
+	}
+	
+	public boolean removeEquipSpellId(int spellId)
+	{
+		return mEquipSpells.remove(new Integer(spellId));
 	}
 }

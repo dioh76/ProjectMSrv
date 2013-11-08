@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<spell_table>
+	<spells>
+		<spell id="1" name="홀리워드" type="0" value="1" value2="0" target="2" target2="0" use="1" img="spell/card1" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_megami"/>
+		<spell id="2" name="홀리워드_리버스" type="0" value="-1" value2="0" target="2" target2="0" use="1" img="spell/card2" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_megami"/>
+		<spell id="3" name="리콜" type="1" value="0" value2="0" target="0" target2="0" use="0" img="spell/card3" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_teleport"/>
+		<spell id="4" name="나무방패" type="2" value="50" value2="0" target="0" target2="1" use="2" img="spell/card4" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_w_shield"/>
+		<spell id="5" name="황금방패" type="2" value="100" value2="0" target="0" target2="1" use="2" img="spell/card5" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_g_shield"/>
+		<spell id="6" name="매직 볼트" type="3" value="50" value2="0" target="1" target2="1" use="0" img="spell/card6" hiteffect="effect/skill/Lightning" bufeffect="effect/skill/test_loop" sound="spell_thunder"/>
+		<spell id="7" name="여신의 가호" type="4" value="100" value2="0" target="0" target2="1" use="0" img="spell/card7" hiteffect="effect/skill/fieryHolly" bufeffect="effect/skill/test_loop" sound="spell_holy"/>
+		<spell id="8" name="텔레포트" type="6" value="0" value2="0" target="0" target2="0" use="0" img="spell/card8" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_teleport"/>
+		<spell id="9" name="소울헌터" type="7" value="20" value2="0" target="0" target2="0" use="0" img="spell/card9" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_hunter"/>
+		<spell id="10" name="광대의 조롱" type="8" value="0" value2="0" target="3" target2="1" use="0" img="spell/card10" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_sneer"/>
+		<spell id="11" name="토르의 망치" type="9" value="0" value2="0" target="1" target2="1" use="0" img="spell/card11" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_hammer"/>
+		<spell id="12" name="어스퀘이크" type="10" value="1" value2="0" target="1" target2="1" use="0" img="spell/card12" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_earth"/>
+		<spell id="13" name="마법방패" type="17" value="0" value2="0" target="0" target2="0" use="2" img="spell/card12" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_m_shield"/>
+		<spell id="14" name="메뚜기떼 습격" type="11" value="20" value2="0" target="0" target2="0" use="0" img="spell/card12" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_grasshopper"/>
+		<spell id="15" name="고블린" type="12" value="20002" value2="0" target="1" target2="1" use="0" img="spell/card12" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_sneer"/>
+		<spell id="16" name="슬로우워크" type="13" value="6" value2="0" target="1" target2="0" use="0" img="spell/card12" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_slow"/>
+		<spell id="17" name="카오스패닉" type="14" value="0" value2="0" target="1" target2="0" use="0" img="spell/card12" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_chaos"/>
+		<spell id="18" name="리치맨" type="15" value="200" value2="-1" target="0" target2="1" use="0" img="spell/card12" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_richman"/>
+		<spell id="19" name="블리자드" type="15" value="50" value2="5" target="1" target2="1" use="0" img="spell/card12" hiteffect="effect/skill/meteo" bufeffect="effect/skill/test_loop" sound="spell_blizzard"/>
+		<spell id="20" name="석화" type="16" value="1" value2="0" target="2" target2="0" use="0" img="spell/card12" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_stone"/>
+		<spell id="1000" name="포탈" type="5" value="-1" value2="0" target="0" target2="1" use="1" img="spell/card1000" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_teleport"/>
+		<spell id="1001" name="배틀아레나(디버프)" type="3" value="75" value2="0" target="1" target2="1" use="0" img="spell/card6" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_thunder"/>
+		<spell id="1002" name="배틀아레나(버프)" type="4" value="125" value2="0" target="1" target2="1" use="0" img="spell/card7" hiteffect="effect/skill/test_once" bufeffect="effect/skill/test_loop" sound="spell_holy"/>
+	</spells>
+</spell_table>

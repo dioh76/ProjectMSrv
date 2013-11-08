@@ -10,6 +10,7 @@ import xml.BattleDiceTable;
 import xml.CardTable;
 import xml.CharTable;
 import xml.GameRule;
+import xml.SpellTable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -40,6 +41,7 @@ public class GameRoom {
 	private BattleArena mLastBattleArena;
 	
 	private List<Integer> maporders;
+	private List<Integer> mSpellCards;
 
 	private int mCharIdSeq = 100;
 	
@@ -111,6 +113,20 @@ public class GameRoom {
 		}
     	
 		addCharacter(user);
+	}
+	
+	public User getUser(long userId)
+	{
+		synchronized(mUsers)
+		{
+			for(User user : mUsers)
+			{
+				if(user.getUserId() == userId)
+					return user;
+			}
+		}
+		
+		return null;
 	}
 	
 	public void addCharacter(User user)
@@ -213,7 +229,24 @@ public class GameRoom {
 		mCharIds = new ArrayList<Integer>(mCharacters.keySet());
 		mCurrentRound = 1;
 		
+		//init spell card
+		initSpellCards();
+		
 		notifyAll(new ServerPacketGameReady(0).toJson());
+    }
+    
+    private void initSpellCards()
+    {
+    	mSpellCards = new ArrayList<Integer>();
+    	Iterator<Integer> spellCards = SpellTable.getInstance().getInitSpellCards();
+    	while(spellCards.hasNext())
+    	{
+    		int spellId = spellCards.next();
+    		if(spellId < SpellInfo.SYSTEM_SPELL_CARDNUM)
+    			mSpellCards.add(spellId);
+    	}
+    	
+    	Collections.shuffle(mSpellCards);
     }
     
     public void processPacket( int protocol, JsonNode node )
@@ -491,7 +524,12 @@ public class GameRoom {
     {
     	ClientPacketSpellOpen pkt = Json.fromJson(node, ClientPacketSpellOpen.class);
     	
-    	notifyAll(new ServerPacketSpellOpen(pkt.sender).toJson());   	
+    	if(mSpellCards.size() == 0)
+    		initSpellCards();
+    	
+    	int spellId = mSpellCards.remove(0);
+    	
+    	notifyAll(new ServerPacketSpellOpen(pkt.sender,spellId).toJson());   	
     }
     
     private void onSpellReqUse(JsonNode node)
@@ -507,7 +545,35 @@ public class GameRoom {
     	
     	mLastSpellUsed = new SpellUsed(pkt.sender, pkt.spellid, pkt.targetchar, pkt.targetzone, pkt.targetzone2);
     	
-    	notifyAll(new ServerPacketSpellUse(pkt.sender, pkt.spellid, pkt.targetchar, pkt.targetzone, pkt.targetzone2).toJson());   	
+    	SpellInfo spellInfo = SpellTable.getInstance().getSpell(pkt.spellid);
+    	
+    	if(spellInfo == null)
+    		return;
+    	
+    	//exclusive for grasshopper attack all
+    	if(pkt.targetchar != -1 && pkt.sender != pkt.targetchar && spellInfo.spellType != SpellInfo.SPELL_ATTACKALL)
+    	{
+    		SrvCharacter chr = mCharacters.get(pkt.targetchar);
+    		if(chr == null)
+    			return;
+    		
+    		if(chr.hasEquipSpell(SpellInfo.SPELL_IMMUNE))
+    		{
+    			
+    			User user = getUser(chr.userId);
+    			if(user != null)
+    				user.SendPacket(new ServerPacketSpellDefense(chr.charId,chr.charId).toJson());
+
+    		}
+    		else
+    		{
+    			notifyAll(new ServerPacketSpellUse(pkt.sender, pkt.spellid, pkt.targetchar, pkt.targetzone, pkt.targetzone2).toJson());
+    		}
+    	}
+    	else
+    	{
+    		notifyAll(new ServerPacketSpellUse(pkt.sender, pkt.spellid, pkt.targetchar, pkt.targetzone, pkt.targetzone2).toJson());
+    	}   	
     }
     
     private void onSpellDefense(JsonNode node)
@@ -521,6 +587,12 @@ public class GameRoom {
     {
     	ClientPacketSpellEquip pkt = Json.fromJson(node, ClientPacketSpellEquip.class);
     	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if(chr == null)
+    		return;
+    	
+    	chr.mEquipSpells.add(pkt.spellid);
+    	
     	notifyAll(new ServerPacketSpellEquip(pkt.sender, pkt.spellid).toJson());   	
     }
     
@@ -530,6 +602,20 @@ public class GameRoom {
     	
     	if(mLastSpellUsed != null)
     	{
+    		if(pkt.use == true)
+    		{
+    			SrvCharacter chr = mCharacters.get(pkt.sender);
+    			if(chr == null)
+    				return;
+    			
+    			int removeSpellId = chr.removeEquipSpell(SpellInfo.SPELL_IMMUNE);
+    			if(removeSpellId != -1)
+    			{
+    				notifyAll(new ServerPacketEquipSpellRemove(pkt.sender,removeSpellId).toJson());
+    			}
+    			
+    		}
+    		
     		notifyAll(new ServerPacketSpellDefenseReply(pkt.sender, pkt.defender, mLastSpellUsed.spellId, mLastSpellUsed.targetchar, mLastSpellUsed.targetzone, mLastSpellUsed.targetzone2, pkt.use).toJson());	
     	}   	
     }
@@ -734,6 +820,16 @@ public class GameRoom {
     public void onEquipSpellUseReply(JsonNode node)
     {
     	ClientPacketEquipSpellUseReply pkt = Json.fromJson(node, ClientPacketEquipSpellUseReply.class);
+    	
+    	if(pkt.use == true)
+    	{
+
+			SrvCharacter chr = mCharacters.get(pkt.sender);
+			if(chr == null)
+				return;
+			
+			chr.removeEquipSpellId(pkt.spellId);
+    	}
     	
     	notifyAll(new ServerPacketEquipSpellUseReply(pkt.sender,pkt.spellId,mLastBattle.zoneId,pkt.use).toJson());    	   	
     }

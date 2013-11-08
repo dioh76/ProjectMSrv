@@ -43,6 +43,7 @@ public class ServerPacket
 	public static final int MSP_EQUIP_SPELL_USE_REPLY = 1310;
 	public static final int MSP_SERVER_DISCONNECT = 1311; // not used in server
 	public static final int MSP_GAME_OVER = 1312;
+	public static final int MSP_EQUIP_SPELL_REMOVE = 1313;
 	//for server only
 	public static final int MSP_INIT_ZONE = 1400;
 	public static final int MSP_CHAR_REMOVE = 1401;

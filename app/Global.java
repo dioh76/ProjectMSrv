@@ -12,6 +12,7 @@ import xml.BattleDiceTable;
 import xml.CardTable;
 import xml.CharTable;
 import xml.GameRule;
+import xml.SpellTable;
 
 public class Global extends GlobalSettings {
 	  @Override
@@ -22,6 +23,7 @@ public class Global extends GlobalSettings {
 	    CharTable.getInstance().init(app.resourceAsStream("xml/char_table.xml"));
 	    CardTable.getInstance().initCard(app.resourceAsStream("xml/card_table.xml"));
 	    CardTable.getInstance().initEvent(app.resourceAsStream("xml/card_eventzone.xml"));
+	    SpellTable.getInstance().init(app.resourceAsStream("xml/spell_table.xml"));
 	    BattleDiceTable.getInstance().init(app.resourceAsStream("xml/battledice_table.xml"));
 	    
 	    RoomManager.defaultRoomManager = Akka.system().actorOf(Props.create(RoomManager.class));
