@@ -110,6 +110,18 @@ public class GameRoom {
 		synchronized(mUsers)
 		{
 			mUsers.add(user);
+			
+			user.SendPacket(new ServerPacketGameJoin(0,user.getUserId(),user.getName(),mMaxUser,mUsers.size()==1 ? true:false).toJson());
+			
+			ArrayList<Long> userIds = new ArrayList<Long>();
+			ArrayList<String> userNames = new ArrayList<String>();
+			for(User u : mUsers)
+			{
+				userIds.add(u.getUserId());
+				userNames.add(u.getName());
+			}
+			
+			notifyAll(new ServerPacketUserList(0,userIds,userNames).toJson());
 		}
     	
 		addCharacter(user);
@@ -133,10 +145,13 @@ public class GameRoom {
 	{
 		boolean isFull = false;
 		
+		
 		int charType = 1;
 		CharInfo charInfo = CharTable.getInstance().randomChar();		
 		if(charInfo != null)
 			charType = charInfo.charType;
+		
+		charType = mCharacters.size() + 1;
 		
 		float initSoul = GameRule.getInstance().CHAR_INIT_SOUL;
 		SrvCharacter chr = new SrvCharacter(user.getUserId(), getNewCharId(), charType, user.getName(), true, initSoul, false );
@@ -149,7 +164,7 @@ public class GameRoom {
     		
     	if(isFull)
     	{
-    		initGame();
+    		initGame(false);
     	}
 	}
 	
@@ -164,6 +179,8 @@ public class GameRoom {
 			CharInfo charInfo = CharTable.getInstance().randomChar();		
 			if(charInfo != null)
 				charType = charInfo.charType;
+			
+			charType = mCharacters.size() + 1;
 			
 			SrvCharacter chr = new SrvCharacter(randomUserId, getNewCharId(), charType, "AIPlayer"+(i+1), false, 300, false );
 	    	
@@ -205,12 +222,12 @@ public class GameRoom {
     	return user;
     }
     
-    private void initGame()
+    private void initGame(boolean useAI)
     {
     	
     	RoomManager.ready(this.getRoomId());
     	
-		if(mCharacters.size() < 4)
+		if(useAI == true && mCharacters.size() < 4)
     	{
 			Logger.info("ai player will be added randomly");
 			addRandomAICharacter(4 - mCharacters.size());
@@ -282,19 +299,12 @@ public class GameRoom {
     	case ClientPacket.MCP_EVENT_ARENA_REWARD: onEventArenaReward(node); break;
     	case ClientPacket.MCP_EQUIP_SPELL_USE: onEquipSpellUse(node); break;
     	case ClientPacket.MCP_EQUIP_SPELL_USE_REPLY: onEquipSpellUseReply(node); break;
+    	case ClientPacket.MCP_GAME_READY: onGameReady(node); break;
     	}
     }
     
     public synchronized void Update(long currentmillisec)
     {
-    	if(mCreatedTime + 5000 < System.currentTimeMillis())
-    	{
-    		if(isPlaying() == false )
-    		{
-    			setPlaying(true);
-    			initGame();
-    		}
-    	}
     }
     
     // Send a Json event to all members
@@ -832,6 +842,17 @@ public class GameRoom {
     	}
     	
     	notifyAll(new ServerPacketEquipSpellUseReply(pkt.sender,pkt.spellId,mLastBattle.zoneId,pkt.use).toJson());    	   	
+    }
+    
+    public void onGameReady(JsonNode node)
+    {
+    	ClientPacketGameReady pkt = Json.fromJson(node, ClientPacketGameReady.class);
+    	
+    	if(isPlaying() == false )
+		{
+			setPlaying(true);
+			initGame(pkt.useAI);
+		}
     }
     
     // -- Messages

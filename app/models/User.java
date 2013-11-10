@@ -72,8 +72,6 @@ public class User implements Callback<JsonNode>,Callback0 {
 			if( protocol == ClientPacket.MCP_GAME_JOIN )
 			{
 				ClientPacketGameJoin packet = Json.fromJson(recvmsg, ClientPacketGameJoin.class);
-				//reply firstly
-				SendPacket(new ServerPacketGameJoin(0,getUserId(),packet.maxuser).toJson());
 				
 				RoomManager.join(this, packet.maxuser);
 			}
