@@ -122,6 +122,9 @@ public class GameRoom {
 			}
 			
 			notifyAll(new ServerPacketUserList(0,userIds,userNames).toJson());
+			
+	    	//initialize map for this user when user joins
+	    	notifyAll(new ServerPacketInitZone(0, maporders).toJson());
 		}
     	
 		addCharacter(user);
@@ -232,9 +235,6 @@ public class GameRoom {
 			Logger.info("ai player will be added randomly");
 			addRandomAICharacter(4 - mCharacters.size());
     	}
-    	
-    	//initialize map for this user
-    	notifyAll(new ServerPacketInitZone(0, maporders).toJson());
     	
     	//init char
 		

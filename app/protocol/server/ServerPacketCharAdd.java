@@ -9,7 +9,6 @@ public class ServerPacketCharAdd extends ServerPacket{
 	public int		charType;
 	public String 	name;
 	public boolean	userChar;
-	public boolean	wait;
 	
 	public ServerPacketCharAdd( int sender, long userId, int charId, int charType, String name, boolean userChar )
 	{
@@ -20,6 +19,5 @@ public class ServerPacketCharAdd extends ServerPacket{
 		this.charType = charType;
 		this.name = name;
 		this.userChar = userChar;
-		this.wait = true;
 	}
 }
