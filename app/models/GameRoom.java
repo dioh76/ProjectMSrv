@@ -11,6 +11,7 @@ import xml.CardTable;
 import xml.CharTable;
 import xml.GameRule;
 import xml.SpellTable;
+import xml.ZoneTable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -27,6 +28,7 @@ public class GameRoom {
 	private List<User> mUsers = new ArrayList<User>();
 	private SortedMap<Integer, SrvCharacter> mCharacters = new TreeMap<Integer, SrvCharacter>();
 	private List<Integer> mCharIds = null;
+	private List<ZoneInfo> mZones = new ArrayList<ZoneInfo>();
 	
 	//common
 	private long mCreatedTime = 0;
@@ -53,10 +55,12 @@ public class GameRoom {
 		mMaxUser = maxuser;
 		
 		maporders = new ArrayList<Integer>();
-		maporders.add(Race.HUMAN);
-		maporders.add(Race.DEVIL);
-		maporders.add(Race.ANGEL);
+		maporders.add(ZoneInfo.ZONE_RACE_HUMAN);
+		maporders.add(ZoneInfo.ZONE_RACE_DEVIL);
+		maporders.add(ZoneInfo.ZONE_RACE_ANGEL);
 		Collections.shuffle(maporders);
+		
+		initZones();
 	}
 	
 	public long getRoomId()
@@ -225,6 +229,43 @@ public class GameRoom {
     	return user;
     }
     
+    private void initZones()
+    {
+    	List<Integer> raceTypes = new ArrayList<Integer>();
+    	
+    	raceTypes.addAll(maporders);
+    	raceTypes.add(0, ZoneInfo.ZONE_RACE_NONE);
+    	raceTypes.add(ZoneInfo.NEUTRAL_ZONE_INDEX,ZoneInfo.ZONE_RACE_NEUTRAL);
+    	
+    	int[] raceIndex = new int[]{0,0,0,0,0};
+    	int[] raceAdvancedIndex = new int[]{3,3,3,3,3};
+    	
+    	for(int i = 0; i < ZoneTable.getInstance().getZoneCount(); i++)
+    	{
+    		ZonePosInfo posInfo = ZoneTable.getInstance().getZonePosInfo(i);
+    		
+    		int race = raceTypes.get(posInfo.group);
+    		
+    		ZoneInfo zoneInfo = new ZoneInfo(posInfo.id);
+    		zoneInfo.type = posInfo.type;
+    		zoneInfo.race = race;
+    		
+    		if(race != ZoneInfo.ZONE_RACE_NONE)
+    		{
+        		if(posInfo.advanced == 0)
+        		{
+        			zoneInfo.values = ZoneTable.getInstance().getZoneValues(race, raceIndex[race]++);
+        		}
+        		else
+        		{
+        			zoneInfo.values = ZoneTable.getInstance().getZoneValues(race, raceAdvancedIndex[race]++);
+        		}    			
+    		}
+       		
+    		mZones.add(zoneInfo);
+    	}
+    }
+    
     private void initGame(boolean useAI)
     {
     	
@@ -266,6 +307,27 @@ public class GameRoom {
     	Collections.shuffle(mSpellCards);
     }
     
+    private void sendRanking()
+    {
+    	List<AssetRank> ranks = new ArrayList<AssetRank>();
+    	synchronized(mCharacters)
+    	{
+    		for(SrvCharacter srvChr : mCharacters.values())
+    		{
+    			ranks.add(new AssetRank(srvChr.charId,srvChr.getZoneAssets() + srvChr.soul));
+    		}
+    	}
+    	
+    	Collections.sort(ranks);
+    	
+    	List<Integer> sendRanks = new ArrayList<Integer>();
+    	for(AssetRank rank : ranks)
+    		sendRanks.add(rank.charId);
+    	
+    	
+    	notifyAll( new ServerPacketCharRankAsset(0,sendRanks).toJson());    
+    }
+    
     public void processPacket( int protocol, JsonNode node )
     {
     	switch( protocol )
@@ -281,6 +343,8 @@ public class GameRoom {
     	case ClientPacket.MCP_CHAR_TURN_OVER: onCharTurnOver(node); break;
     	case ClientPacket.MCP_CHAR_ADD_BUFF: onCharAddBuff(node); break;
     	case ClientPacket.MCP_CHAR_MOVE_BYSPELL: onCharMoveBySpell(node); break;
+    	case ClientPacket.MCP_CHAR_SET_ZONE: onCharSetZone(node); break;
+    	case ClientPacket.MCP_CHAR_REMOVE_ZONE: onCharRemoveZone(node); break;
     	case ClientPacket.MCP_SPELL_OPEN: onSpellOpen(node); break;
     	case ClientPacket.MCP_SPELL_REQ_USE: onSpellReqUse(node); break;
     	case ClientPacket.MCP_SPELLUSE: onSpellUse(node); break;
@@ -341,7 +405,9 @@ public class GameRoom {
     	
     	chr.soul += pkt.addsoul;
     	boolean bankrupt = chr.soul <= 0 ? true : false;
-    	notifyAll(new ServerPacketCharAddSoul(pkt.sender, chr.soul, bankrupt).toJson());   	
+    	notifyAll(new ServerPacketCharAddSoul(pkt.sender, chr.soul, bankrupt).toJson());
+    	
+    	sendRanking();
     }    
     
     private void onCharDirection(JsonNode node)
@@ -530,6 +596,54 @@ public class GameRoom {
     	notifyAll(new ServerPacketCharMoveBySpell(pkt.sender,pkt.move,pkt.reverse,pkt.bonus).toJson());       	
     }
     
+    private void onCharSetZone(JsonNode node)
+    {
+    	ClientPacketCharSetZone pkt = Json.fromJson(node, ClientPacketCharSetZone.class);
+    	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	
+    	if( chr == null )
+    		return;
+    	
+    	chr.addZoneAsset(pkt.zId, pkt.zVal);
+    	mZones.get(pkt.zId).setChar(chr.charId);
+    	
+    	if(pkt.buy)
+    	{
+    		chr.soul -= mZones.get(pkt.zId).buySoul();
+    		boolean bankrupt = chr.soul <= 0 ? true : false;
+    		notifyAll(new ServerPacketCharAddSoul(pkt.sender, chr.soul, bankrupt).toJson());
+    	}
+    	
+    	notifyAll( new ServerPacketCharZoneAsset(pkt.sender,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    	
+    	sendRanking();    	
+    }
+    
+    private void onCharRemoveZone(JsonNode node)
+    {
+    	ClientPacketCharRemoveZone pkt = Json.fromJson(node, ClientPacketCharRemoveZone.class);
+    	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	
+    	if( chr == null )
+    		return;
+    	
+    	chr.removeZoneAsset(pkt.zId);
+    	mZones.get(pkt.zId).setChar(0);
+    	
+    	if(pkt.sell)
+    	{
+    		chr.soul += mZones.get(pkt.zId).sellSoul();
+    		boolean bankrupt = chr.soul <= 0 ? true : false;
+    		notifyAll(new ServerPacketCharAddSoul(pkt.sender, chr.soul, bankrupt).toJson());
+    	}
+    	
+    	notifyAll( new ServerPacketCharZoneAsset(pkt.sender,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    	
+    	sendRanking();   	
+    }
+    
     private void onSpellOpen(JsonNode node)
     {
     	ClientPacketSpellOpen pkt = Json.fromJson(node, ClientPacketSpellOpen.class);
@@ -704,6 +818,27 @@ public class GameRoom {
     {
     	ClientPacketBattleEnd pkt = Json.fromJson(node, ClientPacketBattleEnd.class);
     	
+    	//이겼을 때만 우선 소울을 서버에서 같이 처리한다.( 두 캐릭터의 존 가치가 동시에 변경되므로 한번에 랭킹을 보내주는 것이 낫다.)
+/*    	if(pkt.attackwin)
+    	{
+    		SrvCharacter attacker = mCharacters.get(pkt.sender);
+    		if( attacker == null )
+        		return;
+    		
+    		attacker.addZoneAsset(mLastBattle.zoneId,mZones.get(mLastBattle.zoneId).sellSoul());
+
+    		SrvCharacter defender = mCharacters.get(mZones.get(mLastBattle.zoneId).getChar());
+    		if( defender == null )
+        		return;
+
+    		defender.removeZoneAsset(mLastBattle.zoneId);
+    		
+    		notifyAll( new ServerPacketCharZoneAsset(pkt.sender,attacker.getZoneCount(),attacker.getZoneAssets()).toJson());
+    		notifyAll( new ServerPacketCharZoneAsset(pkt.sender,defender.getZoneCount(),defender.getZoneAssets()).toJson());
+
+        	sendRanking();
+    	}*/
+    	
     	notifyAll(new ServerPacketBattleEnd(pkt.sender,mLastBattle.charId,mLastBattle.attackCard,pkt.attackwin,0,mLastBattle.zoneId).toJson());    	
     }
     
@@ -857,6 +992,8 @@ public class GameRoom {
     
     // -- Messages
     
+   
+    
 
 
 	public class Join {
@@ -940,6 +1077,25 @@ public class GameRoom {
 			else if( this.score > o.score ) return -1;
 			else return 1;
 		}
+    }
+    
+    class AssetRank implements Comparable<AssetRank>{
+    	public int charId;
+    	public float asset;
+    	
+    	public AssetRank(int charId, float asset)
+    	{
+    		this.charId = charId;
+    		this.asset = asset;
+    	}
+		
+    	@Override
+		public int compareTo(AssetRank o) {
+			if( this.asset == o.asset ) return 0;
+			else if( this.asset > o.asset ) return -1;
+			else return 1;
+		}  	
+    	
     }
     
 }

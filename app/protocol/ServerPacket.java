@@ -22,6 +22,8 @@ public class ServerPacket
 	public static final int MSP_CHAR_MOVE_BYSPELL = 1113;
 	public static final int MSP_ROUND_DISCARD = 1114;		
 	public static final int MSP_ROUND_OVER = 1115;
+	public static final int MSP_CHAR_ZONE_ASSET = 1116;
+	public static final int MSP_CHAR_RANK_ASSET = 1117;
 	public static final int MSP_SPELL_OPEN = 1200;
 	public static final int MSP_SPELL_REQ_USE = 1201;
 	public static final int MSP_SPELLUSE = 1202;

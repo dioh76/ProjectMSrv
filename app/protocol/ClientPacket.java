@@ -14,6 +14,8 @@ public class ClientPacket
 	public static final int MCP_CHAR_TURN_OVER = 109;
 	public static final int MCP_CHAR_ADD_BUFF = 110;
 	public static final int MCP_CHAR_MOVE_BYSPELL = 111;
+	public static final int MCP_CHAR_SET_ZONE = 112;
+	public static final int MCP_CHAR_REMOVE_ZONE = 113;
 	public static final int MCP_SPELL_OPEN = 200;
 	public static final int MCP_SPELL_REQ_USE = 201;
 	public static final int MCP_SPELLUSE = 202;
