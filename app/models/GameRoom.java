@@ -468,7 +468,27 @@ public class GameRoom {
     {
     	ClientPacketCharEnhance pkt = Json.fromJson(node, ClientPacketCharEnhance.class);
     	
-    	notifyAll(new ServerPacketCharEnhance(pkt.sender).toJson());   	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if( chr == null )
+    		return;
+    	
+    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	if(zoneInfo == null)
+    		return;
+    	
+    	if(zoneInfo.getChar() != pkt.sender)
+    		return;
+    	
+    	if(zoneInfo.getLevel() >= 2 || zoneInfo.getLevel() < 0)
+    		return;
+    	
+    	chr.soul -= zoneInfo.buySoul();
+    	zoneInfo.setLevel(zoneInfo.getLevel() + 1);
+    	chr.addZoneAsset(zoneInfo.id, zoneInfo.sellSoul());
+    	
+    	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.zId,zoneInfo.getLevel(),chr.soul,chr.getZoneCount(),chr.getZoneAssets(),true).toJson());
+    	
+    	sendRanking();
     }   
     
     private void onCharPassByStart(JsonNode node)
@@ -777,6 +797,31 @@ public class GameRoom {
     public void onStartReward(JsonNode node)
     {
     	ClientPacketStartReward pkt = Json.fromJson(node, ClientPacketStartReward.class);
+    	
+    	if(pkt.use)
+    	{
+    	   	SrvCharacter chr = mCharacters.get(pkt.sender);
+        	if( chr == null )
+        		return;
+        	
+        	ZoneInfo zoneInfo = mZones.get(pkt.targetzone);
+        	if(zoneInfo == null)
+        		return;
+        	
+        	if(zoneInfo.getChar() != pkt.sender)
+        		return;
+        	
+        	if(zoneInfo.getLevel() >= 2 || zoneInfo.getLevel() < 0)
+        		return;
+        	
+        	chr.soul -= zoneInfo.buySoul();
+        	zoneInfo.setLevel(zoneInfo.getLevel() + 1);
+        	chr.addZoneAsset(zoneInfo.id, zoneInfo.sellSoul());
+        	
+        	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.targetzone,zoneInfo.getLevel(),chr.soul,chr.getZoneCount(),chr.getZoneAssets(),false).toJson());
+        	
+        	sendRanking();
+    	}
     	
     	notifyAll(new ServerPacketStartReward(pkt.sender, pkt.use, pkt.targetzone).toJson());
     }

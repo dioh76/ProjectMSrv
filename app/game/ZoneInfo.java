@@ -45,6 +45,11 @@ public class ZoneInfo {
 		mLevel = level;
 	}
 	
+	public int getLevel()
+	{
+		return mLevel;
+	}
+	
 	public float buySoul()
 	{
 		if(values == null || values.size() == 0)
