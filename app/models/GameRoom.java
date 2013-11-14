@@ -328,6 +328,12 @@ public class GameRoom {
     	notifyAll( new ServerPacketCharRankAsset(0,sendRanks).toJson());    
     }
     
+    private void sendSoulChanged(SrvCharacter chr)
+    {
+    	boolean bankrupt = chr.soul <= 0 ? true : false;
+    	notifyAll(new ServerPacketCharAddSoul(chr.charId, chr.soul, bankrupt).toJson());
+    }
+    
     public void processPacket( int protocol, JsonNode node )
     {
     	switch( protocol )
@@ -404,8 +410,7 @@ public class GameRoom {
     		return;
     	
     	chr.soul += pkt.addsoul;
-    	boolean bankrupt = chr.soul <= 0 ? true : false;
-    	notifyAll(new ServerPacketCharAddSoul(pkt.sender, chr.soul, bankrupt).toJson());
+    	sendSoulChanged(chr);
     	
     	sendRanking();
     }    
@@ -495,15 +500,15 @@ public class GameRoom {
     {
     	ClientPacketCharPassByStart pkt = Json.fromJson(node, ClientPacketCharPassByStart.class);
     	
-    	notifyAll(new ServerPacketCharPassByStart(pkt.sender).toJson());
-    	
     	SrvCharacter chr = mCharacters.get(pkt.sender);
     	
     	if( chr == null )
     		return;
     	
     	chr.soul += GameRule.getInstance().BOUNS_START_SOUL;
-    	notifyAll(new ServerPacketCharAddSoul(pkt.sender, chr.soul, false).toJson());  
+    	sendSoulChanged(chr);
+    	
+    	notifyAll(new ServerPacketCharPassByStart(pkt.sender).toJson());
     }
     
     private void onCharTurnOver(JsonNode node)
@@ -631,8 +636,7 @@ public class GameRoom {
     	if(pkt.buy)
     	{
     		chr.soul -= mZones.get(pkt.zId).buySoul();
-    		boolean bankrupt = chr.soul <= 0 ? true : false;
-    		notifyAll(new ServerPacketCharAddSoul(pkt.sender, chr.soul, bankrupt).toJson());
+    		sendSoulChanged(chr);
     	}
     	
     	notifyAll( new ServerPacketCharZoneAsset(pkt.sender,chr.getZoneCount(),chr.getZoneAssets()).toJson());
@@ -655,8 +659,7 @@ public class GameRoom {
     	if(pkt.sell)
     	{
     		chr.soul += mZones.get(pkt.zId).sellSoul();
-    		boolean bankrupt = chr.soul <= 0 ? true : false;
-    		notifyAll(new ServerPacketCharAddSoul(pkt.sender, chr.soul, bankrupt).toJson());
+    		sendSoulChanged(chr);
     	}
     	
     	notifyAll( new ServerPacketCharZoneAsset(pkt.sender,chr.getZoneCount(),chr.getZoneAssets()).toJson());
@@ -830,10 +833,22 @@ public class GameRoom {
     {
     	ClientPacketEventGamble pkt = Json.fromJson(node, ClientPacketEventGamble.class);
     	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if( chr == null )
+    		return;
+    	
+    	chr.soul -= 30;
+    	sendSoulChanged(chr);
+    	
     	int card = CardTable.getInstance().getEventCard();
-    	
-    	//TODO : exclusive S, A card
-    	
+    	CardInfo info = CardTable.getInstance().getCard(card);
+    	if(info != null)
+    	{
+    		if(info.grade != CardInfo.CARD_GRADE_S && info.grade != CardInfo.CARD_GRADE_A)
+    			card = -1;
+    	}
+    	else
+    		card = -1;
     	
     	notifyAll(new ServerPacketEventGamble(pkt.sender, pkt.index, card).toJson());    	
     }
