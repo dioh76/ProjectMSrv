@@ -74,6 +74,6 @@ public class ZoneInfo {
 			return 0;
 		else if(mLevel >= values.size())
 			return 0;
-		else return values.get(mLevel).toll * mTollRate;
+		else return values.get(mLevel).toll * mTollRate/100.0f;
 	}
 }
