@@ -351,6 +351,7 @@ public class GameRoom {
     	case ClientPacket.MCP_CHAR_MOVE_BYSPELL: onCharMoveBySpell(node); break;
     	case ClientPacket.MCP_CHAR_SET_ZONE: onCharSetZone(node); break;
     	case ClientPacket.MCP_CHAR_REMOVE_ZONE: onCharRemoveZone(node); break;
+    	case ClientPacket.MCP_CHAR_PAY: onCharPay(node); break;
     	case ClientPacket.MCP_SPELL_OPEN: onSpellOpen(node); break;
     	case ClientPacket.MCP_SPELL_REQ_USE: onSpellReqUse(node); break;
     	case ClientPacket.MCP_SPELLUSE: onSpellUse(node); break;
@@ -663,6 +664,36 @@ public class GameRoom {
     	}
     	
     	notifyAll( new ServerPacketCharZoneAsset(pkt.sender,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    	
+    	sendRanking();   	
+    }
+    
+    private void onCharPay(JsonNode node)
+    {
+    	ClientPacketCharPay pkt = Json.fromJson(node, ClientPacketCharPay.class);
+    	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	
+    	if( chr == null )
+    		return;
+    	
+    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	if(zoneInfo == null)
+    		return;
+    	
+    	int ownerId = zoneInfo.getChar();
+    	SrvCharacter owner = mCharacters.get(ownerId);
+    	if(owner == null)
+    		return;
+    	
+    	chr.soul -= zoneInfo.tollSoul();
+    	sendSoulChanged(chr);
+    	owner.soul += zoneInfo.tollSoul();
+    	sendSoulChanged(owner);
+    	
+    	notifyAll(new ServerPacketCharPay(pkt.sender,pkt.zId).toJson());
+    	chr.removeZoneAsset(pkt.zId);
+    	mZones.get(pkt.zId).setChar(0);
     	
     	sendRanking();   	
     }
