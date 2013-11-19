@@ -128,7 +128,7 @@ public class GameRoom {
 			notifyAll(new ServerPacketUserList(0,userIds,userNames).toJson());
 			
 	    	//initialize map for this user when user joins
-	    	notifyAll(new ServerPacketInitZone(0, maporders).toJson());
+	    	user.SendPacket(new ServerPacketInitZone(0, maporders).toJson());
 		}
     	
 		addCharacter(user);
@@ -487,8 +487,8 @@ public class GameRoom {
     	if(zoneInfo.getLevel() >= 2 || zoneInfo.getLevel() < 0)
     		return;
     	
-    	chr.soul -= zoneInfo.buySoul();
     	zoneInfo.setLevel(zoneInfo.getLevel() + 1);
+    	chr.soul -= zoneInfo.buySoul();
     	chr.addZoneAsset(zoneInfo.id, zoneInfo.sellSoul());
     	
     	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.zId,zoneInfo.getLevel(),chr.soul,chr.getZoneCount(),chr.getZoneAssets(),true).toJson());
@@ -817,8 +817,8 @@ public class GameRoom {
         	if(zoneInfo.getLevel() >= 2 || zoneInfo.getLevel() < 0)
         		return;
         	
-        	chr.soul -= zoneInfo.buySoul();
         	zoneInfo.setLevel(zoneInfo.getLevel() + 1);
+        	chr.soul -= zoneInfo.buySoul();
         	chr.addZoneAsset(zoneInfo.id, zoneInfo.sellSoul());
         	
         	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.targetzone,zoneInfo.getLevel(),chr.soul,chr.getZoneCount(),chr.getZoneAssets(),false).toJson());
