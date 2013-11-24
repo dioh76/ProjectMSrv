@@ -20,7 +20,7 @@ public class ServerPacket
 	public static final int MSP_CHAR_ADD_BUFF = 1111;
 	public static final int MSP_CHAR_DEL_BUFF = 1112;
 	public static final int MSP_CHAR_MOVE_BYSPELL = 1113;
-	public static final int MSP_ROUND_DISCARD = 1114;		
+	public static final int MSP_ROUND_ADDCARD = 1114;		
 	public static final int MSP_ROUND_OVER = 1115;
 	public static final int MSP_CHAR_ZONE_ASSET = 1116;
 	public static final int MSP_CHAR_RANK_ASSET = 1117;

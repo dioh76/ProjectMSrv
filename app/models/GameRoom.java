@@ -352,6 +352,7 @@ public class GameRoom {
     	case ClientPacket.MCP_CHAR_SET_ZONE: onCharSetZone(node); break;
     	case ClientPacket.MCP_CHAR_REMOVE_ZONE: onCharRemoveZone(node); break;
     	case ClientPacket.MCP_CHAR_PAY: onCharPay(node); break;
+    	case ClientPacket.MCP_CHAR_ADDCARD: onCharAddCard(node); break;
     	case ClientPacket.MCP_SPELL_OPEN: onSpellOpen(node); break;
     	case ClientPacket.MCP_SPELL_REQ_USE: onSpellReqUse(node); break;
     	case ClientPacket.MCP_SPELLUSE: onSpellUse(node); break;
@@ -569,7 +570,7 @@ public class GameRoom {
     		}
     		else
     		{
-    			notifyAll(new ServerPacketRoundDiscard(pkt.sender).toJson());
+    			notifyAll(new ServerPacketRoundAddCard(pkt.sender).toJson());
     		}
     	}
     	else
@@ -697,6 +698,44 @@ public class GameRoom {
     	
     	sendRanking();   	
     }
+    
+    private void onCharAddCard(JsonNode node)
+    {
+    	ClientPacketCharAddCard pkt = Json.fromJson(node, ClientPacketCharAddCard.class);
+    	
+    	boolean allready = true;
+		
+		synchronized(mCharacters)
+		{
+			SrvCharacter chr = mCharacters.get(pkt.sender);
+	    	if( chr == null )
+	    		return;
+	    	
+	    	chr.addcard = true;
+	    	for( SrvCharacter srvChr : mCharacters.values() )
+	    	{
+	    		if(srvChr.addcard == false)
+	    		{
+	    			allready = false;
+	    			break;
+	    		}
+	    	}
+		}
+		
+		if(allready)
+		{		
+			synchronized(mCharacters)
+			{
+				for( SrvCharacter srvChr : mCharacters.values() )
+    	    		srvChr.addcard = false;        		
+			}
+			
+			//Check if start char is changed
+			mCurrentRound++;
+			
+			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
+		}    
+	}
     
     private void onSpellOpen(JsonNode node)
     {
@@ -948,10 +987,10 @@ public class GameRoom {
     	    	if( chr == null )
     	    		return;
     	    	
-    	    	chr.discardcard = true;
+    	    	chr.addcard = true;
     	    	for( SrvCharacter srvChr : mCharacters.values() )
     	    	{
-    	    		if(srvChr.discardcard == false)
+    	    		if(srvChr.addcard == false)
     	    		{
     	    			allready = false;
     	    			break;
@@ -964,7 +1003,7 @@ public class GameRoom {
     			synchronized(mCharacters)
     			{
     				for( SrvCharacter srvChr : mCharacters.values() )
-        	    		srvChr.discardcard = false;        		
+        	    		srvChr.addcard = false;        		
     			}
     			
     			//Check if start char is changed

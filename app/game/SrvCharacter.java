@@ -14,7 +14,7 @@ public class SrvCharacter {
 	public boolean	userChar;
 	public float	soul;
 	public boolean	checkdirection;
-	public boolean	discardcard;
+	public boolean	addcard;
 	
 	public List<Buff> mBuffs;
 	public List<Integer> mEquipSpells;
@@ -31,7 +31,7 @@ public class SrvCharacter {
 		this.soul = soul;
 		this.checkdirection = checkdirection;
 		
-		this.discardcard = false; 
+		this.addcard = false; 
 		
 		mBuffs = new ArrayList<Buff>();
 		mEquipSpells = new ArrayList<Integer>();
