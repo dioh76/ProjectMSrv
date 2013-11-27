@@ -10,7 +10,7 @@ public class ZoneInfo {
 	public static final int ZONE_RACE_ANGEL 	= 3;
 	public static final int ZONE_RACE_NEUTRAL 	= 4;
 	
-	public static final int NEUTRAL_ZONE_INDEX 	= 3;
+	public static final int NEUTRAL_ZONE_INDEX 	= 4;
 	
 	public int 	id;
 	public int 	type;

@@ -58,7 +58,7 @@ public class GameRoom {
 		maporders.add(ZoneInfo.ZONE_RACE_HUMAN);
 		maporders.add(ZoneInfo.ZONE_RACE_DEVIL);
 		maporders.add(ZoneInfo.ZONE_RACE_ANGEL);
-		Collections.shuffle(maporders);
+		//Collections.shuffle(maporders);
 		
 		initZones();
 	}
@@ -188,8 +188,8 @@ public class GameRoom {
 				charType = charInfo.charType;
 			
 			charType = mCharacters.size() + 1;
-			
-			SrvCharacter chr = new SrvCharacter(randomUserId, getNewCharId(), charType, "AIPlayer"+(i+1), false, 300, false );
+			float initSoul = GameRule.getInstance().CHAR_INIT_SOUL;
+			SrvCharacter chr = new SrvCharacter(randomUserId, getNewCharId(), charType, "AIPlayer"+(i+1), false, initSoul, false );
 	    	
 	    	synchronized(mCharacters)
 	    	{
@@ -238,7 +238,7 @@ public class GameRoom {
     	raceTypes.add(ZoneInfo.NEUTRAL_ZONE_INDEX,ZoneInfo.ZONE_RACE_NEUTRAL);
     	
     	int[] raceIndex = new int[]{0,0,0,0,0};
-    	int[] raceAdvancedIndex = new int[]{3,3,3,3,3};
+    	int[] raceAdvancedIndex = new int[]{3,3,3,3,2};
     	
     	for(int i = 0; i < ZoneTable.getInstance().getZoneCount(); i++)
     	{

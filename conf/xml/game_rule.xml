@@ -1,6 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <game_rule>
-	<char soul="300" />
-	<bonus start="50" />
+	<char soul="2000" />
+	<bonus start="300" />
 	<gameend maxturn="30" />
+	<zonebuff>
+		<buff zonerace = "1" creaturerace="1" value="1.2"/>
+		<buff zonerace = "1" creaturerace="2" value="1"/>
+		<buff zonerace = "1" creaturerace="3" value="1"/>
+		<buff zonerace = "1" creaturerace="4" value="1.05"/>
+		<buff zonerace = "2" creaturerace="1" value="1"/>
+		<buff zonerace = "2" creaturerace="2" value="1.2"/>
+		<buff zonerace = "2" creaturerace="3" value="1"/>
+		<buff zonerace = "2" creaturerace="4" value="1.05"/>
+		<buff zonerace = "3" creaturerace="1" value="1"/>
+		<buff zonerace = "3" creaturerace="2" value="1"/>
+		<buff zonerace = "3" creaturerace="3" value="1.2"/>
+		<buff zonerace = "3" creaturerace="4" value="1.05"/>
+		<buff zonerace = "4" creaturerace="1" value="1.05"/>
+		<buff zonerace = "4" creaturerace="2" value="1.05"/>
+		<buff zonerace = "4" creaturerace="3" value="1.05"/>
+		<buff zonerace = "4" creaturerace="4" value="1.05"/>
+	</zonebuff>
+	<zonelvbuff>
+		<buff lv="0" value="1.0"/>
+		<buff lv="1" value="1.2"/>
+		<buff lv="2" value="1.5"/>
+	</zonelvbuff>
 </game_rule>
