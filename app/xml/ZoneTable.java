@@ -51,6 +51,11 @@ public class ZoneTable {
 		return mZoneInfos.get(race).get(index).values;
 	}
 	
+	public boolean getZoneEnhancable(int race, int index)
+	{
+		return mZoneInfos.get(race).get(index).enhancable;
+	}
+	
 	private void readZones(Element elem)
 	{
 		NodeList child = elem.getElementsByTagName("zone");
@@ -119,6 +124,7 @@ public class ZoneTable {
 				
 				bInfo.name = childElem.getAttribute("name");
 				bInfo.advanced = Integer.parseInt(childElem.getAttribute("advanced"));
+				bInfo.enhancable = Integer.parseInt(childElem.getAttribute("enhance")) == 1 ? true : false;
 				
 				basicInfos.add(bInfo);
 			}
@@ -142,5 +148,6 @@ class ZoneBasicInfo
 	public String name;
 	public int advanced;
 	public int race;
+	public boolean enhancable;
 	public List<ZoneValueInfo> values = new ArrayList<ZoneValueInfo>();
 }

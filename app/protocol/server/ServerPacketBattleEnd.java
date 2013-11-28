@@ -8,9 +8,9 @@ public class ServerPacketBattleEnd extends ServerPacket{
 	public int attackCard;
 	public boolean attackwin;
 	public int	defenderId;
-	public int	zoneId;
+	public int	zId;
 	
-	public ServerPacketBattleEnd( int sender, int attackId, int attackCard, boolean attackwin, int defenderId, int zoneId )
+	public ServerPacketBattleEnd(int sender, int attackId, int attackCard, boolean attackwin, int defenderId, int zoneId)
 	{
 		this.sender = sender;
 		this.proto = ServerPacket.MSP_PLAYER_BATTLE_END;
@@ -18,6 +18,6 @@ public class ServerPacketBattleEnd extends ServerPacket{
 		this.attackCard = attackCard;
 		this.attackwin = attackwin;
 		this.defenderId = defenderId;
-		this.zoneId = zoneId;
+		this.zId = zoneId;
 	}
 }

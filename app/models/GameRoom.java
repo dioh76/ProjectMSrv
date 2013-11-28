@@ -252,6 +252,8 @@ public class GameRoom {
     		
     		if(race != ZoneInfo.ZONE_RACE_NONE)
     		{
+    			zoneInfo.enhancable = ZoneTable.getInstance().getZoneEnhancable(race,  raceIndex[race]);
+    			
         		if(posInfo.advanced == 0)
         		{
         			zoneInfo.values = ZoneTable.getInstance().getZoneValues(race, raceIndex[race]++);
@@ -259,7 +261,7 @@ public class GameRoom {
         		else
         		{
         			zoneInfo.values = ZoneTable.getInstance().getZoneValues(race, raceAdvancedIndex[race]++);
-        		}    			
+        		}
     		}
        		
     		mZones.add(zoneInfo);
@@ -948,6 +950,18 @@ public class GameRoom {
     {
     	ClientPacketBattleEnd pkt = Json.fromJson(node, ClientPacketBattleEnd.class);
     	
+    	ZoneInfo zoneInfo = mZones.get(mLastBattle.zoneId);
+    	if(zoneInfo == null)
+    		return;
+
+    	if(pkt.attackwin == false && zoneInfo.enhancable == false)
+    	{	    	
+	    	if(zoneInfo.getLevel() < 2 && zoneInfo.getLevel() >= 0)
+	    	{
+	    		zoneInfo.setLevel(zoneInfo.getLevel() + 1);
+	    	}
+    	}
+    	
     	//이겼을 때만 우선 소울을 서버에서 같이 처리한다.( 두 캐릭터의 존 가치가 동시에 변경되므로 한번에 랭킹을 보내주는 것이 낫다.)
 /*    	if(pkt.attackwin)
     	{
@@ -969,7 +983,7 @@ public class GameRoom {
         	sendRanking();
     	}*/
     	
-    	notifyAll(new ServerPacketBattleEnd(pkt.sender,mLastBattle.charId,mLastBattle.attackCard,pkt.attackwin,0,mLastBattle.zoneId).toJson());    	
+    	notifyAll(new ServerPacketBattleEnd(pkt.sender,mLastBattle.charId,mLastBattle.attackCard,pkt.attackwin,0,mLastBattle.zoneId).toJson());
     }
     
     public void onCardDeckUse(JsonNode node)
