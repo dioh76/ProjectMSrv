@@ -11,7 +11,7 @@ public class ServerPacketCharAddBuff extends ServerPacket{
 	public int 	targetzone;
 	public int 	remainturn;
 	public boolean creature;
-	public int		spellid;
+	public int	spellid;
 	
 	public ServerPacketCharAddBuff( int sender, int id, int bufftype, int targetvalue, int targetchar, int targetzone, int remainturn, boolean creature, int spellId )
 	{

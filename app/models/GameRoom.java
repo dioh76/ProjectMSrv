@@ -355,6 +355,9 @@ public class GameRoom {
     	case ClientPacket.MCP_CHAR_REMOVE_ZONE: onCharRemoveZone(node); break;
     	case ClientPacket.MCP_CHAR_PAY: onCharPay(node); break;
     	case ClientPacket.MCP_CHAR_ADDCARD: onCharAddCard(node); break;
+    	case ClientPacket.MCP_CHAR_CHANGE_OWNER: onCharChangeOwner(node); break;
+    	case ClientPacket.MCP_CHAR_OCCUPY: onCharOccupy(node); break;
+    	case ClientPacket.MCP_ZONE_AMBUSH: onZoneAmbush(node); break;
     	case ClientPacket.MCP_SPELL_OPEN: onSpellOpen(node); break;
     	case ClientPacket.MCP_SPELL_REQ_USE: onSpellReqUse(node); break;
     	case ClientPacket.MCP_SPELLUSE: onSpellUse(node); break;
@@ -589,6 +592,7 @@ public class GameRoom {
     	
     	Buff buff = new Buff();
     	buff.id = objectId;
+    	buff.owner = pkt.sender;
     	buff.buffType = pkt.bufftype;
     	buff.targetchar = pkt.targetchar;
     	buff.targetzone = pkt.targetzone;
@@ -737,6 +741,72 @@ public class GameRoom {
 			
 			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
 		}    
+	}
+    
+    private void onCharChangeOwner(JsonNode node)
+    {
+    	ClientPacketCharChangeOwner pkt = Json.fromJson(node, ClientPacketCharChangeOwner.class);
+    	
+    	SrvCharacter toChar = mCharacters.get(pkt.toId);
+    	
+    	if( toChar == null )
+    		return;
+    	
+    	SrvCharacter fromChar = mCharacters.get(pkt.fromId);
+    	
+    	if( fromChar == null )
+    		return;    	
+    	
+    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	if(zoneInfo == null)
+    		return;
+    	
+    	zoneInfo.setChar(toChar.charId);
+    	
+    	toChar.addZoneAsset(pkt.zId, zoneInfo.sellSoul());
+    	fromChar.removeZoneAsset(pkt.zId);
+    	
+    	notifyAll(new ServerPacketCharChangeOwner(pkt.sender,pkt.zId,pkt.toId,toChar.getZoneCount(),toChar.getZoneAssets(),pkt.fromId,fromChar.getZoneCount(),fromChar.getZoneAssets()).toJson());
+    	sendRanking();
+	}
+    
+    private void onCharOccupy(JsonNode node)
+    {
+    	ClientPacketCharOccupy pkt = Json.fromJson(node, ClientPacketCharOccupy.class);
+    	
+    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	if(zoneInfo == null)
+    		return;
+    	
+    	if(zoneInfo.getAmbush())
+    	{	
+    		if(zoneInfo.getAmbushOwner() == pkt.sender)
+    		{
+    			zoneInfo.setAmbush(false, 0);  			
+    			Logger.info("occupy and buff free");
+    		}
+    		else
+    		{
+    			zoneInfo.setAmbush(false, 0);
+    			notifyAll(new ServerPacketCharOccupyAmbush(pkt.sender,pkt.zId,pkt.idx,pkt.cId).toJson());
+    			return;
+    		}
+    	}
+    	
+    	notifyAll(new ServerPacketCharOccupy(pkt.sender,pkt.zId,pkt.idx,pkt.cId).toJson());    
+	}
+    
+    private void onZoneAmbush(JsonNode node)
+    {
+    	ClientPacketZoneAmbush pkt = Json.fromJson(node, ClientPacketZoneAmbush.class);
+    	
+    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	if(zoneInfo == null)
+    		return;
+    	
+    	zoneInfo.setAmbush(true, pkt.sender);
+    	
+    	notifyAll(new ServerPacketZoneAmbush(pkt.sender,pkt.zId,true).toJson());    
 	}
     
     private void onSpellOpen(JsonNode node)
@@ -930,20 +1000,20 @@ public class GameRoom {
     	ClientPacketBattle pkt = Json.fromJson(node, ClientPacketBattle.class);
     	
     	mLastBattle = new BattleInfo();
-    	mLastBattle.zoneId = pkt.zoneId;
+    	mLastBattle.zoneId = pkt.zId;
     	mLastBattle.charId = pkt.sender; 
-    	mLastBattle.attackCard = pkt.attackCard;
-    	mLastBattle.defenseCard = pkt.defenseCard;
+    	mLastBattle.attackCard = pkt.atId;
+    	mLastBattle.defenseCard = pkt.dfId;
     	
-    	int attackGrade = CardTable.getInstance().getCard(pkt.attackCard).grade;
-    	int defenseGrade = CardTable.getInstance().getCard(pkt.defenseCard).grade;
+    	int attackGrade = CardTable.getInstance().getCard(pkt.atId).grade;
+    	int defenseGrade = CardTable.getInstance().getCard(pkt.dfId).grade;
     	
     	int attackDice = BattleDiceTable.getInstance().getAttackDice(attackGrade, defenseGrade);
     	int defenseDice = BattleDiceTable.getInstance().getDefenseDice(defenseGrade, attackGrade);
     	
     	//final Random = ( int sender, int attackCard, int zoneId, int attackDice, int defenseDice )
     	
-    	notifyAll(new ServerPacketBattle(pkt.sender,pkt.attackCard,pkt.zoneId,attackDice,defenseDice).toJson());    	
+    	notifyAll(new ServerPacketBattle(pkt.sender,pkt.idx,pkt.atId,pkt.zId,attackDice,defenseDice).toJson());    	
     }    
 
     public void onBattleEnd(JsonNode node)

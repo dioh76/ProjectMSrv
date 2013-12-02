@@ -9,8 +9,10 @@ public class Buff {
 	public static final int TURN_SKIP = 2;
 	public static final int PLUS_TOLL = 3;
 	public static final int SPELL_USE = 4;
+	public static final int NONE = 100;
 	
 	public int id;
+	public int owner;
 	public int buffType;
 	public int targetchar;
 	public int targetzone;

@@ -25,6 +25,10 @@ public class ServerPacket
 	public static final int MSP_CHAR_ZONE_ASSET = 1116;
 	public static final int MSP_CHAR_RANK_ASSET = 1117;
 	public static final int MSP_CHAR_PAY = 1118;
+	public static final int MSP_CHAR_CHANGE_OWNER = 1119;
+	public static final int MSP_CHAR_OCCUPY = 1120;
+	public static final int MSP_CHAR_OCCUPY_AMBUSH = 1121;
+	public static final int MSP_ZONE_AMBUSH = 1122;
 	public static final int MSP_SPELL_OPEN = 1200;
 	public static final int MSP_SPELL_REQ_USE = 1201;
 	public static final int MSP_SPELLUSE = 1202;

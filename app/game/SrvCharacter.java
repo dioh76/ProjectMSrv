@@ -3,6 +3,8 @@ package game;
 import java.util.ArrayList;
 import java.util.List;
 
+import protocol.server.ServerPacketCharDelBuff;
+
 import xml.SpellTable;
 
 public class SrvCharacter {
@@ -69,6 +71,20 @@ public class SrvCharacter {
 	public boolean removeEquipSpellId(int spellId)
 	{
 		return mEquipSpells.remove(new Integer(spellId));
+	}
+	
+	public void removeBuff(int buffId)
+	{
+		for(int i = mBuffs.size() - 1; i >=0; i--)
+		{
+			Buff buff = mBuffs.get(i);
+			if( buff.id == buffId )
+			{
+				mBuffs.remove(i);
+				break;
+				//notifyAll(new ServerPacketCharDelBuff(charId,buff.id,buff.targetchar).toJson()); 
+			}
+		}		
 	}
 	
 	public void addZoneAsset( int zoneId, float value )

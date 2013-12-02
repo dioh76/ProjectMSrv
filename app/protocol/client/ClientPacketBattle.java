@@ -4,9 +4,10 @@ import protocol.ClientPacket;
 
 public class ClientPacketBattle extends ClientPacket{
 	
-	public int attackCard;
-	public int zoneId;
-	public int defenseCard;
+	public int idx;
+	public int atId;
+	public int zId;
+	public int dfId;
 	
 	public ClientPacketBattle()
 	{

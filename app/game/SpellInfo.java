@@ -21,6 +21,14 @@ public class SpellInfo {
 	public final static int SPELL_TURNOVER = 16;
 	public final static int SPELL_IMMUNE = 17;
 	
+	public final static int SPELL_BEAUTY = 101;
+	public final static int SPELL_AMBUSH = 102;
+	public final static int SPELL_REFUGEES = 103;
+	public final static int SPELL_PROVOCATION = 104;
+	public final static int SPELL_SACRIFICE = 105;
+	public final static int SPELL_REST = 106;
+	public final static int SPELL_DONATION = 107;
+	
 	public final static int SYSTEM_SPELL_CARDNUM = 1000;
 	
 	public int spellId;

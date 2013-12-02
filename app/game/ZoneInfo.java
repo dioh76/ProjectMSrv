@@ -20,6 +20,8 @@ public class ZoneInfo {
 	private int	mLevel;
 	private int	mCharId;
 	private float mTollRate;
+	private boolean mAmbush;
+	private int mAmbushOwner;
 	
 	public List<ZoneValueInfo> values;
 	
@@ -41,6 +43,22 @@ public class ZoneInfo {
 		return mCharId;
 	}
 	
+	public void setAmbush(boolean ambush, int owner)
+	{
+		this.mAmbush = ambush;
+		this.mAmbushOwner = owner;
+	}
+	
+	public boolean getAmbush()
+	{
+		return mAmbush;
+	}
+	
+	public int getAmbushOwner()
+	{
+		return mAmbushOwner;
+	}
+		
 	public void setLevel(int level)
 	{
 		mLevel = level;
