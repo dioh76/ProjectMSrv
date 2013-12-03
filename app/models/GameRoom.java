@@ -35,6 +35,7 @@ public class GameRoom {
 	
 	private int mStartCharId = 0;
 	private int mLastCharId = 0;
+	private int mLastDoubled = 0;
 	private int mCurrentTurn = 0;
 	private int mCurrentRound = 0;
 	
@@ -358,6 +359,7 @@ public class GameRoom {
     	case ClientPacket.MCP_CHAR_CHANGE_OWNER: onCharChangeOwner(node); break;
     	case ClientPacket.MCP_CHAR_OCCUPY: onCharOccupy(node); break;
     	case ClientPacket.MCP_ZONE_AMBUSH: onZoneAmbush(node); break;
+    	case ClientPacket.MCP_ROLL_DICE: onRollDice(node); break;
     	case ClientPacket.MCP_SPELL_OPEN: onSpellOpen(node); break;
     	case ClientPacket.MCP_SPELL_REQ_USE: onSpellReqUse(node); break;
     	case ClientPacket.MCP_SPELLUSE: onSpellUse(node); break;
@@ -450,10 +452,27 @@ public class GameRoom {
     		final Random random = new Random();
     		
 			mStartCharId = mCharIds.get(random.nextInt(mCharacters.size())).intValue();
+			mLastCharId = mStartCharId;
     		
 			notifyAll(new ServerPacketGameStart(pkt.sender, mStartCharId).toJson());
     	}
     }        
+    
+    private void onRollDice(JsonNode node)
+    {
+    	ClientPacketRollDice pkt = Json.fromJson(node, ClientPacketRollDice.class);
+    	
+    	if(pkt.sender == mLastCharId && pkt.doubled && mLastDoubled < 3)
+    	{
+    		mLastDoubled++;
+    	}
+    	else
+    	{
+    		mLastDoubled = 0;
+    	}
+    	
+    	notifyAll(new ServerPacketCharMove(pkt.sender, pkt.val).toJson());   	
+    }
     
     private void onCharMove(JsonNode node)
     {
@@ -522,9 +541,12 @@ public class GameRoom {
     {
     	ClientPacketCharTurnOver pkt = Json.fromJson(node, ClientPacketCharTurnOver.class);
     	
-    	if(pkt.doubledice == false)
+    	if(pkt.force == true)
+    		mLastDoubled = 0;
+    	
+    	if(mLastDoubled == 0)
     	{
-    		SrvCharacter chr = mCharacters.get(pkt.sender);
+    		SrvCharacter chr = mCharacters.get(mLastCharId);
     		for(int i = chr.mBuffs.size() - 1; i >=0; i--)
     		{
     			Buff buff = chr.mBuffs.get(i);
@@ -539,7 +561,7 @@ public class GameRoom {
     		}
     	}
     	
-    	mLastCharId = pkt.sender;
+    	boolean doubledice = mLastDoubled == 0 ? false : true;
     	
     	//ArrayList<Integer> charIds = new ArrayList<Integer>(mCharacters.keySet());
     	int nextIndex = 0;
@@ -554,9 +576,9 @@ public class GameRoom {
 		}
 		
 		int nextCharId = mCharIds.get(nextIndex);
-    	
+		
     	boolean roundover = false;
-    	if(pkt.doubledice == false)
+    	if(doubledice == false)
     	{
     		mCurrentTurn++;
     		
@@ -580,8 +602,12 @@ public class GameRoom {
     	}
     	else
     	{
-    		notifyAll(new ServerPacketCharTurnOver(pkt.sender,pkt.doubledice,roundover,nextCharId).toJson());
+    		notifyAll(new ServerPacketCharTurnOver(pkt.sender,mLastCharId,doubledice,roundover,nextCharId).toJson());
     	}
+    	
+    	//Lastly, if turn over is completed, hand over turn
+    	if(doubledice == false)
+    		mLastCharId = nextCharId;
     }
     
     private void onCharAddBuff(JsonNode node)

@@ -4,7 +4,7 @@ import protocol.ClientPacket;
 
 public class ClientPacketCharTurnOver extends ClientPacket{
 	
-	public boolean doubledice;
+	public boolean force;
 	
 	public ClientPacketCharTurnOver()
 	{

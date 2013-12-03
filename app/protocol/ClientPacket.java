@@ -21,6 +21,7 @@ public class ClientPacket
 	public static final int MCP_CHAR_CHANGE_OWNER = 116;
 	public static final int MCP_CHAR_OCCUPY = 117;
 	public static final int MCP_ZONE_AMBUSH = 118;
+	public static final int MCP_ROLL_DICE = 119;
 	public static final int MCP_SPELL_OPEN = 200;
 	public static final int MCP_SPELL_REQ_USE = 201;
 	public static final int MCP_SPELLUSE = 202;
