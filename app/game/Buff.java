@@ -28,7 +28,7 @@ public class Buff {
 	{
 	}
 	
-	public void TurnOver()
+	public void turnOver()
 	{
 		if( buffType != Buff.SPELL_USE )
 			remainturn--;

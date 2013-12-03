@@ -30,6 +30,8 @@ public class ClientPacket
 	public static final int MCP_SPELLDEFENSE_REPLY = 205;
 	public static final int MCP_BUFF_USE = 206;
 	public static final int MCP_PORTAL_USE = 207;
+	public static final int MCP_ZONE_ADD_BUFF = 208;
+	public static final int MCP_ZONE_DEL_BUFF = 209;
 	public static final int MCP_START_REWARD = 300;
 	public static final int MCP_EVENT_GAMBLE = 301;
 	public static final int MCP_PLAYER_BATTLE = 302;

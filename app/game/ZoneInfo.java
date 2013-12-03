@@ -22,6 +22,7 @@ public class ZoneInfo {
 	private float mTollRate;
 	private boolean mAmbush;
 	private int mAmbushOwner;
+	private Buff mBuff;
 	
 	public List<ZoneValueInfo> values;
 	
@@ -57,6 +58,16 @@ public class ZoneInfo {
 	public int getAmbushOwner()
 	{
 		return mAmbushOwner;
+	}
+	
+	public void setBuff(Buff buff)
+	{
+		mBuff = buff;
+	}
+	
+	public Buff getBuff()
+	{
+		return mBuff;
 	}
 		
 	public void setLevel(int level)

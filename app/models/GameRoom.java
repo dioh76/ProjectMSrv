@@ -368,6 +368,8 @@ public class GameRoom {
     	case ClientPacket.MCP_SPELLDEFENSE_REPLY: onSpellDefenseReply(node); break;
     	case ClientPacket.MCP_BUFF_USE: onBuffUse(node); break;
     	case ClientPacket.MCP_PORTAL_USE: onPortalUse(node); break;
+    	case ClientPacket.MCP_ZONE_ADD_BUFF: onZoneAddBuff(node); break;
+    	case ClientPacket.MCP_ZONE_DEL_BUFF: onZoneDelBuff(node); break;
     	case ClientPacket.MCP_START_REWARD: onStartReward(node); break;
     	case ClientPacket.MCP_EVENT_GAMBLE: onEventGamble(node); break;
     	case ClientPacket.MCP_PLAYER_BATTLE: onBattle(node); break;
@@ -552,7 +554,7 @@ public class GameRoom {
     		for(int i = chr.mBuffs.size() - 1; i >=0; i--)
     		{
     			Buff buff = chr.mBuffs.get(i);
-    			buff.TurnOver();
+    			buff.turnOver();
     			
     			if(buff.isValid() == false)
     			{
@@ -593,6 +595,21 @@ public class GameRoom {
     	
     	if(roundover)
     	{
+    		for(ZoneInfo zoneInfo : mZones)
+    		{
+    			Buff buff = zoneInfo.getBuff();
+    			if(buff != null)
+    			{
+    				buff.turnOver();
+    				if(buff.isValid() == false)
+    				{
+    					Logger.info("remove zone buff..");
+    					notifyAll(new ServerPacketZoneDelBuff(pkt.sender,buff.id,buff.targetzone).toJson());
+    					zoneInfo.setBuff(null);
+    				}
+    			}
+    		}
+    		
     		if( mCurrentRound == GameRule.getInstance().GAMEEND_MAX_TURN)
     		{
     			notifyAll(new ServerPacketGameOver(pkt.sender).toJson());
@@ -845,6 +862,7 @@ public class GameRoom {
     		initSpellCards();
     	
     	int spellId = mSpellCards.remove(0);
+    	spellId=206;
     	
     	notifyAll(new ServerPacketSpellOpen(pkt.sender,spellId).toJson());   	
     }
@@ -966,6 +984,53 @@ public class GameRoom {
     	
     	notifyAll(new ServerPacketPortalUse(pkt.sender, pkt.targetzone).toJson());
     }
+    
+    private void onZoneAddBuff(JsonNode node)
+    {
+    	ClientPacketZoneAddBuff pkt = Json.fromJson(node, ClientPacketZoneAddBuff.class);
+    	
+    	int objectId = Buff.getNewBuffID();
+    	
+    	Buff buff = new Buff();
+    	buff.id = objectId;
+    	buff.owner = pkt.sender;
+    	buff.buffType = pkt.bType;
+    	buff.targetchar = -1;
+    	buff.targetzone = pkt.zId;
+    	buff.remainturn = pkt.remain;
+    	buff.creature = true;
+    	
+    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	if(zoneInfo == null)
+    		return;
+    	
+    	Buff prevBuff = zoneInfo.getBuff();
+    	if(prevBuff != null)
+    	{
+    		notifyAll(new ServerPacketZoneDelBuff(pkt.sender,prevBuff.id,prevBuff.targetzone).toJson());
+    		zoneInfo.setBuff(null);
+    	}
+    	
+    	zoneInfo.setBuff(buff);
+    	    	
+    	notifyAll(new ServerPacketZoneAddBuff(pkt.sender,objectId,pkt.bType,pkt.val,pkt.zId,pkt.remain,pkt.sId).toJson());   	
+    }
+    
+    private void onZoneDelBuff(JsonNode node)
+    {
+    	ClientPacketZoneDelBuff pkt = Json.fromJson(node, ClientPacketZoneDelBuff.class);
+    	
+    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	if(zoneInfo == null)
+    		return;
+    	
+    	Buff prevBuff = zoneInfo.getBuff();
+    	if(prevBuff != null)
+    	{
+    		notifyAll(new ServerPacketZoneDelBuff(pkt.sender,prevBuff.id,prevBuff.targetzone).toJson());
+    		zoneInfo.setBuff(null);
+    	} 	
+    }     
     
     public void onStartReward(JsonNode node)
     {

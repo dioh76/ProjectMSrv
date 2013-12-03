@@ -38,6 +38,8 @@ public class ServerPacket
 	public static final int MSP_SPELLDEFENSE_REPLY = 1205;
 	public static final int MSP_BUFF_USE = 1206;
 	public static final int MSP_PORTAL_USE = 1207;
+	public static final int MSP_ZONE_ADD_BUFF = 1208;
+	public static final int MSP_ZONE_DEL_BUFF = 1209;
 	public static final int MSP_START_REWARD = 1300;
 	public static final int MSP_EVENT_GAMBLE = 1301;
 	public static final int MSP_PLAYER_BATTLE = 1302;
