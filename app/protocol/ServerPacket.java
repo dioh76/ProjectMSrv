@@ -29,6 +29,7 @@ public class ServerPacket
 	public static final int MSP_CHAR_OCCUPY = 1120;
 	public static final int MSP_CHAR_OCCUPY_AMBUSH = 1121;
 	public static final int MSP_ZONE_AMBUSH = 1122;
+	public static final int MSP_ROLL_DICE = 1123;
 	public static final int MSP_SPELL_OPEN = 1200;
 	public static final int MSP_SPELL_REQ_USE = 1201;
 	public static final int MSP_SPELLUSE = 1202;

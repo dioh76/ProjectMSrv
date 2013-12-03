@@ -471,7 +471,9 @@ public class GameRoom {
     		mLastDoubled = 0;
     	}
     	
-    	notifyAll(new ServerPacketCharMove(pkt.sender, pkt.val).toJson());   	
+    	notifyAll(new ServerPacketCharMove(pkt.sender, pkt.val).toJson());
+    	
+    	notifyAll(new ServerPacketRollDice(pkt.sender,pkt.val,mLastDoubled > 0 ? true : false).toJson());
     }
     
     private void onCharMove(JsonNode node)
