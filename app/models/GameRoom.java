@@ -862,7 +862,6 @@ public class GameRoom {
     		initSpellCards();
     	
     	int spellId = mSpellCards.remove(0);
-    	spellId=206;
     	
     	notifyAll(new ServerPacketSpellOpen(pkt.sender,spellId).toJson());   	
     }
