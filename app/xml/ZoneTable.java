@@ -1,8 +1,8 @@
 package xml;
 
-import game.ZoneInfo;
 import game.ZonePosInfo;
 import game.ZoneValueInfo;
+import game.ZoneBasicInfo;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -20,7 +20,9 @@ import play.libs.XML;
 public class ZoneTable {
 	
 	private List<ZonePosInfo> mZones = new ArrayList<ZonePosInfo>();
-	private Map<Integer, List<ZoneBasicInfo>> mZoneInfos = new HashMap<Integer,List<ZoneBasicInfo>>();
+	private Map<Integer, ZoneBasicInfo> mZoneInfos = new HashMap<Integer, ZoneBasicInfo>();
+	private List<List<Integer>> mZoneLinkedInfos = new ArrayList<List<Integer>>();
+	//private Map<Integer, List<ZoneBasicInfo>> mZoneInfos = new HashMap<Integer,List<ZoneBasicInfo>>();
 
 	public void init(InputStream in)
 	{
@@ -29,6 +31,7 @@ public class ZoneTable {
 			
 			readZones(doc.getDocumentElement());
 			readZoneInfos(doc.getDocumentElement());
+			readLinkedInfos(doc.getDocumentElement());
 			
 		}catch( Exception e )
 		{
@@ -46,14 +49,23 @@ public class ZoneTable {
 		return mZones.get(index);
 	}
 	
-	public List<ZoneValueInfo> getZoneValues(int race, int index)
+	public ZoneBasicInfo getZoneBasicInfo(int infoId)
 	{
-		return mZoneInfos.get(race).get(index).values;
+		return mZoneInfos.get(infoId);
 	}
 	
-	public boolean getZoneEnhancable(int race, int index)
+	public List<Integer> getLinkedZones(int zoneId)
 	{
-		return mZoneInfos.get(race).get(index).enhancable;
+		for(List<Integer> list : mZoneLinkedInfos)
+		{
+			for(int zId : list)
+			{
+				if(zId == zoneId)
+					return list;
+			}
+		}
+		
+		return null;
 	}
 	
 	private void readZones(Element elem)
@@ -74,8 +86,7 @@ public class ZoneTable {
 				
 				posInfo.id = Integer.parseInt(childElem.getAttribute("id"));
 				posInfo.type = Integer.parseInt(childElem.getAttribute("type"));
-				posInfo.group = Integer.parseInt(childElem.getAttribute("group"));
-				posInfo.advanced = Integer.parseInt(childElem.getAttribute("advanced"));
+				posInfo.info = Integer.parseInt(childElem.getAttribute("info"));
 				mZones.add(posInfo);
 			}
 		}
@@ -88,28 +99,12 @@ public class ZoneTable {
 			return;
 		
 		Node current = null;
-		
-		int prevRaceType = ZoneInfo.ZONE_RACE_NONE;
-		List<ZoneBasicInfo> basicInfos = new ArrayList<ZoneBasicInfo>();
-		
 		for( int i = 0; i < child.getLength(); i++ )
 		{
 			current = child.item(i);
 			if( current.getNodeType() == Node.ELEMENT_NODE )
 			{
 				Element childElem = (Element)current;
-				
-				int raceType = Integer.parseInt(childElem.getAttribute("race"));
-				if(raceType != prevRaceType)
-				{
-					if(prevRaceType != ZoneInfo.ZONE_RACE_NONE)
-					{
-						mZoneInfos.put(prevRaceType, basicInfos);
-						basicInfos = new ArrayList<ZoneBasicInfo>();
-					}
-					
-					prevRaceType = raceType;
-				}
 				
 				ZoneBasicInfo bInfo = new ZoneBasicInfo();
 				for(int j = 0; j < 3; j++)
@@ -122,16 +117,43 @@ public class ZoneTable {
 					bInfo.values.add(valueInfo);
 				}
 				
+				bInfo.id = Integer.parseInt(childElem.getAttribute("id"));
+				bInfo.race = Integer.parseInt(childElem.getAttribute("race"));
 				bInfo.name = childElem.getAttribute("name");
-				bInfo.advanced = Integer.parseInt(childElem.getAttribute("advanced"));
 				bInfo.enhancable = Integer.parseInt(childElem.getAttribute("enhance")) == 1 ? true : false;
 				
-				basicInfos.add(bInfo);
+				mZoneInfos.put(bInfo.id, bInfo);
 			}
 		}
-		
-		mZoneInfos.put(prevRaceType, basicInfos);
 	}
+	
+	private void readLinkedInfos(Element elem)
+	{
+		NodeList child = elem.getElementsByTagName("link");
+		if(child == null)
+			return;
+		
+		Node current = null;
+		for( int i = 0; i < child.getLength(); i++ )
+		{
+			current = child.item(i);
+			if( current.getNodeType() == Node.ELEMENT_NODE )
+			{
+				Element childElem = (Element)current;
+				
+				String strVal = childElem.getAttribute("value");
+				String[] split = strVal.split(",");
+				ArrayList<Integer> items = new ArrayList<Integer>();
+				for(String item : split)
+				{
+					items.add(Integer.parseInt(item));
+				}
+				
+				mZoneLinkedInfos.add(items);
+			}
+		}
+	}
+		
 
 	private static class Holder {
 		private static final ZoneTable Instance = new ZoneTable(); 
@@ -143,11 +165,4 @@ public class ZoneTable {
 	}
 }
 
-class ZoneBasicInfo
-{
-	public String name;
-	public int advanced;
-	public int race;
-	public boolean enhancable;
-	public List<ZoneValueInfo> values = new ArrayList<ZoneValueInfo>();
-}
+

@@ -231,38 +231,28 @@ public class GameRoom {
     }
     
     private void initZones()
-    {
-    	List<Integer> raceTypes = new ArrayList<Integer>();
-    	
-    	raceTypes.addAll(maporders);
-    	raceTypes.add(0, ZoneInfo.ZONE_RACE_NONE);
-    	raceTypes.add(ZoneInfo.NEUTRAL_ZONE_INDEX,ZoneInfo.ZONE_RACE_NEUTRAL);
-    	
-    	int[] raceIndex = new int[]{0,0,0,0,0};
-    	int[] raceAdvancedIndex = new int[]{3,3,3,3,2};
-    	
+    {	
     	for(int i = 0; i < ZoneTable.getInstance().getZoneCount(); i++)
     	{
     		ZonePosInfo posInfo = ZoneTable.getInstance().getZonePosInfo(i);
     		
-    		int race = raceTypes.get(posInfo.group);
-    		
     		ZoneInfo zoneInfo = new ZoneInfo(posInfo.id);
     		zoneInfo.type = posInfo.type;
-    		zoneInfo.race = race;
-    		
-    		if(race != ZoneInfo.ZONE_RACE_NONE)
+    		if(posInfo.info != 0)
     		{
-    			zoneInfo.enhancable = ZoneTable.getInstance().getZoneEnhancable(race,  raceIndex[race]);
-    			
-        		if(posInfo.advanced == 0)
-        		{
-        			zoneInfo.values = ZoneTable.getInstance().getZoneValues(race, raceIndex[race]++);
-        		}
-        		else
-        		{
-        			zoneInfo.values = ZoneTable.getInstance().getZoneValues(race, raceAdvancedIndex[race]++);
-        		}
+    			ZoneBasicInfo basicInfo = ZoneTable.getInstance().getZoneBasicInfo(posInfo.info);
+    			zoneInfo.race = basicInfo.race;
+    			zoneInfo.enhancable = basicInfo.enhancable;
+    			zoneInfo.values = basicInfo.values;
+    		}
+    		else
+    		{
+    			zoneInfo.race = ZoneInfo.ZONE_RACE_NONE;
+    		}
+    		
+    		if(zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_NORMAL)
+    		{
+    			zoneInfo.mLinkedZones = ZoneTable.getInstance().getLinkedZones(zoneInfo.id);
     		}
        		
     		mZones.add(zoneInfo);

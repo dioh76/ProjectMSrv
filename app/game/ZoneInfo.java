@@ -10,7 +10,13 @@ public class ZoneInfo {
 	public static final int ZONE_RACE_ANGEL 	= 3;
 	public static final int ZONE_RACE_NEUTRAL 	= 4;
 	
-	public static final int NEUTRAL_ZONE_INDEX 	= 4;
+	public static final int ZONE_MAINTYPE_START = 0;
+	public static final int ZONE_MAINTYPE_NORMAL = 1;
+	public static final int ZONE_MAINTYPE_SPELL = 2;
+	public static final int ZONE_MAINTYPE_EVENT1 = 3;
+	public static final int ZONE_MAINTYPE_PORTAL = 4;
+	public static final int ZONE_MAINTYPE_EVENT2 = 5;
+	public static final int ZONE_MAINTYPE_EVENT3 = 6;
 	
 	public int 	id;
 	public int 	type;
@@ -24,7 +30,8 @@ public class ZoneInfo {
 	private int mAmbushOwner;
 	private Buff mBuff;
 	
-	public List<ZoneValueInfo> values;
+	public List<Integer> mLinkedZones; 
+	public List<ZoneValueInfo> values;	
 	
 	public ZoneInfo(int id)
 	{
