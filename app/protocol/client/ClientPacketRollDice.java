@@ -4,7 +4,8 @@ import protocol.ClientPacket;
 
 public class ClientPacketRollDice extends ClientPacket{
 	
-	public int val;
+	public int rVal;
+	public int bVal;
 	public boolean doubled;
 	
 	public ClientPacketRollDice()

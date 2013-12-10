@@ -10,8 +10,9 @@ public class ServerPacketCharEnhance extends ServerPacket{
 	public int zCnt;
 	public float zAsst;
 	public boolean msg;
+	public boolean turn;
 	
-	public ServerPacketCharEnhance( int sender, int zoneId, int zoneLevel, float remainSoul, int zoneCnt, float zoneAsset, boolean notifyMsg )
+	public ServerPacketCharEnhance( int sender, int zoneId, int zoneLevel, float remainSoul, int zoneCnt, float zoneAsset, boolean notifyMsg, boolean turnover )
 	{
 		this.sender = sender;
 		this.proto = ServerPacket.MSP_CHAR_ENHANCE;
@@ -21,5 +22,6 @@ public class ServerPacketCharEnhance extends ServerPacket{
 		this.zCnt = zoneCnt;
 		this.zAsst = zoneAsset;
 		this.msg = notifyMsg;
+		this.turn = turnover;
 	}
 }

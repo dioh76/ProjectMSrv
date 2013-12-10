@@ -463,9 +463,7 @@ public class GameRoom {
     		mLastDoubled = 0;
     	}
     	
-    	notifyAll(new ServerPacketCharMove(pkt.sender, pkt.val).toJson());
-    	
-    	notifyAll(new ServerPacketRollDice(pkt.sender,pkt.val,mLastDoubled > 0 ? true : false).toJson());
+    	notifyAll(new ServerPacketRollDice(pkt.sender,pkt.rVal,pkt.bVal,mLastDoubled > 0 ? true : false).toJson());
     }
     
     private void onCharMove(JsonNode node)
@@ -511,7 +509,7 @@ public class GameRoom {
     	chr.soul -= zoneInfo.buySoul();
     	chr.addZoneAsset(zoneInfo.id, zoneInfo.sellSoul());
     	
-    	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.zId,zoneInfo.getLevel(),chr.soul,chr.getZoneCount(),chr.getZoneAssets(),true).toJson());
+    	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.zId,zoneInfo.getLevel(),chr.soul,chr.getZoneCount(),chr.getZoneAssets(),true,true).toJson());
     	
     	sendRanking();
     }   
@@ -1045,7 +1043,7 @@ public class GameRoom {
         	chr.soul -= zoneInfo.buySoul();
         	chr.addZoneAsset(zoneInfo.id, zoneInfo.sellSoul());
         	
-        	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.targetzone,zoneInfo.getLevel(),chr.soul,chr.getZoneCount(),chr.getZoneAssets(),false).toJson());
+        	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.targetzone,zoneInfo.getLevel(),chr.soul,chr.getZoneCount(),chr.getZoneAssets(),false,false).toJson());
         	
         	sendRanking();
     	}
