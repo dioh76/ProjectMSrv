@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <card_table>
 	<cards>
 		<card id="10001" name="번씨" grade="0" type="1" hp="48" st="23" model="character/creature" atlas="general_choc" spr="C10001"/>
@@ -109,6 +109,7 @@
 		<card id="40014" name="하씨" grade="0" type="4" hp="59" st="43" model="character/creature" atlas="general_etc" spr="N40014"/>
 		<card id="40015" name="하진" grade="0" type="4" hp="23" st="40" model="character/creature" atlas="general_etc" spr="N40015"/>
 		<card id="40016" name="한복" grade="0" type="4" hp="28" st="16" model="character/creature" atlas="general_etc" spr="N40016"/>
+		<card id="40999" name="황건적" grade="0" type="4" hp="10" st="10" model="character/creature" atlas="general_etc" spr="N40999"/>
 		<card id="41001" name="기령" grade="1" type="4" hp="65" st="80" model="character/creature" atlas="general_etc" spr="N41001"/>
 		<card id="41002" name="맹달" grade="1" type="4" hp="75" st="74" model="character/creature" atlas="general_etc" spr="N41002"/>
 		<card id="41003" name="원소" grade="1" type="4" hp="76" st="75" model="character/creature" atlas="general_etc" spr="N41003"/>
