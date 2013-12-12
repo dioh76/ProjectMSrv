@@ -321,10 +321,10 @@ public class GameRoom {
     	notifyAll( new ServerPacketCharRankAsset(0,sendRanks).toJson());    
     }
     
-    private void sendSoulChanged(SrvCharacter chr)
+    private void sendSoulChanged(SrvCharacter chr, boolean notify)
     {
     	boolean bankrupt = chr.soul <= 0 ? true : false;
-    	notifyAll(new ServerPacketCharAddSoul(chr.charId, chr.soul, bankrupt).toJson());
+    	notifyAll(new ServerPacketCharAddSoul(chr.charId, chr.soul, bankrupt,notify).toJson());
     }
     
     public void processPacket( int protocol, JsonNode node )
@@ -411,7 +411,7 @@ public class GameRoom {
     		return;
     	
     	chr.soul += pkt.addsoul;
-    	sendSoulChanged(chr);
+    	sendSoulChanged(chr,true);
     	
     	sendRanking();
     }    
@@ -524,7 +524,7 @@ public class GameRoom {
     		return;
     	
     	chr.soul += GameRule.getInstance().BOUNS_START_SOUL;
-    	sendSoulChanged(chr);
+    	sendSoulChanged(chr,false);
     	
     	notifyAll(new ServerPacketCharPassByStart(pkt.sender).toJson());
     }
@@ -677,7 +677,7 @@ public class GameRoom {
     	if(pkt.buy)
     	{
     		chr.soul -= mZones.get(pkt.zId).buySoul();
-    		sendSoulChanged(chr);
+    		sendSoulChanged(chr,false);
     	}
     	
     	notifyAll( new ServerPacketCharZoneAsset(pkt.sender,chr.getZoneCount(),chr.getZoneAssets()).toJson());
@@ -700,7 +700,7 @@ public class GameRoom {
     	if(pkt.sell)
     	{
     		chr.soul += mZones.get(pkt.zId).sellSoul();
-    		sendSoulChanged(chr);
+    		sendSoulChanged(chr,false);
     	}
     	
     	notifyAll( new ServerPacketCharZoneAsset(pkt.sender,chr.getZoneCount(),chr.getZoneAssets()).toJson());
@@ -727,9 +727,9 @@ public class GameRoom {
     		return;
     	
     	chr.soul -= zoneInfo.tollSoul();
-    	sendSoulChanged(chr);
+    	sendSoulChanged(chr,false);
     	owner.soul += zoneInfo.tollSoul();
-    	sendSoulChanged(owner);
+    	sendSoulChanged(owner,false);
     	
     	notifyAll(new ServerPacketCharPay(pkt.sender,pkt.zId).toJson());
     	chr.removeZoneAsset(pkt.zId);
@@ -1060,7 +1060,7 @@ public class GameRoom {
     		return;
     	
     	chr.soul -= 30;
-    	sendSoulChanged(chr);
+    	sendSoulChanged(chr,false);
     	
     	int card = CardTable.getInstance().getEventCard();
     	CardInfo info = CardTable.getInstance().getCard(card);
