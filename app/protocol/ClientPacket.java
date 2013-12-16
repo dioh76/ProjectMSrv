@@ -43,6 +43,7 @@ public class ClientPacket
 	public static final int MCP_EQUIP_SPELL_USE = 308; // Specially, Defense Toll
 	public static final int MCP_EQUIP_SPELL_USE_REPLY = 309;
 	public static final int MCP_GAME_READY = 400;
+	public static final int MCP_GAME_INITDECKS = 401;
 	
 	public int proto;
 	public int sender;

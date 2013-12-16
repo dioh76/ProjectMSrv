@@ -283,7 +283,7 @@ public class GameRoom {
 		//init spell card
 		initSpellCards();
 		
-		notifyAll(new ServerPacketGameReady(0).toJson());
+		notifyAll(new ServerPacketGameReady(0, mCharIds).toJson());
     }
     
     private void initSpellCards()
@@ -371,6 +371,7 @@ public class GameRoom {
     	case ClientPacket.MCP_EQUIP_SPELL_USE: onEquipSpellUse(node); break;
     	case ClientPacket.MCP_EQUIP_SPELL_USE_REPLY: onEquipSpellUseReply(node); break;
     	case ClientPacket.MCP_GAME_READY: onGameReady(node); break;
+    	case ClientPacket.MCP_GAME_INITDECKS: onGameInitDecks(node); break;
     	}
     }
     
@@ -1282,6 +1283,21 @@ public class GameRoom {
 			setPlaying(true);
 			initGame(pkt.useAI);
 		}
+    }
+    
+    public void onGameInitDecks(JsonNode node)
+    {
+    	ClientPacketGameInitDecks pkt = Json.fromJson(node, ClientPacketGameInitDecks.class);
+    	
+    	for(User user : mUsers)
+    	{
+    		if(user.getUserId() == pkt.uId)
+    		{
+    			user.SendPacket(new ServerPacketGameInitDecks(0).toJson());
+    			break;
+    		}
+    	}
+    	
     }
     
     // -- Messages
