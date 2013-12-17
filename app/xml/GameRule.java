@@ -1,6 +1,7 @@
 package xml;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -13,6 +14,9 @@ public class GameRule {
 	public float 	CHAR_INIT_SOUL = 30;
 	public float 	BOUNS_START_SOUL = 30;
 	public int		GAMEEND_MAX_TURN = 30;
+	public int		START_ENHANCE_ROUND = 3;
+	
+	private ArrayList<Float> mStartEnhance = new ArrayList<Float>();	
 	
 	public void init(InputStream in)
 	{
@@ -25,6 +29,14 @@ public class GameRule {
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public float getStartEnhance(int round)
+	{
+		if(round > START_ENHANCE_ROUND)
+			return mStartEnhance.get(START_ENHANCE_ROUND);
+		
+		return mStartEnhance.get(round);
 	}
 	
 	private void readRules(Element elem)
@@ -48,6 +60,20 @@ public class GameRule {
 			return;
 		
 		BOUNS_START_SOUL = Float.parseFloat(elemChild.getAttribute("start"));
+		
+		child = elem.getElementsByTagName("startenhance");
+		if(child == null)
+			return;
+		
+		elemChild = (Element)child.item(0);
+		if(elemChild == null)
+			return;
+		
+		START_ENHANCE_ROUND = Integer.parseInt(elemChild.getAttribute("round"));
+		mStartEnhance.add(Float.parseFloat(elemChild.getAttribute("rate0")));		
+		mStartEnhance.add(Float.parseFloat(elemChild.getAttribute("rate1")));
+		mStartEnhance.add(Float.parseFloat(elemChild.getAttribute("rate2")));
+		mStartEnhance.add(Float.parseFloat(elemChild.getAttribute("rate3")));
 		
 		child = elem.getElementsByTagName("gameend");
 		if(child == null)

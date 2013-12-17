@@ -2,6 +2,8 @@ package game;
 
 import java.util.List;
 
+import xml.GameRule;
+
 public class ZoneInfo {
 	
 	public static final int ZONE_RACE_NONE 		= 0;
@@ -82,7 +84,7 @@ public class ZoneInfo {
 	
 	public void addStartEnhance()
 	{
-		if(mStartEnhance < 5)
+		if(mStartEnhance < GameRule.getInstance().START_ENHANCE_ROUND)
 			mStartEnhance++;
 	}
 	
@@ -141,7 +143,7 @@ public class ZoneInfo {
 			if(mCardInfo != null)
 				zoneToll += mCardInfo.cost;
 			
-			zoneToll = zoneToll * (1 + 0.1f * mStartEnhance);
+			zoneToll = zoneToll * (1 + GameRule.getInstance().getStartEnhance(mStartEnhance));
 			
 			return values.get(mLevel).toll * mTollRate/100.0f;
 		}
