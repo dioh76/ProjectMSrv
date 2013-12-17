@@ -14,4 +14,5 @@ public class CardInfo {
 	public int race;
 	public int hp;
 	public int ap;
+	public float cost;
 }

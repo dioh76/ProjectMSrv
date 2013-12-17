@@ -327,6 +327,21 @@ public class GameRoom {
     	notifyAll(new ServerPacketCharAddSoul(chr.charId, chr.soul, bankrupt,notify).toJson());
     }
     
+    private boolean isOccpuyLinkedZone(ZoneInfo zoneInfo)
+    {
+    	if(zoneInfo.mLinkedZones == null || zoneInfo.mLinkedZones.size() == 0)
+    		return false;
+    	
+    	boolean bAllOccupy = true;
+    	for(ZoneInfo zInfo : mZones)
+    	{
+    		if(zInfo.getChar() != zoneInfo.getChar())
+    			bAllOccupy = false;
+    	}
+    	
+    	return bAllOccupy;
+    }
+    
     public void processPacket( int protocol, JsonNode node )
     {
     	switch( protocol )
@@ -350,6 +365,7 @@ public class GameRoom {
     	case ClientPacket.MCP_CHAR_OCCUPY: onCharOccupy(node); break;
     	case ClientPacket.MCP_ZONE_AMBUSH: onZoneAmbush(node); break;
     	case ClientPacket.MCP_ROLL_DICE: onRollDice(node); break;
+    	case ClientPacket.MCP_CARD_CHANGE: onCardChange(node); break;
     	case ClientPacket.MCP_SPELL_OPEN: onSpellOpen(node); break;
     	case ClientPacket.MCP_SPELL_REQ_USE: onSpellReqUse(node); break;
     	case ClientPacket.MCP_SPELLUSE: onSpellUse(node); break;
@@ -364,12 +380,12 @@ public class GameRoom {
     	case ClientPacket.MCP_EVENT_GAMBLE: onEventGamble(node); break;
     	case ClientPacket.MCP_PLAYER_BATTLE: onBattle(node); break;
     	case ClientPacket.MCP_PLAYER_BATTLE_END: onBattleEnd(node); break;
-    	case ClientPacket.MCP_CARDDECK_USE: onCardDeckUse(node); break;
     	case ClientPacket.MCP_EVENT_ARENA_REQ: onEventArenaReq(node); break;
     	case ClientPacket.MCP_EVENT_ARENA_USE: onEventArenaUse(node); break;
     	case ClientPacket.MCP_EVENT_ARENA_REWARD: onEventArenaReward(node); break;
     	case ClientPacket.MCP_EQUIP_SPELL_USE: onEquipSpellUse(node); break;
     	case ClientPacket.MCP_EQUIP_SPELL_USE_REPLY: onEquipSpellUseReply(node); break;
+    	case ClientPacket.MCP_START_ENHANCE: onStartEnhance(node); break;
     	case ClientPacket.MCP_GAME_READY: onGameReady(node); break;
     	case ClientPacket.MCP_GAME_INITDECKS: onGameInitDecks(node); break;
     	}
@@ -467,6 +483,22 @@ public class GameRoom {
     	notifyAll(new ServerPacketRollDice(pkt.sender,pkt.rVal,pkt.bVal,mLastDoubled > 0 ? true : false).toJson());
     }
     
+    private void onCardChange(JsonNode node)
+    {
+    	ClientPacketCardChange pkt = Json.fromJson(node, ClientPacketCardChange.class);
+    	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if( chr == null )
+    		return;
+    	
+    	CardInfo cardInfo = CardTable.getInstance().getCard(pkt.cId);
+    	chr.soul -= cardInfo.cost;
+    	
+    	sendSoulChanged(chr,false);
+    	
+    	notifyAll(new ServerPacketCardChange(pkt.sender,pkt.zId,pkt.idx,pkt.cId).toJson());
+    }     
+    
     private void onCharMove(JsonNode node)
     {
     	ClientPacketCharMove pkt = Json.fromJson(node, ClientPacketCharMove.class);
@@ -508,7 +540,10 @@ public class GameRoom {
     	
     	zoneInfo.setLevel(zoneInfo.getLevel() + 1);
     	chr.soul -= zoneInfo.buySoul();
-    	chr.addZoneAsset(zoneInfo.id, zoneInfo.sellSoul());
+
+    	float asset = zoneInfo.tollSoul();
+    	if(isOccpuyLinkedZone(zoneInfo)) asset = asset * 2.0f;    	
+    	chr.addZoneAsset(zoneInfo.id, asset);
     	
     	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.zId,zoneInfo.getLevel(),chr.soul,chr.getZoneCount(),chr.getZoneAssets(),true,true).toJson());
     	
@@ -677,7 +712,8 @@ public class GameRoom {
     	
     	if(pkt.buy)
     	{
-    		chr.soul -= mZones.get(pkt.zId).buySoul();
+    		CardInfo cardInfo = CardTable.getInstance().getCard(pkt.cId);
+    		chr.soul -= cardInfo.cost;
     		sendSoulChanged(chr,false);
     	}
     	
@@ -726,10 +762,13 @@ public class GameRoom {
     	SrvCharacter owner = mCharacters.get(ownerId);
     	if(owner == null)
     		return;
+
+    	float fToll = zoneInfo.tollSoul();
+    	if(isOccpuyLinkedZone(zoneInfo)) fToll = fToll * 2.0f;    	
     	
-    	chr.soul -= zoneInfo.tollSoul();
+    	chr.soul -= fToll;
     	sendSoulChanged(chr,false);
-    	owner.soul += zoneInfo.tollSoul();
+    	owner.soul += fToll;
     	sendSoulChanged(owner,false);
     	
     	notifyAll(new ServerPacketCharPay(pkt.sender,pkt.zId).toJson());
@@ -797,7 +836,9 @@ public class GameRoom {
     	
     	zoneInfo.setChar(toChar.charId);
     	
-    	toChar.addZoneAsset(pkt.zId, zoneInfo.sellSoul());
+    	float asset = zoneInfo.tollSoul();
+    	if(isOccpuyLinkedZone(zoneInfo)) asset = asset * 2.0f;
+    	toChar.addZoneAsset(pkt.zId, asset);
     	fromChar.removeZoneAsset(pkt.zId);
     	
     	notifyAll(new ServerPacketCharChangeOwner(pkt.sender,pkt.zId,pkt.toId,toChar.getZoneCount(),toChar.getZoneAssets(),pkt.fromId,fromChar.getZoneCount(),fromChar.getZoneAssets()).toJson());
@@ -1042,7 +1083,9 @@ public class GameRoom {
         	
         	zoneInfo.setLevel(zoneInfo.getLevel() + 1);
         	chr.soul -= zoneInfo.buySoul();
-        	chr.addZoneAsset(zoneInfo.id, zoneInfo.sellSoul());
+        	float asset = zoneInfo.tollSoul();
+        	if(isOccpuyLinkedZone(zoneInfo)) asset = asset * 2.0f;           	
+        	chr.addZoneAsset(zoneInfo.id, asset);
         	
         	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.targetzone,zoneInfo.getLevel(),chr.soul,chr.getZoneCount(),chr.getZoneAssets(),false,false).toJson());
         	
@@ -1135,48 +1178,6 @@ public class GameRoom {
     	}*/
     	
     	notifyAll(new ServerPacketBattleEnd(pkt.sender,mLastBattle.charId,mLastBattle.attackCard,pkt.attackwin,0,mLastBattle.zoneId).toJson());
-    }
-    
-    public void onCardDeckUse(JsonNode node)
-    {
-    	ClientPacketCardDeckUse pkt = Json.fromJson(node, ClientPacketCardDeckUse.class);
-    	notifyAll(new ServerPacketCardDeckUse(pkt.sender,pkt.acttype,pkt.index,pkt.card).toJson());
-    	
-    	if(pkt.acttype == ServerPacketCardDeckUse.ACT_DISCARD)
-    	{
-    		boolean allready = true;
-    		
-    		synchronized(mCharacters)
-    		{
-    			SrvCharacter chr = mCharacters.get(pkt.sender);
-    	    	if( chr == null )
-    	    		return;
-    	    	
-    	    	chr.addcard = true;
-    	    	for( SrvCharacter srvChr : mCharacters.values() )
-    	    	{
-    	    		if(srvChr.addcard == false)
-    	    		{
-    	    			allready = false;
-    	    			break;
-    	    		}
-    	    	}
-    		}
-    		
-    		if(allready)
-    		{		
-    			synchronized(mCharacters)
-    			{
-    				for( SrvCharacter srvChr : mCharacters.values() )
-        	    		srvChr.addcard = false;        		
-    			}
-    			
-    			//Check if start char is changed
-    			mCurrentRound++;
-    			
-    			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
-    		}
-    	}
     }
     
     public void onEventArenaReq(JsonNode node)
@@ -1273,6 +1274,22 @@ public class GameRoom {
     	
     	notifyAll(new ServerPacketEquipSpellUseReply(pkt.sender,pkt.spellId,mLastBattle.zoneId,pkt.use).toJson());    	   	
     }
+    
+    private void onStartEnhance(JsonNode node)
+    {
+    	ClientPacketStartEnhance pkt = Json.fromJson(node, ClientPacketStartEnhance.class);
+    	
+    	for(ZoneInfo zoneInfo : mZones)
+    	{
+    		if(zoneInfo.getChar() == pkt.sender)
+    		{
+    			zoneInfo.addStartEnhance();
+    		}
+    	}
+    	
+    	notifyAll(new ServerPacketStartEnhance(pkt.sender).toJson());
+    }    
+        
     
     public void onGameReady(JsonNode node)
     {

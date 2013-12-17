@@ -30,6 +30,7 @@ public class ServerPacket
 	public static final int MSP_CHAR_OCCUPY_AMBUSH = 1121;
 	public static final int MSP_ZONE_AMBUSH = 1122;
 	public static final int MSP_ROLL_DICE = 1123;
+	public static final int MSP_CARD_CHANGE = 1124;
 	public static final int MSP_SPELL_OPEN = 1200;
 	public static final int MSP_SPELL_REQ_USE = 1201;
 	public static final int MSP_SPELLUSE = 1202;
@@ -54,6 +55,7 @@ public class ServerPacket
 	public static final int MSP_SERVER_DISCONNECT = 1311; // not used in server
 	public static final int MSP_GAME_OVER = 1312;
 	public static final int MSP_EQUIP_SPELL_REMOVE = 1313;
+	public static final int MSP_START_ENHANCE = 1314;
 	//for server only
 	public static final int MSP_INIT_ZONE = 1400;
 	public static final int MSP_CHAR_REMOVE = 1401;

@@ -22,6 +22,7 @@ public class ClientPacket
 	public static final int MCP_CHAR_OCCUPY = 117;
 	public static final int MCP_ZONE_AMBUSH = 118;
 	public static final int MCP_ROLL_DICE = 119;
+	public static final int MCP_CARD_CHANGE = 120;
 	public static final int MCP_SPELL_OPEN = 200;
 	public static final int MCP_SPELL_REQ_USE = 201;
 	public static final int MCP_SPELLUSE = 202;
@@ -42,6 +43,7 @@ public class ClientPacket
 	public static final int MCP_EVENT_ARENA_REWARD = 307;
 	public static final int MCP_EQUIP_SPELL_USE = 308; // Specially, Defense Toll
 	public static final int MCP_EQUIP_SPELL_USE_REPLY = 309;
+	public static final int MCP_START_ENHANCE = 310;
 	public static final int MCP_GAME_READY = 400;
 	public static final int MCP_GAME_INITDECKS = 401;
 	

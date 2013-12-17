@@ -29,6 +29,8 @@ public class ZoneInfo {
 	private boolean mAmbush;
 	private int mAmbushOwner;
 	private Buff mBuff;
+	private CardInfo mCardInfo;
+	private int	mStartEnhance;
 	
 	public List<Integer> mLinkedZones; 
 	public List<ZoneValueInfo> values;	
@@ -39,6 +41,7 @@ public class ZoneInfo {
 		this.mLevel = 0;
 		this.mCharId = 0;
 		this.mTollRate = 100.0f;
+		this.mStartEnhance = 0;
 	}
 	
 	public void setChar(int charId)
@@ -65,6 +68,22 @@ public class ZoneInfo {
 	public int getAmbushOwner()
 	{
 		return mAmbushOwner;
+	}
+	
+	public CardInfo getCardInfo()
+	{
+		return mCardInfo;
+	}
+	
+	public void setCardInfo(CardInfo info)
+	{
+		mCardInfo = info;
+	}
+	
+	public void addStartEnhance()
+	{
+		if(mStartEnhance < 5)
+			mStartEnhance++;
 	}
 	
 	public void setBuff(Buff buff)
@@ -98,11 +117,16 @@ public class ZoneInfo {
 	
 	public float sellSoul()
 	{
-		if(values == null || values.size() == 0)
+		/*if(values == null || values.size() == 0)
 			return 0;
 		else if(mLevel >= values.size())
 			return 0;
-		else return values.get(mLevel).sell;
+		else return values.get(mLevel).sell;*/
+		
+		if(mCardInfo != null)
+			return mCardInfo.cost / 2;
+		else 
+			return 0;
 	}
 	
 	public float tollSoul()
@@ -111,6 +135,15 @@ public class ZoneInfo {
 			return 0;
 		else if(mLevel >= values.size())
 			return 0;
-		else return values.get(mLevel).toll * mTollRate/100.0f;
+		else 
+		{
+			float zoneToll = values.get(mLevel).toll;
+			if(mCardInfo != null)
+				zoneToll += mCardInfo.cost;
+			
+			zoneToll = zoneToll * (1 + 0.1f * mStartEnhance);
+			
+			return values.get(mLevel).toll * mTollRate/100.0f;
+		}
 	}
 }

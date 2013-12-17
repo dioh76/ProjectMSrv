@@ -5,6 +5,7 @@ import protocol.ClientPacket;
 public class ClientPacketCharSetZone extends ClientPacket{
 	
 	public int zId;
+	public int cId;
 	public float zVal;
 	public boolean buy;
 	

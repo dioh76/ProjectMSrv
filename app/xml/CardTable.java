@@ -84,6 +84,7 @@ public class CardTable {
 				cardInfo.cardId = Integer.parseInt(childElem.getAttribute("id"));
 				cardInfo.cardName = childElem.getAttribute("name");
 				cardInfo.grade = Integer.parseInt(childElem.getAttribute("grade"));
+				cardInfo.cost = Float.parseFloat(childElem.getAttribute("cost"));
 				cardInfo.race = Integer.parseInt(childElem.getAttribute("type"));
 				cardInfo.hp = Integer.parseInt(childElem.getAttribute("hp"));
 				cardInfo.ap = Integer.parseInt(childElem.getAttribute("st"));
