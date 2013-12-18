@@ -218,6 +218,15 @@ public class GameRoom {
     		{
     			notifyAll(new ServerPacketCharRemove(chr.charId, chr.userId).toJson());
     			removes.add(chr.charId);
+    			
+    			for(ZoneInfo zoneInfo : mZones)
+    	    	{
+    	    		if(zoneInfo.getChar() == chr.charId)
+    	    		{
+    	    			zoneInfo.setChar(0);
+    	    			zoneInfo.setCardInfo(null);
+    	    		}
+    	    	}
     		}
     	}
     	
@@ -531,7 +540,7 @@ public class GameRoom {
         	int nextIndex = 0;
     		for(int i=0; i < mCharIds.size(); i++)
     		{
-    			if( mCharIds.get(i) == mLastCharId )
+    			if( mCharIds.get(i) == chr.charId )
     			{
     				if( i+1 <= mCharIds.size() - 1 )
     					nextIndex = i+1;
@@ -581,14 +590,24 @@ public class GameRoom {
         	}
         	else
         	{
-        		notifyAll(new ServerPacketCharTurnOver(pkt.sender,mLastCharId,doubledice,roundover,nextCharId).toJson());
+        		notifyAll(new ServerPacketCharTurnOver(pkt.sender,chr.charId,doubledice,roundover,nextCharId).toJson());
         	}
         	
         	//Lastly, if turn over is completed, hand over turn
         	mLastCharId = nextCharId;
         	mStartCharId = nextCharId;
         	
+        	for(ZoneInfo zoneInfo : mZones)
+	    	{
+	    		if(zoneInfo.getChar() == chr.charId)
+	    		{
+	    			zoneInfo.setChar(0);
+	    			zoneInfo.setCardInfo(null);
+	    		}
+	    	}        	
+        	
         	notifyAll(new ServerPacketCharRemove(pkt.sender,chr.userId).toJson());
+ 	
     	}
     	
     	
