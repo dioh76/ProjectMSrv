@@ -145,7 +145,7 @@ public class ZoneInfo {
 			
 			zoneToll = zoneToll * (1 + GameRule.getInstance().getStartEnhance(mStartEnhance));
 			
-			return values.get(mLevel).toll * mTollRate/100.0f;
+			return zoneToll * mTollRate/100.0f;
 		}
 	}
 }
