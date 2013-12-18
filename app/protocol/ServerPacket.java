@@ -31,6 +31,8 @@ public class ServerPacket
 	public static final int MSP_ZONE_AMBUSH = 1122;
 	public static final int MSP_ROLL_DICE = 1123;
 	public static final int MSP_CARD_CHANGE = 1124;
+	public static final int MSP_CHAR_REMOVE_ZONE = 1125;
+	public static final int MSP_CHAR_ADD_ZONE = 1126;
 	public static final int MSP_SPELL_OPEN = 1200;
 	public static final int MSP_SPELL_REQ_USE = 1201;
 	public static final int MSP_SPELLUSE = 1202;

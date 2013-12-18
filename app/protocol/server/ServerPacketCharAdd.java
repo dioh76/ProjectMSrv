@@ -9,8 +9,9 @@ public class ServerPacketCharAdd extends ServerPacket{
 	public int		charType;
 	public String 	name;
 	public boolean	userChar;
+	public float	soul;
 	
-	public ServerPacketCharAdd( int sender, long userId, int charId, int charType, String name, boolean userChar )
+	public ServerPacketCharAdd( int sender, long userId, int charId, int charType, String name, boolean userChar,float soul )
 	{
 		this.sender = sender;
 		this.proto = ServerPacket.MSP_CHAR_ADD;
@@ -19,5 +20,6 @@ public class ServerPacketCharAdd extends ServerPacket{
 		this.charType = charType;
 		this.name = name;
 		this.userChar = userChar;
+		this.soul = soul;
 	}
 }

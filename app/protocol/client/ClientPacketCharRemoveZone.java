@@ -6,6 +6,7 @@ public class ClientPacketCharRemoveZone extends ClientPacket{
 	
 	public int zId;
 	public boolean sell;
+	public boolean npconly;
 	
 	public ClientPacketCharRemoveZone()
 	{

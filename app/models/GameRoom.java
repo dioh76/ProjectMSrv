@@ -274,7 +274,7 @@ public class GameRoom {
 		
 		for( SrvCharacter chr : mCharacters.values())
 		{
-			notifyAll(new ServerPacketCharAdd(chr.charId, chr.userId, chr.charId, chr.charType, chr.userName, chr.userChar).toJson());
+			notifyAll(new ServerPacketCharAdd(chr.charId, chr.userId, chr.charId, chr.charType, chr.userName, chr.userChar,chr.soul).toJson());
 		}
 		
 		mCharIds = new ArrayList<Integer>(mCharacters.keySet());
@@ -359,6 +359,7 @@ public class GameRoom {
     	case ClientPacket.MCP_CHAR_MOVE_BYSPELL: onCharMoveBySpell(node); break;
     	case ClientPacket.MCP_CHAR_SET_ZONE: onCharSetZone(node); break;
     	case ClientPacket.MCP_CHAR_REMOVE_ZONE: onCharRemoveZone(node); break;
+    	case ClientPacket.MCP_CHAR_ADD_ZONE: onCharAddZone(node); break;
     	case ClientPacket.MCP_CHAR_PAY: onCharPay(node); break;
     	case ClientPacket.MCP_CHAR_ADDCARD: onCharAddCard(node); break;
     	case ClientPacket.MCP_CHAR_CHANGE_OWNER: onCharChangeOwner(node); break;
@@ -366,6 +367,7 @@ public class GameRoom {
     	case ClientPacket.MCP_ZONE_AMBUSH: onZoneAmbush(node); break;
     	case ClientPacket.MCP_ROLL_DICE: onRollDice(node); break;
     	case ClientPacket.MCP_CARD_CHANGE: onCardChange(node); break;
+    	case ClientPacket.MCP_CHAR_BANKRUPT: onCharBankrupt(node); break;
     	case ClientPacket.MCP_SPELL_OPEN: onSpellOpen(node); break;
     	case ClientPacket.MCP_SPELL_REQ_USE: onSpellReqUse(node); break;
     	case ClientPacket.MCP_SPELLUSE: onSpellUse(node); break;
@@ -412,10 +414,10 @@ public class GameRoom {
     	//not to be used in server
     	ClientPacketCharAdd pkt = Json.fromJson(node, ClientPacketCharAdd.class);
     	
-    	SrvCharacter chr = new SrvCharacter(pkt.userId, pkt.charId, 1, pkt.name, pkt.userChar, 300, false );    	
+    	SrvCharacter chr = new SrvCharacter(pkt.userId, pkt.charId, 1, pkt.name, pkt.userChar, GameRule.getInstance().CHAR_INIT_SOUL, false );    	
     	mCharacters.put(pkt.charId, chr);
     	
-    	notifyAll(new ServerPacketCharAdd(pkt.charId, pkt.userId, pkt.charId, chr.charType, pkt.name, pkt.userChar).toJson());   	
+    	notifyAll(new ServerPacketCharAdd(pkt.charId, pkt.userId, pkt.charId, chr.charType, pkt.name, pkt.userChar,chr.soul).toJson());   	
     }
     
     private void onCharAddSoul(JsonNode node)
@@ -497,7 +499,100 @@ public class GameRoom {
     	sendSoulChanged(chr,false);
     	
     	notifyAll(new ServerPacketCardChange(pkt.sender,pkt.zId,pkt.idx,pkt.cId).toJson());
-    }     
+    }
+    
+    private void onCharBankrupt(JsonNode node)
+    {
+    	ClientPacketCharBankrupt pkt = Json.fromJson(node, ClientPacketCharBankrupt.class);
+    	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if( chr == null )
+    		return;
+    	
+    	if(chr.soul <= 0)
+    	{
+        	
+    		for(int i = chr.mBuffs.size() - 1; i >=0; i--)
+    		{
+    			Buff buff = chr.mBuffs.get(i);
+    			buff.turnOver();
+    			
+    			if(buff.isValid() == false)
+    			{
+    				chr.mBuffs.remove(i);
+    				
+    				notifyAll(new ServerPacketCharDelBuff(pkt.sender,buff.id,buff.targetchar).toJson()); 
+    			}
+    		}
+
+        	
+        	boolean doubledice = false;
+        	
+        	int nextIndex = 0;
+    		for(int i=0; i < mCharIds.size(); i++)
+    		{
+    			if( mCharIds.get(i) == mLastCharId )
+    			{
+    				if( i+1 <= mCharIds.size() - 1 )
+    					nextIndex = i+1;
+    				break;
+    			}
+    		}
+    		
+    		int nextCharId = mCharIds.get(nextIndex);
+    		
+        	boolean roundover = false;
+        	if(doubledice == false)
+        	{
+        		mCurrentTurn++;
+        		
+        		if(mCurrentTurn == mCharacters.size())
+        		{
+        			mCurrentTurn = 0;
+        			roundover = true;
+        		}
+        	}
+        	
+        	if(roundover)
+        	{
+        		for(ZoneInfo zoneInfo : mZones)
+        		{
+        			Buff buff = zoneInfo.getBuff();
+        			if(buff != null)
+        			{
+        				buff.turnOver();
+        				if(buff.isValid() == false)
+        				{
+        					Logger.info("remove zone buff..");
+        					notifyAll(new ServerPacketZoneDelBuff(pkt.sender,buff.id,buff.targetzone).toJson());
+        					zoneInfo.setBuff(null);
+        				}
+        			}
+        		}
+        		
+        		if( mCurrentRound == GameRule.getInstance().GAMEEND_MAX_TURN)
+        		{
+        			notifyAll(new ServerPacketGameOver(pkt.sender).toJson());
+        		}
+        		else
+        		{
+        			notifyAll(new ServerPacketRoundAddCard(pkt.sender).toJson());
+        		}
+        	}
+        	else
+        	{
+        		notifyAll(new ServerPacketCharTurnOver(pkt.sender,mLastCharId,doubledice,roundover,nextCharId).toJson());
+        	}
+        	
+        	//Lastly, if turn over is completed, hand over turn
+        	mLastCharId = nextCharId;
+        	mStartCharId = nextCharId;
+        	
+        	notifyAll(new ServerPacketCharRemove(pkt.sender,chr.userId).toJson());
+    	}
+    	
+    	
+    }    
     
     private void onCharMove(JsonNode node)
     {
@@ -731,19 +826,59 @@ public class GameRoom {
     	if( chr == null )
     		return;
     	
-    	chr.removeZoneAsset(pkt.zId);
-    	mZones.get(pkt.zId).setChar(0);
-    	
     	if(pkt.sell)
     	{
     		chr.soul += mZones.get(pkt.zId).sellSoul();
     		sendSoulChanged(chr,false);
     	}
     	
+    	chr.removeZoneAsset(pkt.zId);
+    	mZones.get(pkt.zId).setChar(0);
+    	mZones.get(pkt.zId).setCardInfo(null);
+    	
+    	//check remove buff or not
+    	
     	notifyAll( new ServerPacketCharZoneAsset(pkt.sender,chr.getZoneCount(),chr.getZoneAssets()).toJson());
     	
-    	sendRanking();   	
+    	sendRanking();
+    	
+    	notifyAll( new ServerPacketCharRemoveZone(pkt.sender,pkt.zId,pkt.sell,pkt.npconly).toJson());
     }
+    
+    private void onCharAddZone(JsonNode node)
+    {
+    	ClientPacketCharAddZone pkt = Json.fromJson(node, ClientPacketCharAddZone.class);
+    	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	
+    	if( chr == null )
+    		return;
+    	
+    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	if(zoneInfo == null)
+    		return;
+
+    	CardInfo cardInfo = CardTable.getInstance().getCard(pkt.cId);
+    	if(cardInfo == null)
+    		return;
+    	
+    	zoneInfo.setChar(pkt.sender);
+    	zoneInfo.setCardInfo(cardInfo);
+    	
+    	chr.addZoneAsset(pkt.zId, zoneInfo.tollSoul());
+    	
+    	if(pkt.buy)
+    	{
+			chr.soul -= cardInfo.cost;
+			sendSoulChanged(chr,false);
+    	}
+    	
+    	notifyAll( new ServerPacketCharZoneAsset(pkt.sender,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    	
+    	sendRanking(); 
+    	
+    	notifyAll( new ServerPacketCharAddZone(pkt.sender,pkt.zId,pkt.cId,pkt.pId,pkt.buy,pkt.lIdx).toJson());
+    }    
     
     private void onCharPay(JsonNode node)
     {
