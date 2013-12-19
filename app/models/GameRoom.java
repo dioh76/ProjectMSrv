@@ -585,7 +585,15 @@ public class GameRoom {
         		}
         		else
         		{
-        			notifyAll(new ServerPacketRoundAddCard(pkt.sender).toJson());
+        			//notifyAll(new ServerPacketRoundAddCard(pkt.sender).toJson());
+        			mCurrentRound++;
+        			
+        			if(mCharacters.containsKey(mStartCharId) == false)
+        			{
+        				mStartCharId = mCharacters.firstKey();
+        			}
+        			
+        			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());        			
         		}
         	}
         	else
@@ -724,7 +732,7 @@ public class GameRoom {
     	{
     		mCurrentTurn++;
     		
-    		if(mCurrentTurn == mCharacters.size())
+    		if(mCurrentTurn >= mCharacters.size())
     		{
     			mCurrentTurn = 0;
     			roundover = true;
@@ -754,7 +762,15 @@ public class GameRoom {
     		}
     		else
     		{
-    			notifyAll(new ServerPacketRoundAddCard(pkt.sender).toJson());
+    			//notifyAll(new ServerPacketRoundAddCard(pkt.sender).toJson());
+    			mCurrentRound++;
+    			
+    			if(mCharacters.containsKey(mStartCharId) == false)
+    			{
+    				mStartCharId = mCharacters.firstKey();
+    			}
+    			
+    			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());    			
     		}
     	}
     	else
