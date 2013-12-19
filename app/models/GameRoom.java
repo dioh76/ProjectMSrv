@@ -604,13 +604,13 @@ public class GameRoom {
 	    			zoneInfo.setChar(0);
 	    			zoneInfo.setCardInfo(null);
 	    		}
-	    	}        	
+	    	}
+        	
+    		mCharacters.remove(chr.charId);
+    		if( mCharIds != null ) mCharIds.remove(chr.charId);
         	
         	notifyAll(new ServerPacketCharRemove(pkt.sender,chr.userId).toJson());
- 	
     	}
-    	
-    	
     }    
     
     private void onCharMove(JsonNode node)
