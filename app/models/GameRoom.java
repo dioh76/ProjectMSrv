@@ -233,7 +233,17 @@ public class GameRoom {
     	for(Integer charId : removes)
     	{
     		mCharacters.remove(charId);
-    		if( mCharIds != null ) mCharIds.remove(charId);
+    		if( mCharIds != null )
+    		{
+    			for(int i=0; i< mCharIds.size();i++)
+    			{
+    				if(mCharIds.get(i) == charId)
+    				{
+    					mCharIds.remove(i);
+    					break;
+    				}
+    			}    			
+    		}
     	}
     	
     	return user;
@@ -590,7 +600,7 @@ public class GameRoom {
         			
         			if(mCharacters.containsKey(mStartCharId) == false)
         			{
-        				mStartCharId = mCharacters.firstKey();
+        				mStartCharId = nextCharId;
         			}
         			
         			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());        			
@@ -603,7 +613,8 @@ public class GameRoom {
         	
         	//Lastly, if turn over is completed, hand over turn
         	mLastCharId = nextCharId;
-        	mStartCharId = nextCharId;
+        	if(mStartCharId == chr.charId)
+        		mStartCharId = nextCharId;
         	
         	for(ZoneInfo zoneInfo : mZones)
 	    	{
@@ -615,7 +626,17 @@ public class GameRoom {
 	    	}
         	
     		mCharacters.remove(chr.charId);
-    		if( mCharIds != null ) mCharIds.remove(chr.charId);
+    		if( mCharIds != null )
+    		{
+    			for(int i=0; i< mCharIds.size();i++)
+    			{
+    				if(mCharIds.get(i) == chr.charId)
+    				{
+    					mCharIds.remove(i);
+    					break;
+    				}
+    			}
+    		}
         	
         	notifyAll(new ServerPacketCharRemove(pkt.sender,chr.userId).toJson());
     	}
@@ -767,7 +788,7 @@ public class GameRoom {
     			
     			if(mCharacters.containsKey(mStartCharId) == false)
     			{
-    				mStartCharId = mCharacters.firstKey();
+    				mStartCharId = nextCharId;
     			}
     			
     			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());    			
