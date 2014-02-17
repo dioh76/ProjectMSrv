@@ -20,6 +20,7 @@ public class SrvCharacter {
 	
 	public List<Buff> mBuffs;
 	public List<Integer> mEquipSpells;
+	public List<Integer> mCards;
 	
 	private List<ZoneAsset> mZoneAssets;
 	
@@ -38,6 +39,7 @@ public class SrvCharacter {
 		mBuffs = new ArrayList<Buff>();
 		mEquipSpells = new ArrayList<Integer>();
 		mZoneAssets = new ArrayList<ZoneAsset>();
+		mCards = new ArrayList<Integer>();
 	}
 	
 	public boolean hasEquipSpell(int spellType)

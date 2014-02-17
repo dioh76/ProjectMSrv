@@ -1497,15 +1497,16 @@ public class GameRoom {
     {
     	ClientPacketGameInitDecks pkt = Json.fromJson(node, ClientPacketGameInitDecks.class);
     	
-    	for(User user : mUsers)
-    	{
-    		if(user.getUserId() == pkt.uId)
-    		{
-    			user.SendPacket(new ServerPacketGameInitDecks(0).toJson());
-    			break;
-    		}
-    	}
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if( chr == null )
+    		return;
     	
+    	final Random random = new Random();
+    	int deckType = random.nextInt(5);
+    	
+    	chr.mCards = CardTable.getInstance().getSystemDeck(deckType);
+    	
+    	notifyAll(new ServerPacketGameInitDecks(chr.charId, deckType, chr.mCards).toJson());
     }
     
     // -- Messages
