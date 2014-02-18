@@ -18,6 +18,11 @@ public class SrvCharacter {
 	public boolean	checkdirection;
 	public boolean	addcard;
 	
+	public boolean	myturn;
+	public int		dice1;
+	public int		dice2;
+	public int		doubledice;
+	
 	public List<Buff> mBuffs;
 	public List<Integer> mEquipSpells;
 	public List<Integer> mCards;

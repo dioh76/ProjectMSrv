@@ -33,6 +33,12 @@ public class ServerPacket
 	public static final int MSP_CARD_CHANGE = 1124;
 	public static final int MSP_CHAR_REMOVE_ZONE = 1125;
 	public static final int MSP_CHAR_ADD_ZONE = 1126;
+	//related char turn over 
+	public static final int MSP_CHAR_TURN_START = 1127;
+	public static final int MSP_ROLL_DICE_REQ = 1128;
+	public static final int MSP_CHAR_TURN_SKIP = 1129;
+	public static final int MSP_CHAR_BANKRUPT_REQ = 1130;
+	
 	public static final int MSP_SPELL_OPEN = 1200;
 	public static final int MSP_SPELL_REQ_USE = 1201;
 	public static final int MSP_SPELLUSE = 1202;
@@ -43,6 +49,10 @@ public class ServerPacket
 	public static final int MSP_PORTAL_USE = 1207;
 	public static final int MSP_ZONE_ADD_BUFF = 1208;
 	public static final int MSP_ZONE_DEL_BUFF = 1209;
+	
+	//related char turn over
+	public static final int MSP_BUFF_USE_REQ = 1210;
+	
 	public static final int MSP_START_REWARD = 1300;
 	public static final int MSP_EVENT_GAMBLE = 1301;
 	public static final int MSP_PLAYER_BATTLE = 1302;

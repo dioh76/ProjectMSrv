@@ -346,6 +346,70 @@ public class GameRoom {
     	notifyAll(new ServerPacketCharAddSoul(chr.charId, chr.soul, bankrupt,notify).toJson());
     }
     
+    private void sendTurnStart(SrvCharacter chr, boolean doubledice)
+    {
+    	if(chr == null)
+    		return;
+    	
+    	chr.myturn = true;
+    	
+    	//start turn state to all
+    	notifyAll(new ServerPacketCharTurnStart(chr.charId,doubledice).toJson());
+    	
+    	User user = getUser(chr.userId);
+		if(user == null)
+		{
+			Logger.debug("user is null user id="+chr.userId);
+			return;
+		}
+		
+	  	//bankrupt		
+		if(chr.soul < 0)
+		{
+			user.SendPacket(new ServerPacketCharBankruptReq(chr.charId).toJson());
+			return;
+		}
+    	
+    	//check turnskip buff
+    	for(int i = chr.mBuffs.size() - 1; i >=0; i--)
+		{
+			Buff buff = chr.mBuffs.get(i);
+			if(buff.buffType == Buff.TURN_SKIP)
+			{
+				buff.turnOver();
+				chr.doubledice = 0;
+				notifyAll(new ServerPacketCharTurnSkip(chr.charId).toJson());
+				return;
+			}
+		}
+    	
+    	//check use spell instead of roll dice( e.g. portal)
+    	for(int i = chr.mBuffs.size() - 1; i >=0; i--)
+		{
+			Buff buff = chr.mBuffs.get(i);
+			if(buff.buffType == Buff.SPELL_USE)
+			{
+				chr.doubledice = 0;
+				notifyAll(new ServerPacketBuffUseReq(chr.charId,buff.id).toJson());
+				return;
+			}
+		}
+    	
+    	//roll dice
+		user.SendPacket(new ServerPacketRollDiceReq(chr.charId).toJson());
+    }
+    
+    private void sendTurnOver(SrvCharacter chr)
+    {
+    	if(chr == null)
+    		return;
+    	
+    	chr.myturn = false;
+    	
+    	//send only charId
+    	notifyAll(new ServerPacketCharTurnOver(chr.charId,chr.charId,false,false,0).toJson());
+    }
+    
     private boolean isOccpuyLinkedZone(ZoneInfo zoneInfo)
     {
     	if(zoneInfo.mLinkedZones == null || zoneInfo.mLinkedZones.size() == 0)
@@ -374,6 +438,7 @@ public class GameRoom {
     	case ClientPacket.MCP_CHAR_ENHANCE: onCharEnhance(node); break;
     	case ClientPacket.MCP_CHAR_PASSBY_START: onCharPassByStart(node); break;
     	case ClientPacket.MCP_CHAR_TURN_OVER: onCharTurnOver(node); break;
+    	case ClientPacket.MCP_ROUND_START: onRoundStart(node); break;
     	case ClientPacket.MCP_CHAR_ADD_BUFF: onCharAddBuff(node); break;
     	case ClientPacket.MCP_CHAR_MOVE_BYSPELL: onCharMoveBySpell(node); break;
     	case ClientPacket.MCP_CHAR_SET_ZONE: onCharSetZone(node); break;
@@ -485,6 +550,10 @@ public class GameRoom {
 			mLastCharId = mStartCharId;
     		
 			notifyAll(new ServerPacketGameStart(pkt.sender, mStartCharId).toJson());
+			
+			SrvCharacter startChr = mCharacters.get(mStartCharId);
+			
+			sendTurnStart(startChr, false);
     	}
     }        
     
@@ -492,16 +561,32 @@ public class GameRoom {
     {
     	ClientPacketRollDice pkt = Json.fromJson(node, ClientPacketRollDice.class);
     	
-    	if(pkt.sender == mLastCharId && pkt.doubled && mLastDoubled < 3)
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if(chr == null)
+    		return;
+    	
+    	if(chr.myturn == false)
+    		return;
+    	
+    	final Random random = new Random();
+    	
+    	if(pkt.rVal != 0 && pkt.bVal != 0)
     	{
-    		mLastDoubled++;
+        	chr.dice1 = pkt.rVal;
+        	chr.dice2 = pkt.bVal;
     	}
     	else
     	{
-    		mLastDoubled = 0;
+        	chr.dice1 = random.nextInt(6) + 1;
+        	chr.dice2 = random.nextInt(6) + 1;
     	}
     	
-    	notifyAll(new ServerPacketRollDice(pkt.sender,pkt.rVal,pkt.bVal,mLastDoubled > 0 ? true : false).toJson());
+    	if(chr.dice1 == chr.dice2 && chr.doubledice < 3)
+    		chr.doubledice++;
+    	else
+    		chr.doubledice = 0;
+    	
+    	notifyAll(new ServerPacketRollDice(pkt.sender,chr.dice1,chr.dice2,chr.doubledice > 0 ? true : false).toJson());
     }
     
     private void onCardChange(JsonNode node)
@@ -528,113 +613,113 @@ public class GameRoom {
     	if( chr == null )
     		return;
     	
-    	if(chr.soul <= 0)
+    	if(chr.myturn == false)
     	{
-        	
-    		for(int i = chr.mBuffs.size() - 1; i >=0; i--)
+    		Logger.debug("myturn is false chr = " + chr.charId);
+    		return;
+    	}
+    	
+    	for(int i = chr.mBuffs.size() - 1; i >=0; i--)
+		{
+    		Buff buff = chr.mBuffs.get(i);
+			chr.mBuffs.remove(i);
+				
+			notifyAll(new ServerPacketCharDelBuff(pkt.sender,buff.id,buff.targetchar).toJson()); 
+		}
+    	
+    	boolean roundover = false;
+		if(mCurrentTurn + 1 >= mCharacters.size())
+		{
+			mCurrentTurn = 0;
+			roundover = true;
+		}
+		
+		//check next char in advance
+		int nextIndex = 0;
+		for(int i=0; i < mCharIds.size(); i++)
+		{
+			if( mCharIds.get(i) == chr.charId )
+			{
+				if( i+1 <= mCharIds.size() - 1 )
+					nextIndex = i+1;
+				break;
+			}
+		}
+		
+		int nextCharId = mCharIds.get(nextIndex);
+		
+		SrvCharacter nextChr = mCharacters.get(nextCharId);
+		if(nextChr == null)
+		{
+			Logger.debug("next turn char is null " + nextCharId);
+			return;
+		}
+		
+		if(mStartCharId == chr.charId)
+			mStartCharId = nextCharId;
+		
+		if(roundover)
+		{
+			for(ZoneInfo zoneInfo : mZones)
     		{
-    			Buff buff = chr.mBuffs.get(i);
-    			chr.mBuffs.remove(i);
-    				
-    			notifyAll(new ServerPacketCharDelBuff(pkt.sender,buff.id,buff.targetchar).toJson()); 
-    		}
-    		
-        	boolean doubledice = false;
-        	
-        	int nextIndex = 0;
-    		for(int i=0; i < mCharIds.size(); i++)
-    		{
-    			if( mCharIds.get(i) == chr.charId )
+    			Buff buff = zoneInfo.getBuff();
+    			if(buff != null)
     			{
-    				if( i+1 <= mCharIds.size() - 1 )
-    					nextIndex = i+1;
-    				break;
-    			}
-    		}
-    		
-    		int nextCharId = mCharIds.get(nextIndex);
-    		
-        	boolean roundover = false;
-        	if(doubledice == false)
-        	{
-        		//본인이 나가기 때문에 턴을 올리지 않고 라운드 종료 체크만 해보고 라운드 종료이면 라운드를 넘긴다. 
-        		if(mCurrentTurn + 1 == mCharacters.size())
-        		{
-        			mCurrentTurn = 0;
-        			roundover = true;
-        		}
-        	}
-        	
-        	if(roundover)
-        	{
-        		for(ZoneInfo zoneInfo : mZones)
-        		{
-        			Buff buff = zoneInfo.getBuff();
-        			if(buff != null)
-        			{
-        				buff.turnOver();
-        				if(buff.isValid() == false)
-        				{
-        					Logger.info("remove zone buff..");
-        					notifyAll(new ServerPacketZoneDelBuff(pkt.sender,buff.id,buff.targetzone).toJson());
-        					zoneInfo.setBuff(null);
-        				}
-        			}
-        		}
-        		
-        		if( mCurrentRound == GameRule.getInstance().GAMEEND_MAX_TURN)
-        		{
-        			notifyAll(new ServerPacketGameOver(pkt.sender).toJson());
-        		}
-        		else
-        		{
-        			//notifyAll(new ServerPacketRoundAddCard(pkt.sender).toJson());
-        			mCurrentRound++;
-        			
-        			if(mCharacters.containsKey(mStartCharId) == false)
-        			{
-        				mStartCharId = nextCharId;
-        			}
-        			
-        			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
-        			Logger.info("[bankrupt]round over next char=" + nextCharId);
-        		}
-        	}
-        	else
-        	{
-        		notifyAll(new ServerPacketCharTurnOver(pkt.sender,chr.charId,doubledice,roundover,nextCharId).toJson());
-        		Logger.info("[bankrupt]turn over next char=" + nextCharId);
-        	}
-        	
-        	//Lastly, if turn over is completed, hand over turn
-        	mLastCharId = nextCharId;
-        	if(mStartCharId == chr.charId)
-        		mStartCharId = nextCharId;
-        	
-        	for(ZoneInfo zoneInfo : mZones)
-	    	{
-	    		if(zoneInfo.getChar() == chr.charId)
-	    		{
-	    			zoneInfo.setChar(0);
-	    			zoneInfo.setCardInfo(null);
-	    		}
-	    	}
-        	
-    		mCharacters.remove(chr.charId);
-    		if( mCharIds != null )
-    		{
-    			for(int i=0; i< mCharIds.size();i++)
-    			{
-    				if(mCharIds.get(i) == chr.charId)
+    				buff.turnOver();
+    				if(buff.isValid() == false)
     				{
-    					mCharIds.remove(i);
-    					break;
+    					Logger.info("remove zone buff..");
+    					notifyAll(new ServerPacketZoneDelBuff(pkt.sender,buff.id,buff.targetzone).toJson());
+    					zoneInfo.setBuff(null);
     				}
     			}
     		}
-        	
-        	notifyAll(new ServerPacketCharRemove(pkt.sender,chr.userId).toJson());
+    		
+    		if( mCurrentRound == GameRule.getInstance().GAMEEND_MAX_TURN)
+    		{
+    			notifyAll(new ServerPacketGameOver(pkt.sender).toJson());
+    		}
+    		else
+    		{
+    			mCurrentRound++;
+    			
+    			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
+    			
+    			sendTurnOver(chr);
+    		}			
+		}
+		else
+		{
+			
+			sendTurnOver(chr);
+			sendTurnStart(nextChr, false);
+		}
+		
+		//Remove Char Info
+		for(ZoneInfo zoneInfo : mZones)
+    	{
+    		if(zoneInfo.getChar() == chr.charId)
+    		{
+    			zoneInfo.setChar(0);
+    			zoneInfo.setCardInfo(null);
+    		}
     	}
+    	
+		mCharacters.remove(chr.charId);
+		if( mCharIds != null )
+		{
+			for(int i=0; i< mCharIds.size();i++)
+			{
+				if(mCharIds.get(i) == chr.charId)
+				{
+					mCharIds.remove(i);
+					break;
+				}
+			}
+		}
+    	
+    	notifyAll(new ServerPacketCharRemove(pkt.sender,chr.userId).toJson());		
+    	
     }    
     
     private void onCharMove(JsonNode node)
@@ -707,60 +792,48 @@ public class GameRoom {
     {
     	ClientPacketCharTurnOver pkt = Json.fromJson(node, ClientPacketCharTurnOver.class);
     	
-    	if(pkt.force == true)
-    		mLastDoubled = 0;
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if(chr == null)
+    		return;
     	
-    	if(mLastDoubled == 0)
+    	if(chr.myturn == false)
     	{
-    		SrvCharacter chr = mCharacters.get(mLastCharId);
-    		if(chr != null)
-    		{
-	    		for(int i = chr.mBuffs.size() - 1; i >=0; i--)
-	    		{
-	    			Buff buff = chr.mBuffs.get(i);
-	    			buff.turnOver();
-	    			
-	    			if(buff.isValid() == false)
-	    			{
-	    				chr.mBuffs.remove(i);
-	    				
-	    				notifyAll(new ServerPacketCharDelBuff(pkt.sender,buff.id,buff.targetchar).toJson()); 
-	    			}
-	    		}
-    		}
+    		Logger.debug("myturn is false chr = " + chr.charId);
+    		return;
     	}
     	
-    	boolean doubledice = mLastDoubled == 0 ? false : true;
+    	if(chr.doubledice != 0)
+    	{
+    		sendTurnStart(chr, true);
+    		return;
+    	}
     	
-    	//ArrayList<Integer> charIds = new ArrayList<Integer>(mCharacters.keySet());
-    	int nextIndex = 0;
-		for(int i=0; i < mCharIds.size(); i++)
+		for(int i = chr.mBuffs.size() - 1; i >=0; i--)
 		{
-			if( mCharIds.get(i) == mLastCharId )
+			Buff buff = chr.mBuffs.get(i);
+			
+			//turn skip buff is checked in sendTurnStart func
+			if(buff.buffType != Buff.TURN_SKIP)
+				buff.turnOver();
+			
+			if(buff.isValid() == false)
 			{
-				if( i+1 <= mCharIds.size() - 1 )
-					nextIndex = i+1;
-				break;
+				chr.mBuffs.remove(i);				
+				notifyAll(new ServerPacketCharDelBuff(pkt.sender,buff.id,buff.targetchar).toJson()); 
 			}
 		}
 		
-		int nextCharId = mCharIds.get(nextIndex);
+		boolean roundover = false;
+		mCurrentTurn++;
+		if(mCurrentTurn >= mCharacters.size())
+		{
+			mCurrentTurn = 0;
+			roundover = true;
+		}
 		
-    	boolean roundover = false;
-    	if(doubledice == false)
-    	{
-    		mCurrentTurn++;
-    		
-    		if(mCurrentTurn >= mCharacters.size())
-    		{
-    			mCurrentTurn = 0;
-    			roundover = true;
-    		}
-    	}
-    	
-    	if(roundover)
-    	{
-    		for(ZoneInfo zoneInfo : mZones)
+		if(roundover)
+		{
+			for(ZoneInfo zoneInfo : mZones)
     		{
     			Buff buff = zoneInfo.getBuff();
     			if(buff != null)
@@ -783,28 +856,54 @@ public class GameRoom {
     		{
     			mCurrentRound++;
     			
-    			if(mCharacters.containsKey(mStartCharId) == false)
-    			{
-    				mStartCharId = nextCharId;
-    				mLastCharId = nextCharId;
-    			}
-    			else
-    				mLastCharId = mStartCharId;
-    			
     			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
-    			Logger.info("round over start chr="+mStartCharId+", last="+mLastCharId);
-    		}
-    	}
-    	else
-    	{
-    		notifyAll(new ServerPacketCharTurnOver(pkt.sender,mLastCharId,doubledice,roundover,nextCharId).toJson());
-    		
-    		//Lastly, if turn over is completed, hand over turn
-        	if(doubledice == false)
-        		mLastCharId = nextCharId;
-        	
-        	Logger.info("turn over next chr="+nextCharId+", last="+mLastCharId+", double="+doubledice);
-    	}
+    			
+    			sendTurnOver(chr);
+    		}			
+		}
+		else
+		{
+	    	int nextIndex = 0;
+			for(int i=0; i < mCharIds.size(); i++)
+			{
+				if( mCharIds.get(i) == chr.charId )
+				{
+					if( i+1 <= mCharIds.size() - 1 )
+						nextIndex = i+1;
+					break;
+				}
+			}
+			
+			int nextCharId = mCharIds.get(nextIndex);
+			
+			SrvCharacter nextChr = mCharacters.get(nextCharId);
+			if(nextChr == null)
+			{
+				Logger.debug("next turn char is null " + nextCharId);
+				return;
+			}
+			
+			sendTurnOver(chr);
+			sendTurnStart(nextChr, false);
+		}
+    }
+    
+    private void onRoundStart(JsonNode node)
+    {
+    	ClientPacketRoundStart pkt = Json.fromJson(node, ClientPacketRoundStart.class);
+    	
+    	//process only starter packet 
+    	if(pkt.sender != mStartCharId)
+    		return;
+    	
+    	SrvCharacter nextChr = mCharacters.get(mStartCharId);
+		if(nextChr == null)
+		{
+			Logger.debug("[roundover]next turn char is null " + mStartCharId);
+			return;
+		}
+		
+		sendTurnStart(nextChr, false);
     }
     
     private void onCharAddBuff(JsonNode node)

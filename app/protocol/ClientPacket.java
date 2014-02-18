@@ -25,6 +25,7 @@ public class ClientPacket
 	public static final int MCP_CARD_CHANGE = 120;
 	public static final int MCP_CHAR_BANKRUPT = 121;
 	public static final int MCP_CHAR_ADD_ZONE = 122;
+	public static final int MCP_ROUND_START = 123;
 	public static final int MCP_SPELL_OPEN = 200;
 	public static final int MCP_SPELL_REQ_USE = 201;
 	public static final int MCP_SPELLUSE = 202;
