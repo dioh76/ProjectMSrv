@@ -534,17 +534,11 @@ public class GameRoom {
     		for(int i = chr.mBuffs.size() - 1; i >=0; i--)
     		{
     			Buff buff = chr.mBuffs.get(i);
-    			buff.turnOver();
-    			
-    			if(buff.isValid() == false)
-    			{
-    				chr.mBuffs.remove(i);
+    			chr.mBuffs.remove(i);
     				
-    				notifyAll(new ServerPacketCharDelBuff(pkt.sender,buff.id,buff.targetchar).toJson()); 
-    			}
+    			notifyAll(new ServerPacketCharDelBuff(pkt.sender,buff.id,buff.targetchar).toJson()); 
     		}
-
-        	
+    		
         	boolean doubledice = false;
         	
         	int nextIndex = 0;
@@ -563,9 +557,8 @@ public class GameRoom {
         	boolean roundover = false;
         	if(doubledice == false)
         	{
-        		mCurrentTurn++;
-        		
-        		if(mCurrentTurn == mCharacters.size())
+        		//본인이 나가기 때문에 턴을 올리지 않고 라운드 종료 체크만 해보고 라운드 종료이면 라운드를 넘긴다. 
+        		if(mCurrentTurn + 1 == mCharacters.size())
         		{
         			mCurrentTurn = 0;
         			roundover = true;
@@ -603,12 +596,14 @@ public class GameRoom {
         				mStartCharId = nextCharId;
         			}
         			
-        			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());        			
+        			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
+        			Logger.info("[bankrupt]round over next char=" + nextCharId);
         		}
         	}
         	else
         	{
         		notifyAll(new ServerPacketCharTurnOver(pkt.sender,chr.charId,doubledice,roundover,nextCharId).toJson());
+        		Logger.info("[bankrupt]turn over next char=" + nextCharId);
         	}
         	
         	//Lastly, if turn over is completed, hand over turn
@@ -718,17 +713,20 @@ public class GameRoom {
     	if(mLastDoubled == 0)
     	{
     		SrvCharacter chr = mCharacters.get(mLastCharId);
-    		for(int i = chr.mBuffs.size() - 1; i >=0; i--)
+    		if(chr != null)
     		{
-    			Buff buff = chr.mBuffs.get(i);
-    			buff.turnOver();
-    			
-    			if(buff.isValid() == false)
-    			{
-    				chr.mBuffs.remove(i);
-    				
-    				notifyAll(new ServerPacketCharDelBuff(pkt.sender,buff.id,buff.targetchar).toJson()); 
-    			}
+	    		for(int i = chr.mBuffs.size() - 1; i >=0; i--)
+	    		{
+	    			Buff buff = chr.mBuffs.get(i);
+	    			buff.turnOver();
+	    			
+	    			if(buff.isValid() == false)
+	    			{
+	    				chr.mBuffs.remove(i);
+	    				
+	    				notifyAll(new ServerPacketCharDelBuff(pkt.sender,buff.id,buff.targetchar).toJson()); 
+	    			}
+	    		}
     		}
     	}
     	
@@ -783,25 +781,30 @@ public class GameRoom {
     		}
     		else
     		{
-    			//notifyAll(new ServerPacketRoundAddCard(pkt.sender).toJson());
     			mCurrentRound++;
     			
     			if(mCharacters.containsKey(mStartCharId) == false)
     			{
     				mStartCharId = nextCharId;
+    				mLastCharId = nextCharId;
     			}
+    			else
+    				mLastCharId = mStartCharId;
     			
-    			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());    			
+    			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
+    			Logger.info("round over start chr="+mStartCharId+", last="+mLastCharId);
     		}
     	}
     	else
     	{
     		notifyAll(new ServerPacketCharTurnOver(pkt.sender,mLastCharId,doubledice,roundover,nextCharId).toJson());
+    		
+    		//Lastly, if turn over is completed, hand over turn
+        	if(doubledice == false)
+        		mLastCharId = nextCharId;
+        	
+        	Logger.info("turn over next chr="+nextCharId+", last="+mLastCharId+", double="+doubledice);
     	}
-    	
-    	//Lastly, if turn over is completed, hand over turn
-    	if(doubledice == false)
-    		mLastCharId = nextCharId;
     }
     
     private void onCharAddBuff(JsonNode node)
