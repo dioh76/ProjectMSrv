@@ -115,8 +115,7 @@ public class CardTable {
 		if (mCardEvents.size() == 0)
 			return -1;
 
-		int nProb = random
-				.nextInt(mCardEvents.get(mCardEvents.size() - 1).weight);
+		int nProb = random.nextInt(mCardEvents.get(mCardEvents.size() - 1).weight);
 
 		for (CardEventInfo info : mCardEvents) {
 			if (nProb <= info.weight)
@@ -139,17 +138,13 @@ public class CardTable {
 
 				CardInfo cardInfo = new CardInfo();
 
-				cardInfo.cardId = Integer
-						.parseInt(childElem.getAttribute("id"));
+				cardInfo.cardId = Integer.parseInt(childElem.getAttribute("id"));
 				cardInfo.cardName = childElem.getAttribute("name");
-				cardInfo.grade = Integer.parseInt(childElem
-						.getAttribute("grade"));
-				cardInfo.cost = Float
-						.parseFloat(childElem.getAttribute("cost"));
-				cardInfo.race = Integer
-						.parseInt(childElem.getAttribute("type"));
-				cardInfo.hp = Integer.parseInt(childElem.getAttribute("hp"));
-				cardInfo.ap = Integer.parseInt(childElem.getAttribute("st"));
+				cardInfo.grade = Integer.parseInt(childElem.getAttribute("grade"));
+				cardInfo.cost = Float.parseFloat(childElem.getAttribute("cost"));
+				cardInfo.race = Integer.parseInt(childElem.getAttribute("type"));
+				cardInfo.hp = Float.parseFloat(childElem.getAttribute("hp"));
+				cardInfo.st = Float.parseFloat(childElem.getAttribute("st"));
 
 				mCards.put(cardInfo.cardId, cardInfo);
 
@@ -178,8 +173,7 @@ public class CardTable {
 
 				CardEventInfo info = new CardEventInfo();
 				info.cardId = Integer.parseInt(childElem.getAttribute("id"));
-				totalweight += Integer.parseInt(childElem
-						.getAttribute("weight"));
+				totalweight += Integer.parseInt(childElem.getAttribute("weight"));
 				info.weight = totalweight;
 
 				mCardEvents.add(info);

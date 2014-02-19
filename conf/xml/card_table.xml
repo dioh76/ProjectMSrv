@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <card_table>
 	<cards>
-		<card id="10001" name="번씨" grade="0" cost="100" type="1" hp="79" st="21" model="character/creature " atlas="general_choc" spr="C10001"/>
+		<card id="10001" name="번씨" grade="0" cost="100" type="1" hp="79" st="21" model="character/creature" atlas="general_choc" spr="C10001"/>
 		<card id="10002" name="오란" grade="0" cost="100" type="1" hp="39" st="77" model="character/creature" atlas="general_choc" spr="C10002"/>
 		<card id="10003" name="장씨" grade="0" cost="100" type="1" hp="78" st="59" model="character/creature" atlas="general_choc" spr="C10003"/>
 		<card id="10004" name="황월영" grade="0" cost="100" type="1" hp="79" st="45" model="character/creature" atlas="general_choc" spr="C10004"/>

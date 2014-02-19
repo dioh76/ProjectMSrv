@@ -159,6 +159,7 @@ public class GameRoom {
 		if(charInfo != null)
 			charType = charInfo.charType;
 		
+		//temporarily creating seq ( client same ) 
 		charType = mCharacters.size() + 1;
 		
 		float initSoul = GameRule.getInstance().CHAR_INIT_SOUL;
@@ -1455,21 +1456,44 @@ public class GameRoom {
     {
     	ClientPacketBattle pkt = Json.fromJson(node, ClientPacketBattle.class);
     	
+    	//attack character
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if(chr == null)
+    		return;
+    	
+    	if(pkt.idx == -1)
+    	{
+    		Logger.debug("attack card is not valid.");
+    		return;
+    	}
+    	
+    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	
+    	//defense character
+    	SrvCharacter chrDef = mCharacters.get(zoneInfo.getChar());
+    	if(chrDef == null)
+    		return;
+    	
+    	CardInfo cardInfo = CardTable.getInstance().getCard(pkt.atId);
+    	CharInfo charInfo = CharTable.getInstance().getChar(chr.charType);
+    	float totalSt = (charInfo.st + cardInfo.st) * GameRule.getInstance().getZoneBuff(zoneInfo.race, cardInfo.race);
+    	
+    	CardInfo cardInfo2 = zoneInfo.getCardInfo();
+    	CharInfo charInfo2 = CharTable.getInstance().getChar(chrDef.charType);
+    	float totalHp = (charInfo2.hp + cardInfo2.hp) * GameRule.getInstance().getZoneBuff(zoneInfo.race, cardInfo2.race); 
+    	
+    	boolean attackWin = totalHp - totalSt > 0 ? false : true;
+    	
     	mLastBattle = new BattleInfo();
     	mLastBattle.zoneId = pkt.zId;
     	mLastBattle.charId = pkt.sender; 
     	mLastBattle.attackCard = pkt.atId;
     	mLastBattle.defenseCard = pkt.dfId;
+    	mLastBattle.totalHp = totalHp;
+    	mLastBattle.totalSt = totalSt;
+    	mLastBattle.attackWin = attackWin;
     	
-    	int attackGrade = CardTable.getInstance().getCard(pkt.atId).grade;
-    	int defenseGrade = CardTable.getInstance().getCard(pkt.dfId).grade;
-    	
-    	int attackDice = BattleDiceTable.getInstance().getAttackDice(attackGrade, defenseGrade);
-    	int defenseDice = BattleDiceTable.getInstance().getDefenseDice(defenseGrade, attackGrade);
-    	
-    	//final Random = ( int sender, int attackCard, int zoneId, int attackDice, int defenseDice )
-    	
-    	notifyAll(new ServerPacketBattle(pkt.sender,pkt.idx,pkt.atId,pkt.zId,attackDice,defenseDice).toJson());    	
+    	notifyAll(new ServerPacketBattle(pkt.sender,pkt.idx,chrDef.charId,cardInfo.cardId,cardInfo2.cardId,zoneInfo.id,totalHp,totalSt,attackWin).toJson());   	
     }    
 
     public void onBattleEnd(JsonNode node)
@@ -1534,7 +1558,7 @@ public class GameRoom {
     	
     	if(info != null)
     	{
-    		total = info.ap * dice;
+    		total = (int)info.st * dice;
     	}
     	
     	notifyAll(new ServerPacketEventArenaUse(pkt.sender,pkt.index,pkt.card,dice).toJson());
@@ -1713,6 +1737,9 @@ public class GameRoom {
     	public int charId;
     	public int attackCard;
     	public int defenseCard;
+    	public float totalSt;
+    	public float totalHp;
+    	public boolean attackWin;
     }
     
     class BattleArena {

@@ -55,7 +55,7 @@ public class ServerPacket
 	
 	public static final int MSP_START_REWARD = 1300;
 	public static final int MSP_EVENT_GAMBLE = 1301;
-	public static final int MSP_PLAYER_BATTLE = 1302;
+	public static final int MSP_CHAR_BATTLE = 1302;
 	public static final int MSP_PLAYER_BATTLE_END = 1303;
 	public static final int MSP_CARDDECK_USE = 1304;
 	public static final int MSP_EVENT_ARENA_REQ = 1305;

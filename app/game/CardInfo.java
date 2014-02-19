@@ -12,7 +12,7 @@ public class CardInfo {
 	public String cardName;
 	public int grade;
 	public int race;
-	public int hp;
-	public int ap;
+	public float hp;
+	public float st;
 	public float cost;
 }

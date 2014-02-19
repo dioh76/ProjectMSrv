@@ -5,19 +5,25 @@ import protocol.ServerPacket;
 public class ServerPacketBattle extends ServerPacket{
 	
 	public int idx;
-	public int attackCard;
-	public int zoneId;
-	public int attackDice;
-	public int defenseDice;
+	public int dfChr;
+	public int atCrd;
+	public int dfCrd;
+	public int zId;
+	public float tHp;
+	public float tSt;
+	public boolean atWin;
 	
-	public ServerPacketBattle( int sender, int index, int attackCard, int zoneId, int attackDice, int defenseDice )
+	public ServerPacketBattle( int sender, int index, int defenseChr, int attackCard, int defenseCard, int zoneId, float totalHp, float totalSt, boolean attackWin )
 	{
 		this.sender = sender;
-		this.proto = ServerPacket.MSP_PLAYER_BATTLE;
+		this.proto = ServerPacket.MSP_CHAR_BATTLE;
 		this.idx = index;
-		this.attackCard = attackCard;
-		this.zoneId = zoneId;
-		this.attackDice = attackDice;
-		this.defenseDice = defenseDice;
+		this.dfChr = defenseChr;
+		this.atCrd = attackCard;
+		this.dfCrd = defenseCard;
+		this.zId = zoneId;
+		this.tHp = totalHp;
+		this.tSt = totalSt;
+		this.atWin = attackWin;
 	}
 }
