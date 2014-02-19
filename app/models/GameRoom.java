@@ -462,6 +462,7 @@ public class GameRoom {
     	case ClientPacket.MCP_PORTAL_USE: onPortalUse(node); break;
     	case ClientPacket.MCP_ZONE_ADD_BUFF: onZoneAddBuff(node); break;
     	case ClientPacket.MCP_ZONE_DEL_BUFF: onZoneDelBuff(node); break;
+    	case ClientPacket.MCP_CHAR_CONTROLLED: onCharControlled(node); break;
     	case ClientPacket.MCP_START_REWARD: onStartReward(node); break;
     	case ClientPacket.MCP_EVENT_GAMBLE: onEventGamble(node); break;
     	case ClientPacket.MCP_PLAYER_BATTLE: onBattle(node); break;
@@ -812,6 +813,15 @@ public class GameRoom {
     	SrvCharacter chr = mCharacters.get(pkt.sender);
     	if(chr == null)
     		return;
+    	
+    	//char is controlled by spell and turn over
+    	if(chr.controlled)
+    	{
+    		chr.controlled = false;
+    		
+    		//assign to origin turn owner
+    		chr = mCharacters.get(chr.spellcaster);
+    	}
     	
     	if(chr.myturn == false)
     	{
@@ -1369,7 +1379,19 @@ public class GameRoom {
     		notifyAll(new ServerPacketZoneDelBuff(pkt.sender,prevBuff.id,prevBuff.targetzone).toJson());
     		zoneInfo.setBuff(null);
     	} 	
-    }     
+    }
+    
+    private void onCharControlled(JsonNode node)
+    {
+    	ClientPacketCharControlled pkt = Json.fromJson(node, ClientPacketCharControlled.class);
+    	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if(chr == null)
+    		return;
+    	
+    	chr.controlled = true;
+    	chr.spellcaster = pkt.caster;
+    }
     
     public void onStartReward(JsonNode node)
     {

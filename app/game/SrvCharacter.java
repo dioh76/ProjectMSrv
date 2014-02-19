@@ -23,6 +23,10 @@ public class SrvCharacter {
 	public int		dice2;
 	public int		doubledice;
 	
+	//character is controlled by spell
+	public boolean	controlled;
+	public int		spellcaster;
+	
 	public List<Buff> mBuffs;
 	public List<Integer> mEquipSpells;
 	public List<Integer> mCards;
