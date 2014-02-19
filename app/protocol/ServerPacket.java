@@ -69,6 +69,9 @@ public class ServerPacket
 	public static final int MSP_EQUIP_SPELL_REMOVE = 1313;
 	public static final int MSP_START_ENHANCE = 1314;
 	public static final int MSP_CHAR_BATTLE_NOTIFY = 1315;
+	public static final int MSP_CHAR_BATTLE_WIN = 1316;
+	public static final int MSP_CHAR_BATTLE_LOSE = 1317;
+	
 	//for server only
 	public static final int MSP_INIT_ZONE = 1400;
 	public static final int MSP_CHAR_REMOVE = 1401;

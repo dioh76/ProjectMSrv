@@ -63,6 +63,7 @@ public class SpellTable {
 				spellInfo.spellId = Integer.parseInt(childElem.getAttribute("id"));
 				spellInfo.spellName = childElem.getAttribute("name");
 				spellInfo.spellType = Integer.parseInt(childElem.getAttribute("type"));
+				spellInfo.value = Integer.parseInt(childElem.getAttribute("value"));
 				
 				mSpells.put(spellInfo.spellId, spellInfo);
 			}

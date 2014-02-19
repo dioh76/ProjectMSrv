@@ -411,6 +411,22 @@ public class GameRoom {
     	notifyAll(new ServerPacketCharTurnOver(chr.charId,chr.charId,false,false,0).toJson());
     }
     
+    private void sendBattleLose(SrvCharacter attChr, SrvCharacter defChr, ZoneInfo zoneInfo, boolean useSpell, int value)
+    {
+    	float sumPay = 0;
+    	if(value != 100 || useSpell == false)
+    	{
+	    	//pay for lose
+			sumPay = zoneInfo.tollSoul() * (100 - value) / 100;
+			defChr.soul += sumPay;
+	    	sendSoulChanged(defChr,true);
+	    	attChr.soul -= sumPay;
+	    	sendSoulChanged(attChr, true);
+    	}
+    	
+		notifyAll(new ServerPacketCharBattleLose(attChr.charId,zoneInfo.getChar(),zoneInfo.id,useSpell,value,(int)sumPay).toJson());    	
+    }
+    
     private boolean isOccpuyLinkedZone(ZoneInfo zoneInfo)
     {
     	if(zoneInfo.mLinkedZones == null || zoneInfo.mLinkedZones.size() == 0)
@@ -815,7 +831,12 @@ public class GameRoom {
     	if(chr == null)
     		return;
     	
-    	//char is controlled by spell and turn over
+    	charTurnOver(chr);
+    }
+    
+    private void charTurnOver(SrvCharacter chr)
+    {
+       	//char is controlled by spell and turn over
     	if(chr.controlled)
     	{
     		chr.controlled = false;
@@ -847,7 +868,7 @@ public class GameRoom {
 			if(buff.isValid() == false)
 			{
 				chr.mBuffs.remove(i);				
-				notifyAll(new ServerPacketCharDelBuff(pkt.sender,buff.id,buff.targetchar).toJson()); 
+				notifyAll(new ServerPacketCharDelBuff(chr.charId,buff.id,buff.targetchar).toJson()); 
 			}
 		}
 		
@@ -870,7 +891,7 @@ public class GameRoom {
     				if(buff.isValid() == false)
     				{
     					Logger.info("remove zone buff..");
-    					notifyAll(new ServerPacketZoneDelBuff(pkt.sender,buff.id,buff.targetzone).toJson());
+    					notifyAll(new ServerPacketZoneDelBuff(chr.charId,buff.id,buff.targetzone).toJson());
     					zoneInfo.setBuff(null);
     				}
     			}
@@ -878,13 +899,13 @@ public class GameRoom {
     		
     		if( mCurrentRound == GameRule.getInstance().GAMEEND_MAX_TURN)
     		{
-    			notifyAll(new ServerPacketGameOver(pkt.sender).toJson());
+    			notifyAll(new ServerPacketGameOver(chr.charId).toJson());
     		}
     		else
     		{
     			mCurrentRound++;
     			
-    			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
+    			notifyAll(new ServerPacketRoundOver(chr.charId,mStartCharId).toJson());
     			
     			sendTurnOver(chr);
     		}			
@@ -913,9 +934,8 @@ public class GameRoom {
 			
 			sendTurnOver(chr);
 			sendTurnStart(nextChr, false);
-		}
+		}    	
     }
-    
     private void onRoundStart(JsonNode node)
     {
     	ClientPacketRoundStart pkt = Json.fromJson(node, ClientPacketRoundStart.class);
@@ -1213,6 +1233,8 @@ public class GameRoom {
     		initSpellCards();
     	
     	int spellId = mSpellCards.remove(0);
+    	if(pkt.spellId != 0)
+    		spellId = pkt.spellId;
     	
     	notifyAll(new ServerPacketSpellOpen(pkt.sender,spellId).toJson());   	
     }
@@ -1236,7 +1258,7 @@ public class GameRoom {
     		return;
     	
     	//exclusive for grasshopper attack all
-    	if(pkt.targetchar != -1 && pkt.sender != pkt.targetchar && spellInfo.spellType != SpellInfo.SPELL_ATTACKALL)
+    	if(pkt.targetchar != -1 && pkt.sender != pkt.targetchar /*&& spellInfo.spellType != SpellInfo.SPELL_ATTACKALL*/)
     	{
     		SrvCharacter chr = mCharacters.get(pkt.targetchar);
     		if(chr == null)
@@ -1500,40 +1522,59 @@ public class GameRoom {
     {
     	ClientPacketBattleEnd pkt = Json.fromJson(node, ClientPacketBattleEnd.class);
     	
+    	if(mLastBattle == null && mLastBattle.charId == pkt.sender)
+    	{
+    		Logger.debug("last battle is not found.");
+    		return;
+    	}
+    	
+    	SrvCharacter attChr = mCharacters.get(mLastBattle.charId);
+    	if(attChr == null)
+    		return;
+    	
     	ZoneInfo zoneInfo = mZones.get(mLastBattle.zoneId);
     	if(zoneInfo == null)
     		return;
-
-    	if(pkt.attackwin == false && zoneInfo.enhancable == false)
-    	{	    	
-	    	if(zoneInfo.getLevel() < 2 && zoneInfo.getLevel() >= 0)
-	    	{
-	    		zoneInfo.setLevel(zoneInfo.getLevel() + 1);
-	    	}
-    	}
     	
-    	//이겼을 때만 우선 소울을 서버에서 같이 처리한다.( 두 캐릭터의 존 가치가 동시에 변경되므로 한번에 랭킹을 보내주는 것이 낫다.)
-/*    	if(pkt.attackwin)
+		SrvCharacter prevChr = mCharacters.get(zoneInfo.getChar());
+		if(prevChr == null)
+			return;
+		
+    	if(mLastBattle.attackWin)
     	{
-    		SrvCharacter attacker = mCharacters.get(pkt.sender);
-    		if( attacker == null )
-        		return;
+    		//occupy
     		
-    		attacker.addZoneAsset(mLastBattle.zoneId,mZones.get(mLastBattle.zoneId).sellSoul());
-
-    		SrvCharacter defender = mCharacters.get(mZones.get(mLastBattle.zoneId).getChar());
-    		if( defender == null )
-        		return;
-
-    		defender.removeZoneAsset(mLastBattle.zoneId);
-    		
-    		notifyAll( new ServerPacketCharZoneAsset(pkt.sender,attacker.getZoneCount(),attacker.getZoneAssets()).toJson());
-    		notifyAll( new ServerPacketCharZoneAsset(pkt.sender,defender.getZoneCount(),defender.getZoneAssets()).toJson());
-
+    		//change zone owner
+        	prevChr.removeZoneAsset(zoneInfo.id);
+        	notifyAll( new ServerPacketCharRemoveZone(prevChr.charId,zoneInfo.id,false,true).toJson());
+        	notifyAll( new ServerPacketCharZoneAsset(prevChr.charId,prevChr.getZoneCount(),prevChr.getZoneAssets()).toJson());
+        	
+        	zoneInfo.setChar(mLastBattle.charId);
+        	CardInfo cardInfo = CardTable.getInstance().getCard(mLastBattle.attackCard);
+        	zoneInfo.setCardInfo(cardInfo);
+        	
+        	attChr.addZoneAsset(zoneInfo.id, zoneInfo.tollSoul());        	
+        	notifyAll( new ServerPacketCharAddZone(attChr.charId,mLastBattle.zoneId,mLastBattle.attackCard,attChr.charId,false,-1).toJson());
+        	notifyAll( new ServerPacketCharZoneAsset(attChr.charId,attChr.getZoneCount(),attChr.getZoneAssets()).toJson());
+        	
         	sendRanking();
-    	}*/
-    	
-    	notifyAll(new ServerPacketBattleEnd(pkt.sender,mLastBattle.charId,mLastBattle.attackCard,pkt.attackwin,0,mLastBattle.zoneId).toJson());
+    		
+    		notifyAll( new ServerPacketCharBattleWin(mLastBattle.charId,zoneInfo.getChar(),zoneInfo.id,mLastBattle.attackCard).toJson());
+    	}
+    	else
+    	{
+    		if(attChr.hasEquipSpell(SpellInfo.SPELL_SAFEGUARD))
+    		{
+    			//check for equip spell
+    			User user = getUser(attChr.userId);
+    			if(user != null)
+    			user.SendPacket(new ServerPacketEquipSpellUse(pkt.sender,SpellInfo.SPELL_SAFEGUARD).toJson());  
+    		}
+    		else
+    		{
+    			sendBattleLose(attChr,prevChr,zoneInfo,false,0);
+    		}
+    	}
     }
     
     public void onEventArenaReq(JsonNode node)
@@ -1614,21 +1655,46 @@ public class GameRoom {
     	notifyAll(new ServerPacketEquipSpellUse(pkt.sender,pkt.spellType).toJson());    	   	
     }
     
+    //equip spell for battle toll 
     public void onEquipSpellUseReply(JsonNode node)
     {
     	ClientPacketEquipSpellUseReply pkt = Json.fromJson(node, ClientPacketEquipSpellUseReply.class);
     	
+    	if(mLastBattle == null && mLastBattle.charId == pkt.sender)
+    	{
+    		Logger.debug("last battle is not found.");
+    		return;
+    	}
+    	
+    	SrvCharacter attChr = mCharacters.get(mLastBattle.charId);
+    	if(attChr == null)
+    		return;
+    	
+    	ZoneInfo zoneInfo = mZones.get(mLastBattle.zoneId);
+    	if(zoneInfo == null)
+    		return;
+    	
+		SrvCharacter prevChr = mCharacters.get(zoneInfo.getChar());
+		if(prevChr == null)
+			return;    	
+    	
     	if(pkt.use == true)
     	{
-
-			SrvCharacter chr = mCharacters.get(pkt.sender);
+    		SrvCharacter chr = mCharacters.get(pkt.sender);
 			if(chr == null)
 				return;
 			
+			SpellInfo spell = SpellTable.getInstance().getSpell(pkt.spellId);
+			sendBattleLose(attChr,prevChr,zoneInfo,true,spell.value);
+			
 			chr.removeEquipSpellId(pkt.spellId);
+			notifyAll(new ServerPacketEquipSpellRemove(chr.charId,pkt.spellId).toJson());
     	}
-    	
-    	notifyAll(new ServerPacketEquipSpellUseReply(pkt.sender,pkt.spellId,mLastBattle.zoneId,pkt.use).toJson());    	   	
+    	else
+    	{
+    		sendBattleLose(attChr,prevChr,zoneInfo,false,0); 		
+    	}
+   	   	
     }
     
     private void onStartEnhance(JsonNode node)
