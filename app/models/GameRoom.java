@@ -740,7 +740,24 @@ public class GameRoom {
     {
     	ClientPacketCharMoved pkt = Json.fromJson(node, ClientPacketCharMoved.class);
     	
-    	notifyAll(new ServerPacketCharMoved(pkt.sender).toJson());   	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if( chr == null )
+    		return;
+    	
+    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	if(zoneInfo == null)
+    		return;
+    	
+    	if(zoneInfo.getCardInfo()!= null && zoneInfo.getChar() != pkt.sender)
+    	{
+    		notifyAll(new ServerPacketCharBattleNotify(pkt.sender,chr.charId,zoneInfo.getChar()).toJson());
+    	}
+    	
+    	User user = getUser(chr.userId);
+		if(user != null)
+			user.SendPacket(new ServerPacketCharMoved(pkt.sender,pkt.zId).toJson());
+    	
+    	//notifyAll(new ServerPacketCharMoved(pkt.sender,pkt.zId).toJson());   	
     }  
     
     private void onCharEnhance(JsonNode node)
