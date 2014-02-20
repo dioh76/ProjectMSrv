@@ -1,5 +1,7 @@
 package game;
 
+import game.spell.Spell;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,9 @@ public class SrvCharacter {
 	//character is controlled by spell
 	public boolean	controlled;
 	public int		spellcaster;
+	
+	//casted spell to me
+	public SpellCasted lastspell;
 	
 	public List<Buff> mBuffs;
 	public List<Integer> mEquipSpells;
@@ -55,7 +60,7 @@ public class SrvCharacter {
 	{
 		for(int spellId : mEquipSpells)
 		{
-			SpellInfo info = SpellTable.getInstance().getSpell(spellId);
+			Spell info = SpellTable.getInstance().getSpell(spellId);
 			if(info.spellType == spellType)
 				return true;
 		}
@@ -68,7 +73,7 @@ public class SrvCharacter {
 		for(int i=0; i< mEquipSpells.size(); i++)
 		{
 			int spellId = mEquipSpells.get(i);
-			SpellInfo info = SpellTable.getInstance().getSpell(spellId);
+			Spell info = SpellTable.getInstance().getSpell(spellId);
 			if(info.spellType == spellType)
 			{
 				mEquipSpells.remove(i);

@@ -1,6 +1,6 @@
 package xml;
 
-import game.SpellInfo;
+import game.spell.*;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import org.w3c.dom.NodeList;
 import play.libs.XML;
 
 public class SpellTable {
-	private Map<Integer, SpellInfo> mSpells = new HashMap<Integer,SpellInfo>();
+	private Map<Integer, Spell> mSpells = new HashMap<Integer,Spell>();
 
 	
 	public void init(InputStream in)
@@ -31,7 +31,7 @@ public class SpellTable {
 		}
 	}
 	
-	public SpellInfo getSpell(int spellId)
+	public Spell getSpell(int spellId)
 	{
 		if(mSpells.containsKey(spellId) == false)
 			return null;
@@ -58,14 +58,91 @@ public class SpellTable {
 			{
 				Element childElem = (Element)current;
 				
-				SpellInfo spellInfo = new SpellInfo();
+				int spellId = Integer.parseInt(childElem.getAttribute("id"));
+				String spellName = childElem.getAttribute("name");
+				int spellType = Integer.parseInt(childElem.getAttribute("type"));
+				int value1 = Integer.parseInt(childElem.getAttribute("value"));
+				int value2 = Integer.parseInt(childElem.getAttribute("value2"));
+				int targetUser = Integer.parseInt(childElem.getAttribute("userscope"));
+				int targetType = Integer.parseInt(childElem.getAttribute("target2"));
+				int useType = Integer.parseInt(childElem.getAttribute("use"));
 				
-				spellInfo.spellId = Integer.parseInt(childElem.getAttribute("id"));
-				spellInfo.spellName = childElem.getAttribute("name");
-				spellInfo.spellType = Integer.parseInt(childElem.getAttribute("type"));
-				spellInfo.value = Integer.parseInt(childElem.getAttribute("value"));
+				Spell spell;
 				
-				mSpells.put(spellInfo.spellId, spellInfo);
+				switch(spellType)
+				{
+				case Spell.SPELL_BEAUTY:
+					spell = new SpellBeauty(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_AMBUSH:
+					spell = new SpellAmbush(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_REFUGEES:
+					spell = new SpellRefugees(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_PROVOCATION:
+					spell = new SpellProvocation(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_SACRIFICE:
+					spell = new SpellSacrifice(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_REST:
+					spell = new SpellRest(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_DONATION:
+					spell = new SpellDonation(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_FIRE:
+					spell = new SpellFire(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_FLOOD:
+					spell = new SpellFlood(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_THUNDER:
+					spell = new SpellThunder(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_PLAGUE:
+					spell = new SpellPlague(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_SNOWFALL:
+					spell = new SpellSnowfall(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_GRASSHOPPER:
+					spell = new SpellGrasshopper(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_REDHORSE:
+					spell = new SpellRedHorse(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_UNLUCKHORSE:
+					spell = new SpellUnluckHorse(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_SOUL:
+					spell = new SpellSoul(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_CHANGEZONE:
+					spell = new SpellChangeZone(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_IMMUNE:
+					spell = new SpellImmune(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;				
+				case Spell.SPELL_SAFEGUARD:
+					spell = new SpellSafeGuard(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_MOVESELECT:
+					spell = new SpellMoveSelect(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;				
+				case Spell.SPELL_ATTACK:
+					spell = new SpellAttack(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				case Spell.SPELL_HEAL:
+					spell = new SpellHeal(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;				
+				default:
+					spell = new SpellNone(spellId,spellName,value1,value2,useType,targetUser,targetType);
+					break;
+				}
+				
+				mSpells.put(spell.spellId, spell);
 			}
 		}
 	}

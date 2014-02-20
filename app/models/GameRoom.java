@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.*;
 
 import game.*;
+import game.spell.Spell;
 
 public class GameRoom {
 	
@@ -250,6 +251,51 @@ public class GameRoom {
     	return user;
     }
     
+    public List<Integer> getCharZones(int charId)
+    {
+    	List<Integer> zones = new ArrayList<Integer>();
+    	synchronized(mZones)
+		{
+			for(ZoneInfo zoneInfo : mZones)
+			{
+				if(zoneInfo.getChar() == charId)
+					zones.add(zoneInfo.id);
+			}
+		}
+		
+		return zones;    	
+    }
+    
+    public List<SrvCharacter> getAllCharacters()
+    {
+    	synchronized(mCharacters)
+    	{
+    		return new ArrayList<SrvCharacter>(mCharacters.values());
+    	}
+    	
+    	//mCharacters.values();
+    }
+    
+    public int getMostExpensiveZone()
+    {
+    	float soul = 0;
+    	int zoneId = -1;
+    	
+    	synchronized(mZones)
+    	{
+    		for(ZoneInfo zoneInfo : mZones)
+    		{
+    			if(zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_NORMAL && zoneInfo.getCardInfo() != null && zoneInfo.tollSoul() > soul)
+    			{
+    				soul = zoneInfo.tollSoul();
+    				zoneId = zoneInfo.id;
+    			}
+    		}
+    	}
+    	
+    	return zoneId;
+    }
+    
     private void initZones()
     {	
     	for(int i = 0; i < ZoneTable.getInstance().getZoneCount(); i++)
@@ -313,14 +359,14 @@ public class GameRoom {
     	while(spellCards.hasNext())
     	{
     		int spellId = spellCards.next();
-    		if(spellId < SpellInfo.SYSTEM_SPELL_CARDNUM)
+    		if(spellId < Spell.SYSTEM_SPELL_CARDNUM)
     			mSpellCards.add(spellId);
     	}
     	
     	Collections.shuffle(mSpellCards);
     }
     
-    private void sendRanking()
+    public void sendRanking()
     {
     	List<AssetRank> ranks = new ArrayList<AssetRank>();
     	synchronized(mCharacters)
@@ -341,7 +387,7 @@ public class GameRoom {
     	notifyAll( new ServerPacketCharRankAsset(0,sendRanks).toJson());    
     }
     
-    private void sendSoulChanged(SrvCharacter chr, boolean notify)
+    public void sendSoulChanged(SrvCharacter chr, boolean notify)
     {
     	boolean bankrupt = chr.soul <= 0 ? true : false;
     	notifyAll(new ServerPacketCharAddSoul(chr.charId, chr.soul, bankrupt,notify).toJson());
@@ -427,7 +473,7 @@ public class GameRoom {
 		notifyAll(new ServerPacketCharBattleLose(attChr.charId,zoneInfo.getChar(),zoneInfo.id,useSpell,value,(int)sumPay).toJson());    	
     }
     
-    private boolean isOccpuyLinkedZone(ZoneInfo zoneInfo)
+    public boolean isOccpuyLinkedZone(ZoneInfo zoneInfo)
     {
     	if(zoneInfo.mLinkedZones == null || zoneInfo.mLinkedZones.size() == 0)
     		return false;
@@ -831,6 +877,8 @@ public class GameRoom {
     	if(chr == null)
     		return;
     	
+    	Logger.debug("[srv] turn over char = " + pkt.sender);
+    	
     	charTurnOver(chr);
     }
     
@@ -958,16 +1006,21 @@ public class GameRoom {
     {
     	ClientPacketCharAddBuff pkt = Json.fromJson(node, ClientPacketCharAddBuff.class);
     	
+    	charAddBuff(pkt.sender,pkt.bufftype,pkt.targetvalue,pkt.targetchar,pkt.targetzone,pkt.remainturn,pkt.creature,pkt.spellid);   	
+    }
+    
+    public void charAddBuff(int ownerId, int buffType, int targetVal, int targerChr, int targetZone, int remain, boolean creature, int spellId)
+    {
     	int objectId = Buff.getNewBuffID();
     	
     	Buff buff = new Buff();
     	buff.id = objectId;
-    	buff.owner = pkt.sender;
-    	buff.buffType = pkt.bufftype;
-    	buff.targetchar = pkt.targetchar;
-    	buff.targetzone = pkt.targetzone;
-    	buff.remainturn = pkt.remainturn;
-    	buff.creature = pkt.creature;
+    	buff.owner = ownerId;
+    	buff.buffType = buffType;
+    	buff.targetchar = targerChr;
+    	buff.targetzone = targetZone;
+    	buff.remainturn = remain;
+    	buff.creature = creature;
     	
     	if(mCharacters.containsKey(buff.targetchar) == false)
     		return;
@@ -989,7 +1042,7 @@ public class GameRoom {
     	
     	chr.mBuffs.add(buff);
     	
-    	notifyAll(new ServerPacketCharAddBuff(pkt.sender,objectId,pkt.bufftype,pkt.targetvalue,pkt.targetchar,pkt.targetzone,pkt.remainturn,pkt.creature,pkt.spellid).toJson());   	
+    	notifyAll(new ServerPacketCharAddBuff(ownerId,objectId,buffType,targetVal,targerChr,targetZone,remain,creature,spellId).toJson());    	
     }
     
     private void onCharMoveBySpell(JsonNode node)
@@ -1060,31 +1113,36 @@ public class GameRoom {
     	if( chr == null )
     		return;
     	
-    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	charAddZone(chr,pkt.zId,pkt.cId,pkt.buy,pkt.lIdx);
+    }
+    
+    private void charAddZone(SrvCharacter chr, int zoneId, int cardId, boolean buy, int index )
+    {
+    	ZoneInfo zoneInfo = mZones.get(zoneId);
     	if(zoneInfo == null)
     		return;
 
-    	CardInfo cardInfo = CardTable.getInstance().getCard(pkt.cId);
+    	CardInfo cardInfo = CardTable.getInstance().getCard(cardId);
     	if(cardInfo == null)
     		return;
     	
-    	zoneInfo.setChar(pkt.sender);
+    	zoneInfo.setChar(chr.charId);
     	zoneInfo.setCardInfo(cardInfo);
     	
-    	chr.addZoneAsset(pkt.zId, zoneInfo.tollSoul());
+    	chr.addZoneAsset(zoneId, zoneInfo.tollSoul());
     	
-    	if(pkt.buy)
+    	if(buy)
     	{
 			chr.soul -= cardInfo.cost;
 			sendSoulChanged(chr,false);
     	}
     	
-    	notifyAll( new ServerPacketCharZoneAsset(pkt.sender,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    	notifyAll( new ServerPacketCharZoneAsset(chr.charId,chr.getZoneCount(),chr.getZoneAssets()).toJson());
     	
     	sendRanking(); 
     	
-    	notifyAll( new ServerPacketCharAddZone(pkt.sender,pkt.zId,pkt.cId,pkt.pId,pkt.buy,pkt.lIdx).toJson());
-    }    
+    	notifyAll( new ServerPacketCharAddZone(chr.charId,zoneId,cardId,chr.charId,buy,index).toJson());    	
+    }
     
     private void onCharPay(JsonNode node)
     {
@@ -1190,6 +1248,10 @@ public class GameRoom {
     {
     	ClientPacketCharOccupy pkt = Json.fromJson(node, ClientPacketCharOccupy.class);
     	
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if(chr == null)
+    		return;
+    	
     	ZoneInfo zoneInfo = mZones.get(pkt.zId);
     	if(zoneInfo == null)
     		return;
@@ -1208,6 +1270,8 @@ public class GameRoom {
     			return;
     		}
     	}
+    	
+    	charAddZone(chr,zoneInfo.id,pkt.cId,true,pkt.idx);   	
     	
     	notifyAll(new ServerPacketCharOccupy(pkt.sender,pkt.zId,pkt.idx,pkt.cId).toJson());    
 	}
@@ -1250,12 +1314,22 @@ public class GameRoom {
     {
     	ClientPacketSpellUse pkt = Json.fromJson(node, ClientPacketSpellUse.class);
     	
-    	mLastSpellUsed = new SpellUsed(pkt.sender, pkt.spellid, pkt.targetchar, pkt.targetzone, pkt.targetzone2);
+    	SrvCharacter castChr = mCharacters.get(pkt.sender);
+    	SrvCharacter targetChr = null;
+    	if(pkt.targetchar != -1) targetChr = mCharacters.get(pkt.targetchar);
+    	ZoneInfo zoneInfo1 = null;
+    	if(pkt.targetzone != -1) zoneInfo1 = mZones.get(pkt.targetzone);
+    	ZoneInfo zoneInfo2 = null;
+    	if(pkt.targetzone2 != -1) zoneInfo2 = mZones.get(pkt.targetzone2);
     	
-    	SpellInfo spellInfo = SpellTable.getInstance().getSpell(pkt.spellid);
+    	if(targetChr != null)
+    		targetChr.lastspell = new SpellCasted(pkt.sender, pkt.spellid, pkt.targetchar, pkt.targetzone, pkt.targetzone2);
+    	
+    	Spell spellInfo = SpellTable.getInstance().getSpell(pkt.spellid);
     	
     	if(spellInfo == null)
     		return;
+    	
     	
     	//exclusive for grasshopper attack all
     	if(pkt.targetchar != -1 && pkt.sender != pkt.targetchar /*&& spellInfo.spellType != SpellInfo.SPELL_ATTACKALL*/)
@@ -1264,7 +1338,7 @@ public class GameRoom {
     		if(chr == null)
     			return;
     		
-    		if(chr.hasEquipSpell(SpellInfo.SPELL_IMMUNE))
+    		if(chr.hasEquipSpell(Spell.SPELL_IMMUNE))
     		{
     			
     			User user = getUser(chr.userId);
@@ -1274,12 +1348,16 @@ public class GameRoom {
     		}
     		else
     		{
-    			notifyAll(new ServerPacketSpellUse(pkt.sender, pkt.spellid, pkt.targetchar, pkt.targetzone, pkt.targetzone2).toJson());
+    			boolean turnover = spellInfo.onUse(spellInfo.spellId, this, castChr, targetChr, zoneInfo1, zoneInfo2);
+    			
+    			notifyAll(new ServerPacketSpellUse(pkt.sender, pkt.spellid, pkt.targetchar, pkt.targetzone, pkt.targetzone2,turnover).toJson());
     		}
     	}
     	else
     	{
-    		notifyAll(new ServerPacketSpellUse(pkt.sender, pkt.spellid, pkt.targetchar, pkt.targetzone, pkt.targetzone2).toJson());
+    		boolean turnover = spellInfo.onUse(spellInfo.spellId, this, castChr, targetChr, zoneInfo1, zoneInfo2);
+    		
+    		notifyAll(new ServerPacketSpellUse(pkt.sender, pkt.spellid, pkt.targetchar, pkt.targetzone, pkt.targetzone2,turnover).toJson());
     	}   	
     }
     
@@ -1307,23 +1385,37 @@ public class GameRoom {
     {
     	ClientPacketSpellDefenseReply pkt = Json.fromJson(node, ClientPacketSpellDefenseReply.class);
     	
-    	if(mLastSpellUsed != null)
+    	SrvCharacter chr = mCharacters.get(pkt.sender);
+    	if(chr == null)
+    		return;
+    	
+    	if(chr.lastspell != null)
     	{
+    		boolean turnover = true;
     		if(pkt.use == true)
     		{
-    			SrvCharacter chr = mCharacters.get(pkt.sender);
-    			if(chr == null)
-    				return;
-    			
-    			int removeSpellId = chr.removeEquipSpell(SpellInfo.SPELL_IMMUNE);
+    			int removeSpellId = chr.removeEquipSpell(Spell.SPELL_IMMUNE);
     			if(removeSpellId != -1)
     			{
     				notifyAll(new ServerPacketEquipSpellRemove(pkt.sender,removeSpellId).toJson());
     			}
-    			
+    		}
+    		else
+    		{
+    			Spell spellInfo = SpellTable.getInstance().getSpell(chr.lastspell.spellId);
+    	    	if(spellInfo == null)
+    	    		return;
+    	    	
+    	    	SrvCharacter castChr = mCharacters.get(chr.lastspell.caster);
+    	    	ZoneInfo zoneInfo1 = null;
+    	    	if(chr.lastspell.targetzone != -1) zoneInfo1 = mZones.get(chr.lastspell.targetzone);
+    	    	ZoneInfo zoneInfo2 = null;
+    	    	if(chr.lastspell.targetzone2 != -1) zoneInfo2 = mZones.get(chr.lastspell.targetzone2);    	    	
+    	    	
+    	    	turnover = spellInfo.onUse(spellInfo.spellId, this, castChr, chr, zoneInfo1, zoneInfo2);
     		}
     		
-    		notifyAll(new ServerPacketSpellDefenseReply(pkt.sender, pkt.defender, mLastSpellUsed.spellId, mLastSpellUsed.targetchar, mLastSpellUsed.targetzone, mLastSpellUsed.targetzone2, pkt.use).toJson());	
+    		notifyAll(new ServerPacketSpellDefenseReply(chr.lastspell.caster, pkt.defender, chr.lastspell.spellId, chr.lastspell.targetchar, chr.lastspell.targetzone, chr.lastspell.targetzone2, pkt.use,turnover).toJson());	
     	}   	
     }
     
@@ -1361,31 +1453,36 @@ public class GameRoom {
     {
     	ClientPacketZoneAddBuff pkt = Json.fromJson(node, ClientPacketZoneAddBuff.class);
     	
+    	zoneAddBuff(pkt.sender,pkt.bType,pkt.zId,pkt.val,pkt.remain,pkt.sId);
+    }
+    
+    public void zoneAddBuff(int ownerId, int buffType, int zoneId, int val,int remain, int spellId)
+    {
     	int objectId = Buff.getNewBuffID();
     	
     	Buff buff = new Buff();
     	buff.id = objectId;
-    	buff.owner = pkt.sender;
-    	buff.buffType = pkt.bType;
+    	buff.owner = ownerId;
+    	buff.buffType = buffType;
     	buff.targetchar = -1;
-    	buff.targetzone = pkt.zId;
-    	buff.remainturn = pkt.remain;
+    	buff.targetzone = zoneId;
+    	buff.remainturn = remain;
     	buff.creature = true;
     	
-    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	ZoneInfo zoneInfo = mZones.get(zoneId);
     	if(zoneInfo == null)
     		return;
     	
     	Buff prevBuff = zoneInfo.getBuff();
     	if(prevBuff != null)
     	{
-    		notifyAll(new ServerPacketZoneDelBuff(pkt.sender,prevBuff.id,prevBuff.targetzone).toJson());
+    		notifyAll(new ServerPacketZoneDelBuff(ownerId,prevBuff.id,prevBuff.targetzone).toJson());
     		zoneInfo.setBuff(null);
     	}
     	
     	zoneInfo.setBuff(buff);
     	    	
-    	notifyAll(new ServerPacketZoneAddBuff(pkt.sender,objectId,pkt.bType,pkt.val,pkt.zId,pkt.remain,pkt.sId).toJson());   	
+    	notifyAll(new ServerPacketZoneAddBuff(ownerId,objectId,buffType,val,zoneId,remain,spellId).toJson());      	
     }
     
     private void onZoneDelBuff(JsonNode node)
@@ -1522,7 +1619,7 @@ public class GameRoom {
     {
     	ClientPacketBattleEnd pkt = Json.fromJson(node, ClientPacketBattleEnd.class);
     	
-    	if(mLastBattle == null && mLastBattle.charId == pkt.sender)
+    	if(mLastBattle == null || mLastBattle.charId != pkt.sender)
     	{
     		Logger.debug("last battle is not found.");
     		return;
@@ -1535,6 +1632,8 @@ public class GameRoom {
     	ZoneInfo zoneInfo = mZones.get(mLastBattle.zoneId);
     	if(zoneInfo == null)
     		return;
+    	
+    	int defenseChrId = zoneInfo.getChar();
     	
 		SrvCharacter prevChr = mCharacters.get(zoneInfo.getChar());
 		if(prevChr == null)
@@ -1559,20 +1658,24 @@ public class GameRoom {
         	
         	sendRanking();
     		
-    		notifyAll( new ServerPacketCharBattleWin(mLastBattle.charId,zoneInfo.getChar(),zoneInfo.id,mLastBattle.attackCard).toJson());
+    		notifyAll( new ServerPacketCharBattleWin(mLastBattle.charId,defenseChrId,zoneInfo.id,mLastBattle.attackCard).toJson());
+    		
+    		mLastBattle = null;
     	}
     	else
     	{
-    		if(attChr.hasEquipSpell(SpellInfo.SPELL_SAFEGUARD))
+    		if(attChr.hasEquipSpell(Spell.SPELL_SAFEGUARD))
     		{
     			//check for equip spell
     			User user = getUser(attChr.userId);
     			if(user != null)
-    			user.SendPacket(new ServerPacketEquipSpellUse(pkt.sender,SpellInfo.SPELL_SAFEGUARD).toJson());  
+    			user.SendPacket(new ServerPacketEquipSpellUse(pkt.sender,Spell.SPELL_SAFEGUARD).toJson());  
     		}
     		else
     		{
     			sendBattleLose(attChr,prevChr,zoneInfo,false,0);
+    			
+    			mLastBattle = null;
     		}
     	}
     }
@@ -1660,7 +1763,7 @@ public class GameRoom {
     {
     	ClientPacketEquipSpellUseReply pkt = Json.fromJson(node, ClientPacketEquipSpellUseReply.class);
     	
-    	if(mLastBattle == null && mLastBattle.charId == pkt.sender)
+    	if(mLastBattle == null || mLastBattle.charId != pkt.sender)
     	{
     		Logger.debug("last battle is not found.");
     		return;
@@ -1684,8 +1787,8 @@ public class GameRoom {
 			if(chr == null)
 				return;
 			
-			SpellInfo spell = SpellTable.getInstance().getSpell(pkt.spellId);
-			sendBattleLose(attChr,prevChr,zoneInfo,true,spell.value);
+			Spell spell = SpellTable.getInstance().getSpell(pkt.spellId);
+			sendBattleLose(attChr,prevChr,zoneInfo,true,spell.value1);
 			
 			chr.removeEquipSpellId(pkt.spellId);
 			notifyAll(new ServerPacketEquipSpellRemove(chr.charId,pkt.spellId).toJson());
@@ -1694,6 +1797,8 @@ public class GameRoom {
     	{
     		sendBattleLose(attChr,prevChr,zoneInfo,false,0); 		
     	}
+    	
+    	mLastBattle = null;
    	   	
     }
     
