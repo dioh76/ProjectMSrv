@@ -658,15 +658,36 @@ public class GameRoom {
     	ClientPacketCardChange pkt = Json.fromJson(node, ClientPacketCardChange.class);
     	
     	SrvCharacter chr = mCharacters.get(pkt.sender);
-    	if( chr == null )
+    	if(chr == null)
     		return;
     	
+    	ZoneInfo zoneInfo = mZones.get(pkt.zId);
+    	if(zoneInfo == null)
+    		return;
+    	
+    	if(zoneInfo.getCardInfo() == null)
+    		return;
+    	
+    	//no return cost
+    	int prevCard = zoneInfo.getCardInfo().cardId;
+    	  
     	CardInfo cardInfo = CardTable.getInstance().getCard(pkt.cId);
     	chr.soul -= cardInfo.cost;
     	
     	sendSoulChanged(chr,false);
     	
-    	notifyAll(new ServerPacketCardChange(pkt.sender,pkt.zId,pkt.idx,pkt.cId).toJson());
+    	chr.removeZoneAsset(pkt.zId);
+		notifyAll( new ServerPacketCharRemoveZone(chr.charId,pkt.zId,false,true).toJson());
+    	
+		zoneInfo.setCardInfo(cardInfo);
+    	chr.addZoneAsset(zoneInfo.id, zoneInfo.tollSoul());
+    	notifyAll( new ServerPacketCharAddZone(chr.charId,zoneInfo.id,cardInfo.cardId,chr.charId,false,-1).toJson());    
+		
+    	notifyAll( new ServerPacketCharZoneAsset(chr.charId,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    	
+    	sendRanking();
+    	
+    	notifyAll(new ServerPacketCardChange(pkt.sender,pkt.zId,pkt.idx,pkt.cId,prevCard).toJson());
     }
     
     private void onCharBankrupt(JsonNode node)

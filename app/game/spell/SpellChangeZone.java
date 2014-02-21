@@ -32,19 +32,22 @@ public class SpellChangeZone extends Spell {
 		
 		if(zoneInfo1 == null)
 			return true;
+		
+		if(targetChr == null)
+			return true;
 
 		CardInfo cardInfo = CardTable.getInstance().getCard(value1);
 		if(cardInfo == null)
 			return true;
 		
-		castChr.removeZoneAsset(zoneInfo1.id);
-		room.notifyAll( new ServerPacketCharRemoveZone(castChr.charId,zoneInfo1.id,false,true).toJson());
+		targetChr.removeZoneAsset(zoneInfo1.id);
+		room.notifyAll( new ServerPacketCharRemoveZone(targetChr.charId,zoneInfo1.id,false,true).toJson());
     	
     	zoneInfo1.setCardInfo(cardInfo);
-    	castChr.addZoneAsset(zoneInfo1.id, zoneInfo1.tollSoul());
-    	room.notifyAll( new ServerPacketCharAddZone(castChr.charId,zoneInfo1.id,cardInfo.cardId,castChr.charId,false,-1).toJson());    
+    	targetChr.addZoneAsset(zoneInfo1.id, zoneInfo1.tollSoul());
+    	room.notifyAll( new ServerPacketCharAddZone(targetChr.charId,zoneInfo1.id,cardInfo.cardId,targetChr.charId,false,-1).toJson());    
 		
-    	room.notifyAll( new ServerPacketCharZoneAsset(castChr.charId,castChr.getZoneCount(),castChr.getZoneAssets()).toJson());
+    	room.notifyAll( new ServerPacketCharZoneAsset(targetChr.charId,targetChr.getZoneCount(),targetChr.getZoneAssets()).toJson());
     	
     	room.sendRanking();
 		
