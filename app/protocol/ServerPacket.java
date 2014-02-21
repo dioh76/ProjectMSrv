@@ -39,6 +39,8 @@ public class ServerPacket
 	public static final int MSP_CHAR_TURN_SKIP = 1129;
 	public static final int MSP_CHAR_BANKRUPT_REQ = 1130;
 	
+	public static final int MSP_CHAR_MOVE_ZONE = 1131;
+	
 	public static final int MSP_SPELL_OPEN = 1200;
 	public static final int MSP_SPELL_REQ_USE = 1201;
 	public static final int MSP_SPELLUSE = 1202;

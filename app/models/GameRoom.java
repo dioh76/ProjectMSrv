@@ -251,6 +251,25 @@ public class GameRoom {
     	return user;
     }
     
+    public int getZoneCount()
+    {
+    	synchronized(mZones)
+    	{
+    		return mZones.size();
+    	}
+    }
+    
+    public ZoneInfo getZone(int zoneId)
+    {
+    	if(zoneId == -1)
+    		return null;
+    	
+    	synchronized(mZones)
+    	{
+    		return mZones.get(zoneId);
+    	}
+    }
+    
     public List<Integer> getCharZones(int charId)
     {
     	List<Integer> zones = new ArrayList<Integer>();
@@ -832,6 +851,8 @@ public class GameRoom {
     	ZoneInfo zoneInfo = mZones.get(pkt.zId);
     	if(zoneInfo == null)
     		return;
+    	
+    	chr.curzone = pkt.zId;
     	
     	if(zoneInfo.getCardInfo()!= null && zoneInfo.getChar() != pkt.sender)
     	{
@@ -1717,7 +1738,7 @@ public class GameRoom {
     	ClientPacketEventArenaUse pkt = Json.fromJson(node, ClientPacketEventArenaUse.class);
     	
     	final Random random = new Random();
-    	int dice = random.nextInt(3) + 1;
+    	int dice = 1;//random.nextInt(3) + 1;
     	CardInfo info = CardTable.getInstance().getCard(pkt.card);
     	int total = 0;
     	

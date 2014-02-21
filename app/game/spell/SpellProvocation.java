@@ -1,5 +1,6 @@
 package game.spell;
 
+import protocol.server.ServerPacketCharMoveZone;
 import game.SrvCharacter;
 import game.ZoneInfo;
 import models.GameRoom;
@@ -29,7 +30,27 @@ public class SpellProvocation extends Spell {
 			return true;
 		
 		if(targetChr == null)
-    		return true;    			
+    		return true;
+		
+		int pos = targetChr.curzone;
+		int i = pos + 1;
+		while(i != pos)
+		{
+			ZoneInfo zoneInfo = room.getZone(i);
+			if(zoneInfo != null)
+			{
+				if(zoneInfo.getChar() == castChr.charId)
+					break;
+			}
+			i++;
+			if(i >= room.getZoneCount())
+				i = 0;
+			
+	    	targetChr.controlled = true;
+	    	targetChr.spellcaster = castChr.charId;
+	    	
+	    	room.notifyAll(new ServerPacketCharMoveZone(targetChr.charId,i).toJson());
+		}
 		
 		return false;
 	}

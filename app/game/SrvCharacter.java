@@ -20,6 +20,9 @@ public class SrvCharacter {
 	public boolean	checkdirection;
 	public boolean	addcard;
 	
+	//position
+	public int		curzone;
+	
 	public boolean	myturn;
 	public int		dice1;
 	public int		dice2;
