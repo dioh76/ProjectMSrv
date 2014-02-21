@@ -35,7 +35,6 @@ public class SpellBeauty extends Spell {
     	zoneInfo1.setChar(castChr.charId);
     	
     	float asset = zoneInfo1.tollSoul();
-    	if(room.isOccpuyLinkedZone(zoneInfo1)) asset = asset * 2.0f;
     	castChr.addZoneAsset(zoneInfo1.id, asset);
     	targetChr.removeZoneAsset(zoneInfo1.id);
     	

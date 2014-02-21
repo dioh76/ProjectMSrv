@@ -35,7 +35,6 @@ public class SpellDonation extends Spell {
     	zoneInfo1.setChar(targetChr.charId);
     	
     	float asset = zoneInfo1.tollSoul();
-    	if(room.isOccpuyLinkedZone(zoneInfo1)) asset = asset * 2.0f;
     	targetChr.addZoneAsset(zoneInfo1.id, asset);
     	castChr.removeZoneAsset(zoneInfo1.id);
     	

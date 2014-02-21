@@ -2,6 +2,8 @@ package game;
 
 import java.util.List;
 
+import models.GameRoom;
+
 import xml.GameRule;
 
 public class ZoneInfo {
@@ -35,15 +37,18 @@ public class ZoneInfo {
 	private int	mStartEnhance;
 	
 	public List<Integer> mLinkedZones; 
-	public List<ZoneValueInfo> values;	
+	public List<ZoneValueInfo> values;
 	
-	public ZoneInfo(int id)
+	public GameRoom gameroom;
+	
+	public ZoneInfo(int id, GameRoom room)
 	{
 		this.id = id;
 		this.mLevel = 0;
 		this.mCharId = 0;
 		this.mTollRate = 100.0f;
 		this.mStartEnhance = 0;
+		this.gameroom = room;
 	}
 	
 	public void setChar(int charId)
@@ -54,6 +59,16 @@ public class ZoneInfo {
 	public int getChar()
 	{
 		return mCharId;
+	}
+	
+	public void setTollRate(float rate)
+	{
+		mTollRate = rate;
+	}
+	
+	public float getTollRate()
+	{
+		return mTollRate;
 	}
 	
 	public void setAmbush(boolean ambush, int owner)
@@ -90,6 +105,11 @@ public class ZoneInfo {
 	
 	public void setBuff(Buff buff)
 	{
+		if(buff != null)
+			buff.apply();
+		else
+			mBuff.unapply();
+		
 		mBuff = buff;
 	}
 	
@@ -144,8 +164,26 @@ public class ZoneInfo {
 				zoneToll += mCardInfo.cost;
 			
 			zoneToll = zoneToll * (1 + GameRule.getInstance().getStartEnhance(mStartEnhance));
-			
-			return zoneToll * mTollRate/100.0f;
+			if(allOccupyLinkedZone())
+				return zoneToll * 2.0f * mTollRate/100.0f;
+			else
+				return zoneToll * mTollRate/100.0f;
 		}
+	}
+	
+	private boolean allOccupyLinkedZone()
+	{
+		if(mLinkedZones == null || mLinkedZones.size() == 0)
+			return false;
+		
+    	boolean bAllOccupy = true;
+    	for(int zId : mLinkedZones)
+    	{
+    		ZoneInfo zoneInfo = gameroom.getZone(zId);
+    		if(zoneInfo.getChar() != getChar())
+    			bAllOccupy = false;
+    	}
+    	
+    	return bAllOccupy;		
 	}
 }

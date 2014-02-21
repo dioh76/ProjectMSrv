@@ -18,6 +18,9 @@ public class Buff {
 	public int targetzone;
 	public int remainturn;
 	public boolean creature;
+	public int value1;
+	
+	public ZoneInfo zoneInfo = null;
 	
 	public static int getNewBuffID()
 	{
@@ -26,6 +29,11 @@ public class Buff {
 	
 	public Buff()
 	{
+	}
+	
+	public void setZoneInfo(ZoneInfo zoneInfo)
+	{
+		this.zoneInfo = zoneInfo;
 	}
 	
 	public void turnOver()
@@ -37,5 +45,27 @@ public class Buff {
 	public boolean isValid()
 	{
 		return remainturn <= 0 ? false : true;
+	}
+	
+	public void apply()
+	{
+		if(zoneInfo == null)
+			return;
+		
+		if(buffType == Buff.PLUS_TOLL)
+		{
+			zoneInfo.setTollRate(value1);
+		}
+	}
+	
+	public void unapply()
+	{
+		if(zoneInfo == null)
+			return;
+		
+		if(buffType == Buff.PLUS_TOLL)
+		{
+			zoneInfo.setTollRate(100);
+		}
 	}
 }

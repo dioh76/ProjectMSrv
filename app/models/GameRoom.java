@@ -313,7 +313,7 @@ public class GameRoom {
     	{
     		ZonePosInfo posInfo = ZoneTable.getInstance().getZonePosInfo(i);
     		
-    		ZoneInfo zoneInfo = new ZoneInfo(posInfo.id);
+    		ZoneInfo zoneInfo = new ZoneInfo(posInfo.id,this);
     		zoneInfo.type = posInfo.type;
     		if(posInfo.info != 0)
     		{
@@ -482,21 +482,6 @@ public class GameRoom {
     	}
     	
 		notifyAll(new ServerPacketCharBattleLose(attChr.charId,zoneInfo.getChar(),zoneInfo.id,useSpell,value,(int)sumPay).toJson());    	
-    }
-    
-    public boolean isOccpuyLinkedZone(ZoneInfo zoneInfo)
-    {
-    	if(zoneInfo.mLinkedZones == null || zoneInfo.mLinkedZones.size() == 0)
-    		return false;
-    	
-    	boolean bAllOccupy = true;
-    	for(ZoneInfo zInfo : mZones)
-    	{
-    		if(zInfo.getChar() != zoneInfo.getChar())
-    			bAllOccupy = false;
-    	}
-    	
-    	return bAllOccupy;
     }
     
     public void processPacket( int protocol, JsonNode node )
@@ -880,7 +865,6 @@ public class GameRoom {
     	chr.soul -= zoneInfo.buySoul();
 
     	float asset = zoneInfo.tollSoul();
-    	if(isOccpuyLinkedZone(zoneInfo)) asset = asset * 2.0f;    	
     	chr.addZoneAsset(zoneInfo.id, asset);
     	
     	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.zId,zoneInfo.getLevel(),chr.soul,chr.getZoneCount(),chr.getZoneAssets(),true,true).toJson());
@@ -1055,6 +1039,7 @@ public class GameRoom {
     	buff.targetzone = targetZone;
     	buff.remainturn = remain;
     	buff.creature = creature;
+    	buff.value1 = targetVal;
     	
     	if(mCharacters.containsKey(buff.targetchar) == false)
     		return;
@@ -1197,7 +1182,6 @@ public class GameRoom {
     		return;
 
     	float fToll = zoneInfo.tollSoul();
-    	if(isOccpuyLinkedZone(zoneInfo)) fToll = fToll * 2.0f;    	
     	
     	chr.soul -= fToll;
     	sendSoulChanged(chr,false);
@@ -1270,7 +1254,6 @@ public class GameRoom {
     	zoneInfo.setChar(toChar.charId);
     	
     	float asset = zoneInfo.tollSoul();
-    	if(isOccpuyLinkedZone(zoneInfo)) asset = asset * 2.0f;
     	toChar.addZoneAsset(pkt.zId, asset);
     	fromChar.removeZoneAsset(pkt.zId);
     	
@@ -1502,10 +1485,13 @@ public class GameRoom {
     	buff.targetzone = zoneId;
     	buff.remainturn = remain;
     	buff.creature = true;
+    	buff.value1 = val;
     	
     	ZoneInfo zoneInfo = mZones.get(zoneId);
     	if(zoneInfo == null)
     		return;
+    	
+    	buff.setZoneInfo(zoneInfo);
     	
     	Buff prevBuff = zoneInfo.getBuff();
     	if(prevBuff != null)
@@ -1570,7 +1556,6 @@ public class GameRoom {
         	zoneInfo.setLevel(zoneInfo.getLevel() + 1);
         	chr.soul -= zoneInfo.buySoul();
         	float asset = zoneInfo.tollSoul();
-        	if(isOccpuyLinkedZone(zoneInfo)) asset = asset * 2.0f;           	
         	chr.addZoneAsset(zoneInfo.id, asset);
         	
         	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.targetzone,zoneInfo.getLevel(),chr.soul,chr.getZoneCount(),chr.getZoneAssets(),false,false).toJson());
