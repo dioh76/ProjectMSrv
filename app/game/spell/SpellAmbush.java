@@ -29,9 +29,6 @@ public class SpellAmbush extends Spell {
 		if(zoneInfo1 == null)
 			return true;
 		
-		if(targetChr == null)
-			return true;
-		
 		zoneInfo1.setAmbush(true, castChr.charId);
     	
     	room.notifyAll(new ServerPacketZoneAmbush(castChr.charId,zoneInfo1.id,true).toJson());    
