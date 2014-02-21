@@ -251,14 +251,6 @@ public class GameRoom {
     	return user;
     }
     
-    public int getZoneCount()
-    {
-    	synchronized(mZones)
-    	{
-    		return mZones.size();
-    	}
-    }
-    
     public ZoneInfo getZone(int zoneId)
     {
     	if(zoneId == -1)

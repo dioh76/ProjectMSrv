@@ -1,6 +1,7 @@
 package game.spell;
 
 import protocol.server.ServerPacketCharMoveBySpell;
+import xml.ZoneTable;
 import game.Buff;
 import game.SrvCharacter;
 import game.ZoneInfo;
@@ -27,18 +28,20 @@ public class SpellUnluckHorse extends Spell {
 		if(castChr == null)
 			return true;
 		
-		if(targetChr == null)
-			return true;
-		
 		int zoneId = room.getMostExpensiveZone();
 		
 		if(zoneId == -1)
 			return true;
 		
-		//check my position and move to specific zone
-		//room.notifyAll(new ServerPacketCharMoveBySpell(pkt.sender,pkt.move,pkt.reverse,pkt.bonus).toJson());
+		//To determine where you are, and I go to the most expensive land
+		int pos = castChr.curzone;
+		int move = zoneId - pos;
+		if(move < 0)
+		{
+			move = ZoneTable.getInstance().getZoneCount() + move;
+		}
 		
-		//room.charAddBuff(castChr.charId,Buff.SPELL_USE,-1,targetChr.charId,-1,1,false,spellId);   
+		room.notifyAll(new ServerPacketCharMoveBySpell(castChr.charId,move,false,true).toJson());  
 		
 		return false;
 	}

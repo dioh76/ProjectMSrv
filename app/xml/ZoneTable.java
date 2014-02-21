@@ -1,5 +1,6 @@
 package xml;
 
+import game.ZoneInfo;
 import game.ZonePosInfo;
 import game.ZoneValueInfo;
 import game.ZoneBasicInfo;
@@ -22,7 +23,7 @@ public class ZoneTable {
 	private List<ZonePosInfo> mZones = new ArrayList<ZonePosInfo>();
 	private Map<Integer, ZoneBasicInfo> mZoneInfos = new HashMap<Integer, ZoneBasicInfo>();
 	private List<List<Integer>> mZoneLinkedInfos = new ArrayList<List<Integer>>();
-	//private Map<Integer, List<ZoneBasicInfo>> mZoneInfos = new HashMap<Integer,List<ZoneBasicInfo>>();
+	private int portalZone = -1;
 
 	public void init(InputStream in)
 	{
@@ -37,6 +38,11 @@ public class ZoneTable {
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public int getPortalZone()
+	{
+		return portalZone;
 	}
 	
 	public int getZoneCount()
@@ -88,6 +94,9 @@ public class ZoneTable {
 				posInfo.type = Integer.parseInt(childElem.getAttribute("type"));
 				posInfo.info = Integer.parseInt(childElem.getAttribute("info"));
 				mZones.add(posInfo);
+				
+				if(posInfo.type == ZoneInfo.ZONE_MAINTYPE_PORTAL)
+					portalZone = posInfo.id;
 			}
 		}
 	}

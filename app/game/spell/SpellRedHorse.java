@@ -1,6 +1,7 @@
 package game.spell;
 
 import protocol.server.ServerPacketCharMoveBySpell;
+import xml.ZoneTable;
 import game.Buff;
 import game.SrvCharacter;
 import game.ZoneInfo;
@@ -26,9 +27,18 @@ public class SpellRedHorse extends Spell {
 		
 		if(castChr == null)
 			return true;
+
+		int zoneId = ZoneTable.getInstance().getPortalZone();
 		
-		if(targetChr == null)
-			return true;
+		//To determine where you are, and I go to the portal zone
+		int pos = castChr.curzone;
+		int move = zoneId - pos;
+		if(move < 0)
+		{
+			move = ZoneTable.getInstance().getZoneCount() + move;
+		}
+		
+		room.notifyAll(new ServerPacketCharMoveBySpell(castChr.charId,move,false,true).toJson());  				
 		
 		return false;
 	}
