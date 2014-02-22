@@ -126,6 +126,8 @@ public class CardTable {
 			break;
 		case 5:
 		{
+//			ArrayList arr = new ArrayList(mCardOptions.values());
+//			Collections.
 			Collections.shuffle(mCardGrades.get(CardInfo.CARD_GRADE_A));
 			cards.addAll(mCardGrades.get(CardInfo.CARD_GRADE_A).subList(0, 1));
 			Collections.shuffle(mCardGrades.get(CardInfo.CARD_GRADE_B));
@@ -227,8 +229,8 @@ public class CardTable {
 
 				CardOption info = new CardOption();
 				info.cardId = Integer.parseInt(childElem.getAttribute("id"));
-				info.attack = Boolean.parseBoolean(childElem.getAttribute("att"));
-				info.defense = Boolean.parseBoolean(childElem.getAttribute("def"));
+				info.attack = Integer.parseInt(childElem.getAttribute("att")) == 0 ? false : true;
+				info.defense =Integer.parseInt(childElem.getAttribute("def")) == 0 ? false : true;
 				String strCards = childElem.getAttribute("cards");
 				StringTokenizer st = new StringTokenizer(strCards,",");
 				while (st.hasMoreTokens()) {
