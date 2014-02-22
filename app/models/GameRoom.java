@@ -315,6 +315,7 @@ public class GameRoom {
     		
     		ZoneInfo zoneInfo = new ZoneInfo(posInfo.id,this);
     		zoneInfo.type = posInfo.type;
+    		zoneInfo.info = posInfo.info;
     		if(posInfo.info != 0)
     		{
     			ZoneBasicInfo basicInfo = ZoneTable.getInstance().getZoneBasicInfo(posInfo.info);
@@ -1618,9 +1619,34 @@ public class GameRoom {
     	
     	CardInfo cardInfo2 = zoneInfo.getCardInfo();
     	CharInfo charInfo2 = CharTable.getInstance().getChar(chrDef.charType);
-    	float totalHp = (charInfo2.hp + cardInfo2.hp) * GameRule.getInstance().getZoneBuff(zoneInfo.race, cardInfo2.race); 
+    	float totalHp = (charInfo2.hp + cardInfo2.hp) * GameRule.getInstance().getZoneBuff(zoneInfo.race, cardInfo2.race);
     	
-    	boolean attackWin = totalHp - totalSt > 0 ? false : true;
+    	//check option
+    	boolean attackOptionWin = false;
+    	boolean defenseOptionWin = false;
+    	CardOption option = CardTable.getInstance().getCardOption(pkt.atId);
+    	if(option != null)
+    	{
+    		attackOptionWin = option.getAttackMatch(cardInfo2, zoneInfo);
+    	}
+    	
+    	CardOption option2 = CardTable.getInstance().getCardOption(pkt.dfId);
+    	if(option2 != null)
+    	{
+    		defenseOptionWin = option2.getDefenseMatch(cardInfo, zoneInfo);
+    	}
+    	
+    	boolean attackWin = false;
+    	boolean activatedOption = true;
+    	if((attackOptionWin == true && defenseOptionWin == true) || (attackOptionWin == false && defenseOptionWin == false))
+    	{
+    		attackWin = totalHp - totalSt > 0 ? false : true;
+    		activatedOption = false;
+    	}
+    	else if(attackOptionWin == true)
+    		attackWin = true;
+    	else if(defenseOptionWin == true)
+    		attackWin = false;
     	
     	mLastBattle = new BattleInfo();
     	mLastBattle.zoneId = pkt.zId;
@@ -1631,7 +1657,7 @@ public class GameRoom {
     	mLastBattle.totalSt = totalSt;
     	mLastBattle.attackWin = attackWin;
     	
-    	notifyAll(new ServerPacketBattle(pkt.sender,pkt.idx,chrDef.charId,cardInfo.cardId,cardInfo2.cardId,zoneInfo.id,totalHp,totalSt,attackWin).toJson());   	
+    	notifyAll(new ServerPacketBattle(pkt.sender,pkt.idx,chrDef.charId,cardInfo.cardId,cardInfo2.cardId,zoneInfo.id,totalHp,totalSt,attackWin,activatedOption).toJson());   	
     }    
 
     public void onBattleEnd(JsonNode node)
@@ -1857,7 +1883,7 @@ public class GameRoom {
     		return;
     	
     	final Random random = new Random();
-    	int deckType = random.nextInt(5);
+    	int deckType = random.nextInt(6);
     	
     	chr.mCards = CardTable.getInstance().getSystemDeck(deckType);
     	

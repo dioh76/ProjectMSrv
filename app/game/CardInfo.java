@@ -15,4 +15,9 @@ public class CardInfo {
 	public float hp;
 	public float st;
 	public float cost;
+	
+	public int getBaseId()
+	{
+		return cardId / 100;
+	}
 }

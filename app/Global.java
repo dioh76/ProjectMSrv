@@ -24,6 +24,7 @@ public class Global extends GlobalSettings {
 	    CharTable.getInstance().init(app.resourceAsStream("xml/char_table.xml"));
 	    CardTable.getInstance().initCard(app.resourceAsStream("xml/card_table.xml"));
 	    CardTable.getInstance().initEvent(app.resourceAsStream("xml/card_eventzone.xml"));
+	    CardTable.getInstance().initCardOption(app.resourceAsStream("xml/card_option_table.xml"));
 	    SpellTable.getInstance().init(app.resourceAsStream("xml/spell_table.xml"));
 	    BattleDiceTable.getInstance().init(app.resourceAsStream("xml/battledice_table.xml"));
 	    ZoneTable.getInstance().init(app.resourceAsStream("xml/default_zone.xml"));

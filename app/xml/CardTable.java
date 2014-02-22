@@ -1,6 +1,7 @@
 package xml;
 
 import game.CardInfo;
+import game.CardOption;
 
 import java.io.*;
 import java.util.*;
@@ -13,6 +14,7 @@ public class CardTable {
 	private Map<Integer, CardInfo> mCards = new HashMap<Integer, CardInfo>();
 	private Map<Integer, ArrayList<Integer>> mCardGrades = new HashMap<Integer, ArrayList<Integer>>();
 	private List<CardEventInfo> mCardEvents = new ArrayList<CardEventInfo>();
+	private Map<Integer, CardOption> mCardOptions = new HashMap<Integer, CardOption>();
 
 	public void initCard(InputStream in) {
 		try {
@@ -35,12 +37,30 @@ public class CardTable {
 			e.printStackTrace();
 		}
 	}
+	
+	public void initCardOption(InputStream in) {
+		try {
+			Document doc = XML.fromInputStream(in, "UTF-8");
+
+			readCardOption(doc.getDocumentElement());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public CardInfo getCard(int cardId) {
 		if (mCards.containsKey(cardId) == false)
 			return null;
 
 		return mCards.get(cardId);
+	}
+	
+	public CardOption getCardOption(int cardId) {
+		if(mCardOptions.containsKey(cardId) == false)
+			return null;
+		
+		return mCardOptions.get(cardId);
 	}
 
 	public ArrayList<Integer> getSystemDeck(int type) {
@@ -103,6 +123,19 @@ public class CardTable {
 			cards.addAll(mCardGrades.get(CardInfo.CARD_GRADE_D).subList(0, 5));
 			
 		}
+			break;
+		case 5:
+		{
+			Collections.shuffle(mCardGrades.get(CardInfo.CARD_GRADE_A));
+			cards.addAll(mCardGrades.get(CardInfo.CARD_GRADE_A).subList(0, 1));
+			Collections.shuffle(mCardGrades.get(CardInfo.CARD_GRADE_B));
+			cards.addAll(mCardGrades.get(CardInfo.CARD_GRADE_B).subList(0, 6));			
+			Collections.shuffle(mCardGrades.get(CardInfo.CARD_GRADE_C));
+			cards.addAll(mCardGrades.get(CardInfo.CARD_GRADE_C).subList(0, 4));
+			Collections.shuffle(mCardGrades.get(CardInfo.CARD_GRADE_D));
+			cards.addAll(mCardGrades.get(CardInfo.CARD_GRADE_D).subList(0, 5));
+			
+		}		
 			break;
 		}
 
@@ -180,6 +213,41 @@ public class CardTable {
 			}
 		}
 	}
+	
+	private void readCardOption(Element elem) {
+		NodeList child = elem.getElementsByTagName("card");
+		if (child == null)
+			return;
+
+		Node current = null;
+		for (int i = 0; i < child.getLength(); i++) {
+			current = child.item(i);
+			if (current.getNodeType() == Node.ELEMENT_NODE) {
+				Element childElem = (Element) current;
+
+				CardOption info = new CardOption();
+				info.cardId = Integer.parseInt(childElem.getAttribute("id"));
+				info.attack = Boolean.parseBoolean(childElem.getAttribute("att"));
+				info.defense = Boolean.parseBoolean(childElem.getAttribute("def"));
+				String strCards = childElem.getAttribute("cards");
+				StringTokenizer st = new StringTokenizer(strCards,",");
+				while (st.hasMoreTokens()) {
+					String strNext = st.nextToken();
+					if(strNext.isEmpty() == false)
+						info.targetCards.add(Integer.parseInt(strNext));
+				}
+				String strRegions = childElem.getAttribute("regions");
+				st = new StringTokenizer(strRegions,",");
+				while (st.hasMoreTokens()) {
+					String strNext = st.nextToken();
+					if(strNext.isEmpty() == false)
+						info.targetRegions.add(Integer.parseInt(strNext));
+				}
+				
+				mCardOptions.put(info.cardId, info);
+			}
+		}
+	}	
 
 	private static class Holder {
 		private static final CardTable Instance = new CardTable();

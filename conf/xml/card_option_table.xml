@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<card_option_table>
+	<cards>
+		<card id="1000101" att="1" def="0" cards="14006" regions=""/>
+		<card id="1000301" att="1" def="0" cards="14004" regions=""/>
+		<card id="1000401" att="1" def="0" cards="14005" regions=""/>
+		<card id="1100101" att="1" def="0" cards="14001" regions=""/>
+		<card id="2000101" att="1" def="0" cards="22008" regions=""/>
+		<card id="2000301" att="1" def="0" cards="24005" regions=""/>
+		<card id="3000101" att="1" def="0" cards="34002" regions=""/>
+		<card id="3000201" att="1" def="0" cards="34005" regions=""/>
+		<card id="4000501" att="1" def="0" cards="22003" regions=""/>
+		<card id="4001301" att="1" def="0" cards="44001" regions=""/>
+		<card id="4001401" att="1" def="0" cards="40015" regions=""/>
+		<card id="4100801" att="1" def="0" cards="42005" regions=""/>
+		
+		<card id="1300201" att="0" def="1" cards="" regions="3"/>
+		<card id="1300401" att="0" def="1" cards="" regions="19"/>
+		<card id="1300601" att="0" def="1" cards="" regions="5"/>
+		<card id="4200301" att="0" def="1" cards="" regions="10"/>
+		<card id="3300301" att="0" def="1" cards="" regions="16"/>
+	</cards>
+</card_option_table>

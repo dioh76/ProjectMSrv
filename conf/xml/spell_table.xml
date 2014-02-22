@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <spell_table>
 	<spells>
 		<spell id="101" name="배신" type="101" value="0" value2="0" userscope="1" target2="2" use="0" atlas="artifice/trick" spr="trick001" hiteffect="effect/skill/skil_markbasic" bufeffect="effect/skill/test_loop" sound="spell_stone" desc="다른 유저의 영토를 내 소유로 변경"/>
@@ -14,7 +14,7 @@
 		<spell id="301" name="적토마" type="301" value="0" value2="0" userscope="0" target2="0" use="0" atlas="artifice/Item" spr="it001" hiteffect="effect/skill/skil_markbasic" bufeffect="effect/skill/test_loop" sound="spell_teleport" desc="적토마 존으로 즉시 이동"/>
 		<spell id="302" name="적로" type="302" value="0" value2="0" userscope="0" target2="0" use="0" atlas="artifice/Item" spr="it002" hiteffect="effect/skill/skil_markbasic" bufeffect="effect/skill/test_loop" sound="spell_teleport" desc="현재 통행료가 가장 비싼 지역으로 강제 이동"/>
 		<spell id="306" name="전국옥새" type="306" value="200" value2="0" userscope="6" target2="0" use="0" atlas="artifice/Item" spr="it006" hiteffect="effect/skill/skil_markbasic" bufeffect="effect/skill/test_loop" sound="spell_hunter" desc="다른 유저 전원에게 200골드씩 받는다."/>
-		<spell id="307" name="태평요술서" type="307" value="40999" value2="0" userscope="1" target2="2" use="0" atlas="artifice/Item" spr="it007" hiteffect="effect/skill/skil_markbasic" bufeffect="effect/skill/test_loop" sound="spell_sneer" desc="지정한 영토의 장수를 황건적(D)으로 변경"/>
+		<spell id="307" name="태평요술서" type="307" value="4099900" value2="0" userscope="1" target2="2" use="0" atlas="artifice/Item" spr="it007" hiteffect="effect/skill/skil_markbasic" bufeffect="effect/skill/test_loop" sound="spell_sneer" desc="지정한 영토의 장수를 황건적(D)으로 변경"/>
 		<spell id="308" name="거부권" type="308" value="0" value2="0" userscope="0" target2="0" use="2" atlas="artifice/Item" spr="it008" hiteffect="effect/skill/skil_markbasic" bufeffect="effect/skill/test_loop" sound="spell_m_shield" desc="모든 재해, 책략, 아이템 공격을 1회 방어"/>
 		<spell id="309" name="면제권" type="309" value="100" value2="0" userscope="0" target2="2" use="2" atlas="artifice/Item" spr="it009" hiteffect="effect/skill/skil_markbasic" bufeffect="effect/skill/test_loop" sound="spell_w_shield" desc="통행료 1회 면제"/>
 		<spell id="310" name="반값할인권" type="309" value="50" value2="0" userscope="0" target2="2" use="2" atlas="artifice/Item" spr="it010" hiteffect="effect/skill/skil_markbasic" bufeffect="effect/skill/test_loop" sound="spell_g_shield" desc="통행료 1회 50% 할인"/>

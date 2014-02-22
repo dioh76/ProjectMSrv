@@ -26,6 +26,7 @@ public class ZoneInfo {
 	public int 	type;
 	public int 	race;
 	public boolean enhancable;
+	public int	info;	//unique zone information id;
 	
 	private int	mLevel;
 	private int	mCharId;
