@@ -2,6 +2,8 @@ package game.spell;
 
 import protocol.server.ServerPacketCharRemoveZone;
 import protocol.server.ServerPacketCharZoneAsset;
+import protocol.server.ServerPacketZoneDelBuff;
+import game.Buff;
 import game.SrvCharacter;
 import game.ZoneInfo;
 import models.GameRoom;
@@ -40,6 +42,12 @@ public class SpellThunder extends Spell {
 		zoneInfo1.setCardInfo(null);
     	
     	//check remove buff or not
+		Buff prevBuff = zoneInfo1.getBuff();
+		if(prevBuff != null)
+		{
+			zoneInfo1.setBuff(null);
+			room.notifyAll(new ServerPacketZoneDelBuff(castChr.charId,prevBuff.id,prevBuff.targetzone).toJson());
+		}
     	
     	room.notifyAll( new ServerPacketCharZoneAsset(castChr.charId,castChr.getZoneCount(),castChr.getZoneAssets()).toJson());
     	
