@@ -126,17 +126,9 @@ public class CardTable {
 			break;
 		case 5:
 		{
-//			ArrayList arr = new ArrayList(mCardOptions.values());
-//			Collections.
-			Collections.shuffle(mCardGrades.get(CardInfo.CARD_GRADE_A));
-			cards.addAll(mCardGrades.get(CardInfo.CARD_GRADE_A).subList(0, 1));
-			Collections.shuffle(mCardGrades.get(CardInfo.CARD_GRADE_B));
-			cards.addAll(mCardGrades.get(CardInfo.CARD_GRADE_B).subList(0, 6));			
-			Collections.shuffle(mCardGrades.get(CardInfo.CARD_GRADE_C));
-			cards.addAll(mCardGrades.get(CardInfo.CARD_GRADE_C).subList(0, 4));
-			Collections.shuffle(mCardGrades.get(CardInfo.CARD_GRADE_D));
-			cards.addAll(mCardGrades.get(CardInfo.CARD_GRADE_D).subList(0, 5));
-			
+			List<Integer> arr = new ArrayList<Integer>(mCardOptions.keySet());
+			Collections.shuffle(arr);
+			cards.addAll(arr.subList(0, 16));
 		}		
 			break;
 		}

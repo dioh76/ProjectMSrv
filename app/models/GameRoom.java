@@ -98,16 +98,16 @@ public class GameRoom {
 		return mUsers.size();
 	}
 	
-	public long getRandomOwnerId()
+	public User getRandomOwner()
 	{
 		final Random random = new Random();
 		synchronized(mUsers)
 		{
 			if(mUsers.size() == 0)
-				return 0;
+				return null;
 			
 			int index = random.nextInt(mUsers.size());
-			return mUsers.get(index).getUserId();
+			return mUsers.get(index);
 		}
 	}
 	
@@ -164,7 +164,7 @@ public class GameRoom {
 		charType = mCharacters.size() + 1;
 		
 		float initSoul = GameRule.getInstance().CHAR_INIT_SOUL;
-		SrvCharacter chr = new SrvCharacter(user.getUserId(), getNewCharId(), charType, user.getName(), true, initSoul, false );
+		SrvCharacter chr = new SrvCharacter(user, user.getUserId(), getNewCharId(), charType, user.getName(), true, initSoul, false );
     	
     	synchronized(mCharacters)
     	{
@@ -183,7 +183,9 @@ public class GameRoom {
 		
 		for( int i = 0; i < count; i++)
 		{
-			long randomUserId = getRandomOwnerId();
+			User randomUser = getRandomOwner();
+			if(randomUser == null)
+				continue;
 			
 			int charType = 1;
 			CharInfo charInfo = CharTable.getInstance().randomChar();		
@@ -192,7 +194,7 @@ public class GameRoom {
 			
 			charType = mCharacters.size() + 1;
 			float initSoul = GameRule.getInstance().CHAR_INIT_SOUL;
-			SrvCharacter chr = new SrvCharacter(randomUserId, getNewCharId(), charType, "AIPlayer"+(i+1), false, initSoul, false );
+			SrvCharacter chr = new SrvCharacter(randomUser,randomUser.getUserId(), getNewCharId(), charType, "AIPlayer"+(i+1), false, initSoul, false );
 	    	
 	    	synchronized(mCharacters)
 	    	{
@@ -469,6 +471,19 @@ public class GameRoom {
     	notifyAll(new ServerPacketCharTurnOver(chr.charId,chr.charId,false,false,0).toJson());
     }
     
+    private void sendRoundOver(int chrId, int nextChrId)
+    {
+    	synchronized(mCharacters)
+    	{
+    		for( SrvCharacter srvChr : mCharacters.values() )
+        	{
+        		srvChr.addCard();
+        	}    		
+    	}
+    	
+    	notifyAll(new ServerPacketRoundOver(chrId,nextChrId).toJson());
+    }
+    
     private void sendBattleLose(SrvCharacter attChr, SrvCharacter defChr, ZoneInfo zoneInfo, boolean useSpell, int value)
     {
     	float sumPay = 0;
@@ -559,7 +574,15 @@ public class GameRoom {
     	//not to be used in server
     	ClientPacketCharAdd pkt = Json.fromJson(node, ClientPacketCharAdd.class);
     	
-    	SrvCharacter chr = new SrvCharacter(pkt.userId, pkt.charId, 1, pkt.name, pkt.userChar, GameRule.getInstance().CHAR_INIT_SOUL, false );    	
+    	User user = getUser(pkt.userId);
+    	
+    	if(user == null)
+    	{
+    		Logger.debug("[E] user not founded..");
+    		return;
+    	}
+    	
+    	SrvCharacter chr = new SrvCharacter(user,pkt.userId, pkt.charId, 1, pkt.name, pkt.userChar, GameRule.getInstance().CHAR_INIT_SOUL, false );    	
     	mCharacters.put(pkt.charId, chr);
     	
     	notifyAll(new ServerPacketCharAdd(pkt.charId, pkt.userId, pkt.charId, chr.charType, pkt.name, pkt.userChar,chr.soul).toJson());   	
@@ -665,8 +688,12 @@ public class GameRoom {
     	if(zoneInfo.getCardInfo() == null)
     		return;
     	
+    	
     	//no return cost
     	int prevCard = zoneInfo.getCardInfo().cardId;
+    	
+    	chr.removeCard(pkt.cId);
+    	chr.addCard(prevCard);
     	  
     	CardInfo cardInfo = CardTable.getInstance().getCard(pkt.cId);
     	chr.soul -= cardInfo.cost;
@@ -765,7 +792,8 @@ public class GameRoom {
     		{
     			mCurrentRound++;
     			
-    			notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
+    			sendRoundOver(pkt.sender, mStartCharId);
+    			//notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
     			
     			sendTurnOver(chr);
     		}			
@@ -972,7 +1000,8 @@ public class GameRoom {
     		{
     			mCurrentRound++;
     			
-    			notifyAll(new ServerPacketRoundOver(chr.charId,mStartCharId).toJson());
+    			sendRoundOver(chr.charId,mStartCharId);
+    			//notifyAll(new ServerPacketRoundOver(chr.charId,mStartCharId).toJson());
     			
     			sendTurnOver(chr);
     		}			
@@ -1274,6 +1303,8 @@ public class GameRoom {
     	if(zoneInfo == null)
     		return;
     	
+    	chr.removeCard(pkt.cId);
+    	
     	if(zoneInfo.getAmbush())
     	{	
     		if(zoneInfo.getAmbushOwner() == pkt.sender)
@@ -1283,6 +1314,11 @@ public class GameRoom {
     		}
     		else
     		{
+    			CardInfo cardInfo = CardTable.getInstance().getCard(pkt.cId);
+   				chr.soul -= cardInfo.cost;
+   				sendSoulChanged(chr,false);
+    	    	sendRanking(); 
+    	    	
     			zoneInfo.setAmbush(false, 0);
     			notifyAll(new ServerPacketCharOccupyAmbush(pkt.sender,pkt.zId,pkt.idx,pkt.cId).toJson());
     			return;
@@ -1291,7 +1327,7 @@ public class GameRoom {
     	
     	charAddZone(chr,zoneInfo.id,pkt.cId,true,pkt.idx);   	
     	
-    	notifyAll(new ServerPacketCharOccupy(pkt.sender,pkt.zId,pkt.idx,pkt.cId).toJson());    
+    	notifyAll(new ServerPacketCharOccupy(pkt.sender,pkt.zId,pkt.idx,pkt.cId).toJson());
 	}
     
     private void onZoneAmbush(JsonNode node)
@@ -1588,6 +1624,9 @@ public class GameRoom {
     	else
     		card = -1;
     	
+    	if(card != -1)
+    		chr.addCard(card);
+    	
     	notifyAll(new ServerPacketEventGamble(pkt.sender, pkt.index, card).toJson());    	
     }
     
@@ -1612,6 +1651,8 @@ public class GameRoom {
     	SrvCharacter chrDef = mCharacters.get(zoneInfo.getChar());
     	if(chrDef == null)
     		return;
+    	
+    	chr.removeCard(pkt.atId);
     	
     	CardInfo cardInfo = CardTable.getInstance().getCard(pkt.atId);
     	CharInfo charInfo = CharTable.getInstance().getChar(chr.charType);
@@ -1885,9 +1926,17 @@ public class GameRoom {
     	final Random random = new Random();
     	int deckType = random.nextInt(6);
     	
-    	chr.mCards = CardTable.getInstance().getSystemDeck(deckType);
+    	chr.mAllCards = CardTable.getInstance().getSystemDeck(deckType);
+    	chr.mRemainCards = new ArrayList<Integer>(chr.mAllCards);
     	
-    	notifyAll(new ServerPacketGameInitDecks(chr.charId, deckType, chr.mCards).toJson());
+    	for(int i = 0; i < GameRule.INITIAL_CARDDECK_SIZE; i++)
+    	{
+    		int idx = random.nextInt(chr.mRemainCards.size());
+    		chr.mPlayCards.add(chr.mRemainCards.get(idx));
+    		chr.mRemainCards.remove(idx);
+    	}
+    	
+    	notifyAll(new ServerPacketGameInitDecks(chr.charId, deckType, chr.mRemainCards, chr.mPlayCards).toJson());
     }
     
     // -- Messages

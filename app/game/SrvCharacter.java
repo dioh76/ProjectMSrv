@@ -5,12 +5,21 @@ import game.spell.Spell;
 import java.util.ArrayList;
 import java.util.List;
 
-import protocol.server.ServerPacketCharDelBuff;
+import com.fasterxml.jackson.databind.JsonNode;
 
+import models.User;
+
+import protocol.server.ServerPacketCharAddCard;
+import protocol.server.ServerPacketCharDelBuff;
+import protocol.server.ServerPacketCharRemoveCard;
+
+import xml.GameRule;
 import xml.SpellTable;
 
 public class SrvCharacter {
 
+	private User	ownuser;
+	
 	public long 	userId;
 	public int 		charId;
 	public int		charType;
@@ -37,12 +46,15 @@ public class SrvCharacter {
 	
 	public List<Buff> mBuffs;
 	public List<Integer> mEquipSpells;
-	public List<Integer> mCards;
+	public List<Integer> mAllCards;
+	public List<Integer> mPlayCards;
+	public List<Integer> mRemainCards;
 	
 	private List<ZoneAsset> mZoneAssets;
 	
-	public SrvCharacter(long userId, int charId, int charType, String userName, boolean userChar, float soul, boolean checkdirection)
+	public SrvCharacter(User user, long userId, int charId, int charType, String userName, boolean userChar, float soul, boolean checkdirection)
 	{
+		this.ownuser = user;
 		this.userId = userId;
 		this.charId = charId;
 		this.charType = charType;
@@ -56,7 +68,70 @@ public class SrvCharacter {
 		mBuffs = new ArrayList<Buff>();
 		mEquipSpells = new ArrayList<Integer>();
 		mZoneAssets = new ArrayList<ZoneAsset>();
-		mCards = new ArrayList<Integer>();
+		mAllCards = new ArrayList<Integer>();
+		mPlayCards = new ArrayList<Integer>();
+	}
+	
+	private boolean hasPlayCard(int cardId)
+	{
+		boolean hasInPlayCard = false;
+		for(int playCardId : mPlayCards)
+		{
+			if(cardId == playCardId)
+				hasInPlayCard = true;
+		}	
+		
+		return hasInPlayCard;
+	}
+	
+	public void addCard(int cardId)
+	{
+		if(mPlayCards.size() < GameRule.INITIAL_CARDDECK_SIZE)
+		{
+			mPlayCards.add(cardId);
+			sendPacket(new ServerPacketCharAddCard(charId,cardId,false).toJson());
+		}
+		else
+		{
+			//Into the first deck
+			mRemainCards.add(0, cardId);
+		}
+	}
+	
+	public void addCard()
+	{
+		if(mPlayCards.size() < GameRule.INITIAL_CARDDECK_SIZE)
+		{
+			//If the remain of the card is empty, initialize
+			if(mRemainCards.size() == 0)
+			{
+				for(int cardId : mAllCards)
+				{
+					if(hasPlayCard(cardId) == false)
+						mRemainCards.add(cardId);
+				}
+			}
+			
+			int cardId = mRemainCards.get(0);
+			mPlayCards.add(cardId);
+			mRemainCards.remove(0);
+			
+			sendPacket(new ServerPacketCharAddCard(charId,cardId,true).toJson());
+		}
+	}
+	
+	public void removeCard(int cardId)
+	{
+		for(int i = 0; i < mPlayCards.size(); i++)
+		{
+			if(mPlayCards.get(i) == cardId)
+			{
+				mPlayCards.remove(i);
+				break;
+			}
+		}
+		
+		sendPacket(new ServerPacketCharRemoveCard(charId,cardId).toJson());
 	}
 	
 	public boolean hasEquipSpell(int spellType)
@@ -146,6 +221,12 @@ public class SrvCharacter {
 			sum += asset.value;
 		
 		return sum;
+	}
+	
+	public void sendPacket(JsonNode node)
+	{
+		if(ownuser != null) ownuser.SendPacket(node);
+			
 	}
 }
 
