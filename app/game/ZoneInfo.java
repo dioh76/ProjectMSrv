@@ -108,7 +108,7 @@ public class ZoneInfo {
 	{
 		if(buff != null)
 			buff.apply();
-		else
+		else if(mBuff != null)		
 			mBuff.unapply();
 		
 		mBuff = buff;

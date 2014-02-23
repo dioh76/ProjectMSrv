@@ -6,6 +6,6 @@ public class ClientPacketRoundStart extends ClientPacket{
 	
 	public ClientPacketRoundStart()
 	{
-		proto = ClientPacket.MCP_ROUND_START;
+		proto = ClientPacket.MCP_CHAR_START_ROUND;
 	}
 }

@@ -24,6 +24,8 @@ public class GameRule {
 	public int		GAMEEND_MAX_TURN = 30;
 	public int		START_ENHANCE_ROUND = 3;
 	public static final int	INITIAL_CARDDECK_SIZE = 4;
+	public static final int	SPELL_ID_BATTLE_ARENA_WIN = 1002;
+	public static final int	SPELL_ID_BATTLE_ARENA_LOSE = 1001;
 	
 	private ArrayList<Float> mStartEnhance = new ArrayList<Float>();
 	private Map<Integer, List<ZoneBuff>> mZoneBuffs = new HashMap<Integer, List<ZoneBuff>>();

@@ -10,6 +10,6 @@ public class ClientPacketRollDice extends ClientPacket{
 	
 	public ClientPacketRollDice()
 	{
-		proto = ClientPacket.MCP_ROLL_DICE;
+		proto = ClientPacket.MCP_CHAR_ROLL_DICE;
 	}
 }
