@@ -19,8 +19,8 @@ import play.libs.XML;
 
 public class GameRule {
 	
-	public float 	CHAR_INIT_SOUL = 30;
-	public float 	BOUNS_START_SOUL = 30;
+	public float 	CHAR_INIT_MONEY = 30;
+	public float 	START_BONUS_MONEY = 30;
 	public int		GAMEEND_MAX_TURN = 30;
 	public int		START_ENHANCE_ROUND = 3;
 	public static final int	INITIAL_CARDDECK_SIZE = 4;
@@ -120,7 +120,7 @@ public class GameRule {
 		if(elemChild == null)
 			return;
 		
-		CHAR_INIT_SOUL = Float.parseFloat(elemChild.getAttribute("soul"));
+		CHAR_INIT_MONEY = Float.parseFloat(elemChild.getAttribute("soul"));
 		
 		child = elem.getElementsByTagName("bonus");
 		if(child == null)
@@ -130,7 +130,7 @@ public class GameRule {
 		if(elemChild == null)
 			return;
 		
-		BOUNS_START_SOUL = Float.parseFloat(elemChild.getAttribute("start"));
+		START_BONUS_MONEY = Float.parseFloat(elemChild.getAttribute("start"));
 		
 		child = elem.getElementsByTagName("startenhance");
 		if(child == null)

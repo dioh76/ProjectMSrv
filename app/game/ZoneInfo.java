@@ -129,7 +129,7 @@ public class ZoneInfo {
 		return mLevel;
 	}
 	
-	public float buySoul()
+	public float buyMoney()
 	{
 		if(values == null || values.size() == 0)
 			return 0;
@@ -138,7 +138,7 @@ public class ZoneInfo {
 		else return values.get(mLevel).buy;
 	}
 	
-	public float sellSoul()
+	public float sellMoney()
 	{
 		/*if(values == null || values.size() == 0)
 			return 0;
@@ -152,7 +152,7 @@ public class ZoneInfo {
 			return 0;
 	}
 	
-	public float tollSoul()
+	public float tollMoney()
 	{
 		if(values == null || values.size() == 0)
 			return 0;

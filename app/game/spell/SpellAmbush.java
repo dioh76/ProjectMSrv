@@ -3,7 +3,7 @@ package game.spell;
 import models.GameRoom;
 import protocol.server.ServerPacketZoneAmbush;
 import game.spell.Spell;
-import game.SrvCharacter;
+import game.Character;
 import game.ZoneInfo;
 
 public class SpellAmbush extends Spell {
@@ -21,7 +21,7 @@ public class SpellAmbush extends Spell {
 	}
 
 	@Override
-	public boolean onUse(int spellId, GameRoom room, SrvCharacter castChr, SrvCharacter targetChr, ZoneInfo zoneInfo1, ZoneInfo zoneInfo2) {
+	public boolean onUse(int spellId, GameRoom room, Character castChr, Character targetChr, ZoneInfo zoneInfo1, ZoneInfo zoneInfo2) {
 		
 		if(castChr == null)
 			return true;

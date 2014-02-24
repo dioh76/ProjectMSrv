@@ -55,7 +55,7 @@ public class User implements Callback<JsonNode>,Callback0 {
 		return mChannel;
 	}
 	
-	public void SendPacket(JsonNode node)
+	public void sendPacket(JsonNode node)
 	{
 		mChannel.write(node);
 	}

@@ -4,7 +4,7 @@ import protocol.server.ServerPacketCharRemoveZone;
 import protocol.server.ServerPacketCharZoneAsset;
 import protocol.server.ServerPacketZoneDelBuff;
 import game.Buff;
-import game.SrvCharacter;
+import game.Character;
 import game.ZoneInfo;
 import models.GameRoom;
 
@@ -23,8 +23,8 @@ public class SpellThunder extends Spell {
 	}
 
 	@Override
-	public boolean onUse(int spellId, GameRoom room, SrvCharacter castChr,
-			SrvCharacter targetChr, ZoneInfo zoneInfo1, ZoneInfo zoneInfo2) {
+	public boolean onUse(int spellId, GameRoom room, Character castChr,
+			Character targetChr, ZoneInfo zoneInfo1, ZoneInfo zoneInfo2) {
     	
 		if(castChr == null)
 			return true;
@@ -33,8 +33,8 @@ public class SpellThunder extends Spell {
 			return true;
 		
 		
-		castChr.soul += zoneInfo1.sellSoul();
-		room.sendSoulChanged(castChr,false);
+		castChr.money += zoneInfo1.sellMoney();
+		room.sendMoneyChanged(castChr,false);
     	
     	
 		castChr.removeZoneAsset(zoneInfo1.id);

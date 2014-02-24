@@ -16,7 +16,7 @@ import protocol.server.ServerPacketCharRemoveCard;
 import xml.GameRule;
 import xml.SpellTable;
 
-public class SrvCharacter {
+public class Character {
 
 	private User	ownuser;
 	
@@ -25,7 +25,7 @@ public class SrvCharacter {
 	public int		charType;
 	public String	userName;
 	public boolean	userChar;
-	public float	soul;
+	public float	money;
 	public boolean	checkdirection;
 	public boolean	addcard;
 	
@@ -52,7 +52,7 @@ public class SrvCharacter {
 	
 	private List<ZoneAsset> mZoneAssets;
 	
-	public SrvCharacter(User user, long userId, int charId, int charType, String userName, boolean userChar, float soul, boolean checkdirection)
+	public Character(User user, long userId, int charId, int charType, String userName, boolean userChar, float money, boolean checkdirection)
 	{
 		this.ownuser = user;
 		this.userId = userId;
@@ -60,7 +60,7 @@ public class SrvCharacter {
 		this.charType = charType;
 		this.userName = userName;
 		this.userChar = userChar;
-		this.soul = soul;
+		this.money = money;
 		this.checkdirection = checkdirection;
 		
 		this.addcard = false; 
@@ -225,7 +225,7 @@ public class SrvCharacter {
 	
 	public void sendPacket(JsonNode node)
 	{
-		if(ownuser != null) ownuser.SendPacket(node);
+		if(ownuser != null) ownuser.sendPacket(node);
 			
 	}
 }

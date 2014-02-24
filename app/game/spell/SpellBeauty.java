@@ -1,7 +1,7 @@
 package game.spell;
 
 import protocol.server.ServerPacketCharChangeOwner;
-import game.SrvCharacter;
+import game.Character;
 import game.ZoneInfo;
 import models.GameRoom;
 
@@ -20,8 +20,8 @@ public class SpellBeauty extends Spell {
 	}
 
 	@Override
-	public boolean onUse(int spellId, GameRoom room, SrvCharacter castChr,
-			SrvCharacter targetChr, ZoneInfo zoneInfo1, ZoneInfo zoneInfo2) {
+	public boolean onUse(int spellId, GameRoom room, Character castChr,
+			Character targetChr, ZoneInfo zoneInfo1, ZoneInfo zoneInfo2) {
 		
 		if(castChr == null)
 			return true;
@@ -34,7 +34,7 @@ public class SpellBeauty extends Spell {
     	
     	zoneInfo1.setChar(castChr.charId);
     	
-    	float asset = zoneInfo1.tollSoul();
+    	float asset = zoneInfo1.tollMoney();
     	castChr.addZoneAsset(zoneInfo1.id, asset);
     	targetChr.removeZoneAsset(zoneInfo1.id);
     	

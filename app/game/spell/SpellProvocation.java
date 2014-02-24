@@ -2,7 +2,7 @@ package game.spell;
 
 import protocol.server.ServerPacketCharMoveZone;
 import xml.ZoneTable;
-import game.SrvCharacter;
+import game.Character;
 import game.ZoneInfo;
 import models.GameRoom;
 
@@ -21,8 +21,8 @@ public class SpellProvocation extends Spell {
 	}
 
 	@Override
-	public boolean onUse(int spellId, GameRoom room, SrvCharacter castChr,
-			SrvCharacter targetChr, ZoneInfo zoneInfo1, ZoneInfo zoneInfo2) {
+	public boolean onUse(int spellId, GameRoom room, Character castChr,
+			Character targetChr, ZoneInfo zoneInfo1, ZoneInfo zoneInfo2) {
 		
 		if(castChr == null)
 			return true;

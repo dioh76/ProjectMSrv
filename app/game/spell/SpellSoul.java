@@ -1,6 +1,6 @@
 package game.spell;
 
-import game.SrvCharacter;
+import game.Character;
 import game.ZoneInfo;
 import models.GameRoom;
 
@@ -19,8 +19,8 @@ public class SpellSoul extends Spell {
 	}
 
 	@Override
-	public boolean onUse(int spellId, GameRoom room, SrvCharacter castChr,
-			SrvCharacter targetChr, ZoneInfo zoneInfo1, ZoneInfo zoneInfo2) {
+	public boolean onUse(int spellId, GameRoom room, Character castChr,
+			Character targetChr, ZoneInfo zoneInfo1, ZoneInfo zoneInfo2) {
 		
 		if(castChr == null)
 			return true;
@@ -28,11 +28,11 @@ public class SpellSoul extends Spell {
 		if(targetChr == null)
 			return true;
 		
-		castChr.soul += value1;
-		targetChr.soul -= value1;
+		castChr.money += value1;
+		targetChr.money -= value1;
 		
-		room.sendSoulChanged(castChr, true);
-		room.sendSoulChanged(targetChr, true);
+		room.sendMoneyChanged(castChr, true);
+		room.sendMoneyChanged(targetChr, true);
 		
 		room.sendRanking();
 		
