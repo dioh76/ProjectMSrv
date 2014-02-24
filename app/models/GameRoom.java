@@ -415,13 +415,6 @@ public class GameRoom {
     	//start turn state to all
     	notifyAll(new ServerPacketCharTurnStart(chr.charId,doubledice).toJson());
     	
-    	User user = getUser(chr.userId);
-		if(user == null)
-		{
-			Logger.debug("user is null user id="+chr.userId);
-			return;
-		}
-    	
     	//check turnskip buff
     	for(int i = chr.mBuffs.size() - 1; i >=0; i--)
 		{
@@ -448,7 +441,7 @@ public class GameRoom {
 		}
     	
     	//roll dice
-		user.sendPacket(new ServerPacketRollDiceReq(chr.charId).toJson());
+		chr.sendPacket(new ServerPacketRollDiceReq(chr.charId).toJson());
     }
     
     private void sendTurnOver(Character chr)
@@ -525,7 +518,6 @@ public class GameRoom {
     	case ClientPacket.MCP_EVENT_ARENA_REQ: onEventArenaReq(node); break;
     	case ClientPacket.MCP_EVENT_ARENA_USE: onEventArenaUse(node); break;
     	case ClientPacket.MCP_EVENT_ARENA_REWARD: onEventArenaReward(node); break;
-    	case ClientPacket.MCP_EQUIP_SPELL_USE: onEquipSpellUse(node); break;
     	case ClientPacket.MCP_EQUIP_SPELL_USE_REPLY: onEquipSpellUseReply(node); break;
     	case ClientPacket.MCP_START_ENHANCE: onStartEnhance(node); break;
     	case ClientPacket.MCP_GAME_READY: onGameReady(node); break;
@@ -829,11 +821,7 @@ public class GameRoom {
     		notifyAll(new ServerPacketCharBattleNotify(pkt.sender,chr.charId,zoneInfo.getChar()).toJson());
     	}
     	
-    	User user = getUser(chr.userId);
-		if(user != null)
-			user.sendPacket(new ServerPacketCharMoved(pkt.sender,pkt.zId).toJson());
-    	
-    	//notifyAll(new ServerPacketCharMoved(pkt.sender,pkt.zId).toJson());   	
+		chr.sendPacket(new ServerPacketCharMoved(pkt.sender,pkt.zId).toJson());
     }  
     
     private void onCharEnhance(JsonNode node)
@@ -1256,11 +1244,7 @@ public class GameRoom {
     		
     		if(chr.hasEquipSpell(Spell.SPELL_IMMUNE))
     		{
-    			
-    			User user = getUser(chr.userId);
-    			if(user != null)
-    				user.sendPacket(new ServerPacketSpellDefense(chr.charId,chr.charId).toJson());
-
+   				chr.sendPacket(new ServerPacketSpellDefense(chr.charId,chr.charId).toJson());
     		}
     		else
     		{
@@ -1580,9 +1564,7 @@ public class GameRoom {
     		if(attChr.hasEquipSpell(Spell.SPELL_SAFEGUARD))
     		{
     			//check for equip spell
-    			User user = getUser(attChr.userId);
-    			if(user != null)
-    			user.sendPacket(new ServerPacketEquipSpellUse(pkt.sender,Spell.SPELL_SAFEGUARD).toJson());  
+   				attChr.sendPacket(new ServerPacketEquipSpellUse(pkt.sender,Spell.SPELL_SAFEGUARD).toJson());  
     		}
     		else
     		{
@@ -1694,13 +1676,6 @@ public class GameRoom {
     	notifyAll(new ServerPacketEventArenaReward(pkt.sender,pkt.startplayer,pkt.winners,pkt.losers).toJson());    	   	
     }
     
-    public void onEquipSpellUse(JsonNode node)
-    {
-    	ClientPacketEquipSpellUse pkt = Json.fromJson(node, ClientPacketEquipSpellUse.class);
-    	
-    	notifyAll(new ServerPacketEquipSpellUse(pkt.sender,pkt.spellType).toJson());    	   	
-    }
-    
     //equip spell for battle toll 
     public void onEquipSpellUseReply(JsonNode node)
     {
@@ -1749,15 +1724,25 @@ public class GameRoom {
     {
     	ClientPacketStartEnhance pkt = Json.fromJson(node, ClientPacketStartEnhance.class);
     	
+    	Character chr = mCharacters.get(pkt.sender);
+    	if(chr == null)
+    		return;
+    	
+    	boolean enhanced = false;
     	for(ZoneInfo zoneInfo : mZones)
     	{
     		if(zoneInfo.getChar() == pkt.sender)
     		{
-    			zoneInfo.addStartEnhance();
+    			enhanced = zoneInfo.addStartEnhance();
+    			notifyAll(new ServerPacketStartEnhance(pkt.sender,zoneInfo.id).toJson());
     		}
     	}
     	
-    	notifyAll(new ServerPacketStartEnhance(pkt.sender).toJson());
+    	if(enhanced)
+    	{
+    		notifyAll( new ServerPacketCharZoneAsset(chr.charId,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    		sendRanking();
+    	}	
     }    
         
     

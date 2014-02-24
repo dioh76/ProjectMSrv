@@ -98,10 +98,15 @@ public class ZoneInfo {
 		mCardInfo = info;
 	}
 	
-	public void addStartEnhance()
+	public boolean addStartEnhance()
 	{
 		if(mStartEnhance < GameRule.getInstance().START_ENHANCE_ROUND)
+		{
 			mStartEnhance++;
+			return true;
+		}
+		
+		return false;
 	}
 	
 	public void setBuff(Buff buff)

@@ -40,7 +40,7 @@ public class ClientPacket
 	public static final int MCP_EVENT_ARENA_REQ = 305;
 	public static final int MCP_EVENT_ARENA_USE = 306;
 	public static final int MCP_EVENT_ARENA_REWARD = 307;
-	public static final int MCP_EQUIP_SPELL_USE = 308; // Specially, Defense Toll
+//	public static final int MCP_EQUIP_SPELL_USE = 308; // Specially, Defense Toll
 	public static final int MCP_EQUIP_SPELL_USE_REPLY = 309;
 	public static final int MCP_START_ENHANCE = 310;
 	
