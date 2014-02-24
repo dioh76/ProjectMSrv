@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<string_table>
+  <strings>
+    <string id="1" type="0" value=""/>
+	<string id="2" type="0" value=""/>
+	<string id="3" type="0" value="전체 카드덱을 초기화하고 다시 지급됩니다."/>
+	<string id="4" type="0" value=""/>
+	<string id="5" type="0" value=""/>
+	<string id="6" type="0" value=""/>
+	<string id="10" type="0" value=""/>
+	<string id="11" type="0" value=""/>
+	<string id="12" type="0" value=""/>
+	<string id="13" type="0" value=""/>
+	<string id="14" type="0" value=""/>
+	<string id="15" type="0" value=""/>
+	<string id="16" type="0" value=""/>
+	<string id="17" type="0" value=""/>
+	<string id="18" type="0" value=""/>	
+	<string id="19" type="0" value=""/>
+	<string id="20" type="0" value=""/>
+	<string id="21" type="0" value=""/>
+	<string id="22" type="0" value=""/>	
+	<string id="23" type="0" value="{0}부터 시작합니다."/>
+	<string id="24" type="0" value=""/>
+	<string id="25" type="0" value=""/>
+	<string id="26" type="0" value=""/>
+	<string id="27" type="0" value=""/>
+	<string id="28" type="0" value="당신은 다음턴에 원하는 지역으로 이동합니다."/>
+	<string id="29" type="0" value=""/>
+	<string id="30" type="0" value=""/>
+	<string id="31" type="0" value=""/>
+	<string id="32" type="0" value="플레이할 유저를 기다리고 있습니다."/>
+	<string id="33" type="0" value="(플레이할 유저가 없으면 바로 시작하십시요.)"/>
+	<string id="34" type="0" value="서버와의 연결이 끊어졌습니다. 메인으로 돌아갑니다."/>
+	<string id="35" type="0" value="{0}(대기중)"/>
+	<string id="36" type="0" value="{0}님이 전투할 카드가 없어 통행료로 {1:F0} 골드을 지급하였습니다."/>
+	<string id="37" type="0" value="{0}님이 매복에 의해서 카드를 잃고 통행료를 지급합니다."/>
+	<string id="38" type="0" value=""/>
+	<string id="39" type="0" value=""/>
+	<string id="40" type="0" value=""/>
+	<string id="41" type="0" value=""/>
+	<string id="42" type="0" value="{0}님이 투기장에서 승리하여 {1:F0} 골드를 획득하였습니다."/>
+	<string id="43" type="0" value="{0}님이 투기장에서 패배하여 {1:F0} 골드를 잃었습니다."/>
+	<string id="50" type="0" value=""/>
+	<string id="51" type="0" value=""/>
+	
+	<string id="102" type="0" value=""/>
+	<string id="103" type="0" value=""/>
+	<string id="104" type="0" value=""/>
+	<string id="105" type="0" value=""/>
+	<string id="106" type="0" value=""/>
+	
+	<string id="108" type="0" value=""/>
+	<string id="109" type="0" value=""/>
+	<string id="110" type="0" value=""/>
+	<string id="111" type="0" value=""/>
+	<string id="112" type="0" value=""/>
+	<string id="113" type="0" value=""/>
+	<string id="114" type="0" value=""/>
+	<string id="115" type="0" value=""/>
+	<string id="116" type="0" value=""/>
+	<string id="117" type="0" value="당신의 책략카드에 해당되는 지역을 선택할 수 없어 책략을 사용할 수 없습니다."/>
+	<string id="118" type="0" value="{0}님은 책략카드에 해당되는 지역을 선택할 수 없어 책략을 사용할 수 없습니다."/>
+	<string id="119" type="0" value=""/>
+	<string id="120" type="0" value=""/>
+	<string id="121" type="0" value=""/>
+	<string id="122" type="0" value=""/>
+	<string id="123" type="0" value=""/>	
+	<string id="124" type="0" value=""/>
+	<string id="125" type="0" value=""/>
+	<string id="126" type="0" value=""/>
+	<string id="127" type="0" value=""/>	
+	<string id="128" type="0" value=""/>
+	<string id="129" type="0" value=""/>	
+	<string id="130" type="0" value=""/>
+	<string id="131" type="0" value="당신은 책략방어권으로 책략을 방어하였습니다."/>
+	<string id="132" type="0" value="{0}님이 책략방어권으로 책략을 방어하였습니다."/>
+	<string id="133" type="0" value=""/>
+	<string id="134" type="0" value=""/>
+	<string id="135" type="0" value=""/>
+	<string id="136" type="0" value="{0}님이 꽝을 뽑았습니다."/>
+	<string id="137" type="0" value=""/>
+	<string id="138" type="0" value=""/>
+	<string id="139" type="0" value=""/>
+	<string id="140" type="0" value=""/>
+	<string id="141" type="0" value=""/>
+	<string id="142" type="0" value=""/>
+	<string id="143" type="0" value=""/>
+	<string id="144" type="0" value=""/>
+	<string id="145" type="0" value=""/>
+	<string id="146" type="0" value=""/>
+	<string id="147" type="0" value=""/>
+	<string id="148" type="0" value=""/>
+	<string id="149" type="0" value="{0}님은 적로를 탔지만 운이 좋게도 갈곳이 없습니다."/>
+	<string id="150" type="0" value="{0}님은 매각할 지역이 없어 파산합니다."/>
+	<string id="151" type="0" value="당신은 매각할 지역이 없어 파산합니다."/>
+	
+	<string id="1000" type="0" value="일반"/>
+	<string id="1001" type="0" value="요새"/>
+	<string id="1002" type="0" value="캐슬"/>
+	
+	<string id="1101" type="0" value="촉나라"/>
+	<string id="1102" type="0" value="오나라"/>
+	<string id="1103" type="0" value="위나라"/>
+	<string id="1104" type="0" value="중립지역"/>
+	
+	<string id="2000" type="0" value="{0}턴"/>
+	<string id="2001" type="0" value="교체할 카드를 선택해주세요."/>
+	<string id="2002" type="0" value="전투할 카드를 선택해주세요."/>
+	<string id="2003" type="0" value="점령할 카드를 선택해주세요."/>
+	<string id="2101" type="0" value="패스"/>
+	<string id="2102" type="0" value="가격:{0:F0}"/>
+	<string id="2103" type="0" value=" 무조건 공격 승리 "/>
+	<string id="2104" type="0" value=" 무조건 방어 승리 "/>
+	<string id="2105" type="0" value=" 무조건 공방 승리 "/>
+
+	<string id="2201" type="0" value="이동할 지역을 선택해주세요."/>
+	<string id="2202" type="0" value="책략을 방어하기 위해 책략방어권을 사용합니다."/>
+	<string id="2203" type="0" value=""/>
+	<string id="2204" type="0" value="두 카드 중 선택하세요.(30골드가 차감됩니다.)"/>
+	<string id="2205" type="0" value="꽝"/>
+	<string id="2206" type="0" value="다음 기회를 이용해주세요."/>
+	<string id="2209" type="0" value="보유중인 책략 카드로 방어할 수 있습니다. 원하시는 카드를 선택하세요."/>
+	<string id="2210" type="0" value="보유 골드가 부족하여 자산을 매각합니다."/>
+	
+	<string id="3001" type="0" value=""/>
+	<string id="3002" type="0" value=""/>
+	<string id="3003" type="0" value=""/>
+	<string id="3004" type="0" value=""/>
+	<string id="3005" type="0" value=""/>
+	<string id="3006" type="0" value=""/>
+	<string id="3007" type="0" value=""/>
+	<string id="3008" type="0" value=""/>
+	<string id="3009" type="0" value=""/>
+	<string id="3010" type="0" value=""/>
+	<string id="3011" type="0" value=""/>
+	<string id="3012" type="0" value=""/>
+	<string id="3013" type="0" value=""/>
+	<string id="3014" type="0" value=""/>
+	<string id="3015" type="0" value=""/>
+	<string id="3016" type="0" value=""/>
+	<string id="3017" type="0" value=""/>
+	<string id="3018" type="0" value=""/>
+	<string id="3019" type="0" value=""/>
+	<string id="3020" type="0" value=""/>
+
+	<string id="4101" type="0" value="배신을 이용하여 빼앗을 지역을 선택해주세요."/>
+	<string id="4102" type="0" value="빈땅에 매복을 사용하여 상대가 점령시 타격을 줍니다."/>
+	<string id="4105" type="0" value=""/>
+	<string id="4107" type="0" value="기부할 자신의 영토와 받을 상대방을 선택해주세요."/>
+	<string id="4201" type="0" value=""/>
+	<string id="4203" type="0" value="강력한 낙뢰로 선택한 상대 영토를 파괴합니다."/>
+	<string id="4204" type="0" value="상대 영토에 역병을 발생시켜 5턴간 통행료를 면제하게 합니다."/>
+	<string id="4205" type="0" value="선택한 상대영토에 홍수가 발생해 5턴간 통행료를 50%할인합니다."/>
+	<string id="4305" type="0" value=""/>
+	<string id="4307" type="0" value="태평요술서를 통해 상대 진영에 황건적을 출현시킵니다."/>
+	
+	<string id="9000" type="1" value="[디버그] {0}님이 {1}지역에 매복 설정을 {2}하였습니다."/>
+	
+  </strings>
+</string_table>
