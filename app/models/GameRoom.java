@@ -485,8 +485,6 @@ public class GameRoom {
 			defChr.money += sumPay;
 	    	sendMoneyChanged(defChr,true);
 	    	attChr.money -= sumPay;
-	    	if(attChr.money < 0)
-	    		attChr.money = 0;
 	    	sendMoneyChanged(attChr, true);
     	}
     	
