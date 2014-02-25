@@ -1176,7 +1176,19 @@ public class GameRoom {
     	chr.removeCard(pkt.cId);
     	
     	if(zoneInfo.getAmbush())
-    	{	
+    	{
+    		//Erase the ambush buff.
+    		Character ambushChr = mCharacters.get(zoneInfo.getAmbushOwner());
+    		if(ambushChr != null)
+    		{    		
+				Buff prevBuff = zoneInfo.getBuff();
+		    	if(prevBuff != null)
+		    	{
+		    		ambushChr.sendPacket(new ServerPacketZoneDelBuff(zoneInfo.getAmbushOwner(),prevBuff.id,prevBuff.targetzone).toJson());
+		    		zoneInfo.setBuff(null);
+		    	}
+    		}
+	    	
     		if(zoneInfo.getAmbushOwner() == pkt.sender)
     		{
     			zoneInfo.setAmbush(false, 0);  			
@@ -1191,6 +1203,7 @@ public class GameRoom {
     	    	
     			zoneInfo.setAmbush(false, 0);
     			notifyAll(new ServerPacketCharOccupyAmbush(pkt.sender,pkt.zId,pkt.idx,pkt.cId).toJson());
+    			
     			return;
     		}
     	}

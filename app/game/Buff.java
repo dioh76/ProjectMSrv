@@ -9,6 +9,7 @@ public class Buff {
 	public static final int TURN_SKIP = 2;
 	public static final int PLUS_TOLL = 3;
 	public static final int SPELL_USE = 4;
+	public static final int ZONE_AMBUSH = 5;
 	public static final int NONE = 100;
 	
 	public int id;
@@ -38,8 +39,10 @@ public class Buff {
 	
 	public void turnOver()
 	{
-		if( buffType != Buff.SPELL_USE )
-			remainturn--;
+		if(buffType == Buff.SPELL_USE || buffType == Buff.ZONE_AMBUSH)
+			return;
+		
+		remainturn--;
 	}
 
 	public boolean isValid()

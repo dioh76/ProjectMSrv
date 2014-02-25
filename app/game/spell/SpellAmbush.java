@@ -3,6 +3,7 @@ package game.spell;
 import models.GameRoom;
 import protocol.server.ServerPacketZoneAmbush;
 import game.spell.Spell;
+import game.Buff;
 import game.Character;
 import game.ZoneInfo;
 
@@ -31,7 +32,8 @@ public class SpellAmbush extends Spell {
 		
 		zoneInfo1.setAmbush(true, castChr.charId);
     	
-    	room.notifyAll(new ServerPacketZoneAmbush(castChr.charId,zoneInfo1.id,true).toJson());    
+    	room.notifyAll(new ServerPacketZoneAmbush(castChr.charId,zoneInfo1.id,true).toJson());
+    	room.zoneAddBuff(castChr.charId, Buff.ZONE_AMBUSH, zoneInfo1.id, value1, 1, spellId);
 		
 		return false;
 	}
