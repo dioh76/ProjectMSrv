@@ -1187,24 +1187,29 @@ public class GameRoom {
 		    		ambushChr.sendPacket(new ServerPacketZoneDelBuff(zoneInfo.getAmbushOwner(),prevBuff.id,prevBuff.targetzone).toJson());
 		    		zoneInfo.setBuff(null);
 		    	}
-    		}
-	    	
-    		if(zoneInfo.getAmbushOwner() == pkt.sender)
-    		{
-    			zoneInfo.setAmbush(false, 0);  			
-    			Logger.info("occupy and buff free");
+		    	
+		    	if(zoneInfo.getAmbushOwner() == pkt.sender)
+	    		{
+	    			zoneInfo.setAmbush(false, 0);  			
+	    			Logger.info("occupy and buff free");
+	    		}
+	    		else
+	    		{
+	    			
+	   				chr.money -= cardInfo.cost;
+	   				sendMoneyChanged(chr,false);
+	    	    	sendRanking(); 
+	    	    	
+	    			zoneInfo.setAmbush(false, 0);
+	    			notifyAll(new ServerPacketCharOccupyAmbush(pkt.sender,pkt.zId,pkt.idx,pkt.cId).toJson());
+	    			
+	    			return;
+	    		}		    	
     		}
     		else
     		{
-    			
-   				chr.money -= cardInfo.cost;
-   				sendMoneyChanged(chr,false);
-    	    	sendRanking(); 
-    	    	
     			zoneInfo.setAmbush(false, 0);
-    			notifyAll(new ServerPacketCharOccupyAmbush(pkt.sender,pkt.zId,pkt.idx,pkt.cId).toJson());
-    			
-    			return;
+    			zoneInfo.setBuff(null);
     		}
     	}
     	
