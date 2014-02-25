@@ -401,7 +401,7 @@ public class GameRoom {
     
     public void sendMoneyChanged(Character chr, boolean notify)
     {
-    	boolean bankrupt = chr.money <= 0 ? true : false;
+    	boolean bankrupt = chr.money < 0 ? true : false;
     	notifyAll(new ServerPacketCharAddSoul(chr.charId, chr.money, bankrupt,notify).toJson());
     }
     
@@ -899,7 +899,7 @@ public class GameRoom {
     	}
     	
     	//check bankrupt
-    	if(chr.money <= 0)
+    	if(chr.money < 0)
 		{
 			chr.sendPacket(new ServerPacketCharBankruptReq(chr.charId).toJson());
 			return;
