@@ -29,7 +29,10 @@ public class SpellSoul extends Spell {
 			return true;
 		
 		castChr.money += value1;
-		targetChr.money -= value1;
+		if(targetChr.money < value1)
+			targetChr.money = 0;
+		else
+			targetChr.money -= value1;
 		
 		room.sendMoneyChanged(castChr, true);
 		room.sendMoneyChanged(targetChr, true);
