@@ -42,6 +42,7 @@ public class ServerPacket
 	public static final int MSP_CHAR_MOVE_ZONE = 1130;
 	public static final int MSP_CHAR_ADD_CARD = 1131;
 	public static final int MSP_CHAR_REMOVE_CARD = 1132;
+	public static final int MSP_CHAR_SELL_ZONE = 1133;
 	
 	public static final int MSP_SPELL_OPEN = 1200;
 	public static final int MSP_SPELL_REQ_USE = 1201;

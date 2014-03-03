@@ -44,7 +44,7 @@ public class SpellChangeZone extends Spell {
 		room.notifyAll( new ServerPacketCharRemoveZone(targetChr.charId,zoneInfo1.id,false,true).toJson());
     	
     	zoneInfo1.setCardInfo(cardInfo);
-    	targetChr.addZoneAsset(zoneInfo1.id, zoneInfo1.tollMoney());
+    	targetChr.addZoneAsset(zoneInfo1.id, zoneInfo1.tollMoney(), zoneInfo1.sellMoney());
     	room.notifyAll( new ServerPacketCharAddZone(targetChr.charId,zoneInfo1.id,cardInfo.cardId,targetChr.charId,false,-1).toJson());    
 		
     	room.notifyAll( new ServerPacketCharZoneAsset(targetChr.charId,targetChr.getZoneCount(),targetChr.getZoneAssets()).toJson());

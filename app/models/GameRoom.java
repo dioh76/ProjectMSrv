@@ -455,17 +455,41 @@ public class GameRoom {
     	notifyAll(new ServerPacketCharTurnOver(chr.charId,chr.charId,false,false,0).toJson());
     }
     
-    private void sendRoundOver(int chrId, int nextChrId)
+    private void sendRoundOver(Character chr, boolean chrBankrupt, int nextChrId)
     {
-    	synchronized(mCharacters)
+    	for(ZoneInfo zoneInfo : mZones)
+		{
+			Buff buff = zoneInfo.getBuff();
+			if(buff != null)
+			{
+				buff.turnOver();
+				if(buff.isValid() == false)
+				{
+					Logger.info("remove zone buff..");
+					notifyAll(new ServerPacketZoneDelBuff(chr.charId,buff.id,buff.targetzone).toJson());
+					zoneInfo.setBuff(null);
+				}
+			}
+		}
+		
+		if( mCurrentRound == GameRule.getInstance().GAMEEND_MAX_TURN)
+		{
+			notifyAll(new ServerPacketGameOver(chr.charId).toJson());
+		}
+		else
+		{
+			mCurrentRound++;
+			sendTurnOver(chr);
+		}		
+		
+		for( Character srvChr : mCharacters.values() )
     	{
-    		for( Character srvChr : mCharacters.values() )
-        	{
-        		srvChr.addCard();
-        	}    		
-    	}
-    	
-    	notifyAll(new ServerPacketRoundOver(chrId,nextChrId).toJson());
+			if(chrBankrupt && srvChr.charId == chr.charId)
+				continue;
+    		srvChr.addCard();
+    	}    		
+   	
+    	notifyAll(new ServerPacketRoundOver(chr.charId,nextChrId).toJson());
     }
     
     private void sendBattleLose(Character attChr, Character defChr, ZoneInfo zoneInfo, boolean useSpell, int value)
@@ -475,10 +499,42 @@ public class GameRoom {
     	{
 	    	//pay for lose
 			sumPay = zoneInfo.tollMoney() * (100 - value) / 100;
-			defChr.money += sumPay;
-	    	sendMoneyChanged(defChr,true);
-	    	attChr.money -= sumPay;
-	    	sendMoneyChanged(attChr, true);
+			if(sumPay > attChr.money)
+			{
+				float sellSum = attChr.getZoneSellSum();
+				if(sumPay > attChr.money + sellSum)
+				{
+					//bankrupt and hand over all zone
+					List<Integer> attZones = attChr.getOwnZones();
+					for(int zoneId : attZones)
+					{
+						ZoneInfo sellZoneInfo = getZone(zoneId);
+						float asset = sellZoneInfo.tollMoney();
+				    	defChr.addZoneAsset(sellZoneInfo.id, asset, sellZoneInfo.sellMoney());
+				    	sellZoneInfo.setChar(defChr.charId);
+				    	attChr.removeZoneAsset(sellZoneInfo.id);
+				    	notifyAll(new ServerPacketCharChangeOwner(defChr.charId,sellZoneInfo.id,defChr.charId,defChr.getZoneCount(),defChr.getZoneAssets(),attChr.charId,attChr.getZoneCount(),attChr.getZoneAssets()).toJson());
+					}
+					
+					//process bankrupt
+					charBankrupt(attChr);
+					
+			    	sendRanking();						
+				}
+				else
+				{
+					attChr.sendPacket(new ServerPacketCharSellZone(attChr.charId,defChr.charId,sumPay).toJson());
+				}
+				
+				return;
+				
+			}else
+			{
+				defChr.money += sumPay;
+		    	sendMoneyChanged(defChr,true);
+		    	attChr.money -= sumPay;
+		    	sendMoneyChanged(attChr, true);
+			}
     	}
     	
 		notifyAll(new ServerPacketCharBattleLose(attChr.charId,zoneInfo.getChar(),zoneInfo.id,useSpell,value,(int)sumPay).toJson());    	
@@ -660,7 +716,7 @@ public class GameRoom {
 		notifyAll( new ServerPacketCharRemoveZone(chr.charId,pkt.zId,false,true).toJson());
     	
 		zoneInfo.setCardInfo(cardInfo);
-    	chr.addZoneAsset(zoneInfo.id, zoneInfo.tollMoney());
+    	chr.addZoneAsset(zoneInfo.id, zoneInfo.tollMoney(), zoneInfo.sellMoney());
     	notifyAll( new ServerPacketCharAddZone(chr.charId,zoneInfo.id,cardInfo.cardId,chr.charId,false,-1).toJson());    
 		
     	notifyAll( new ServerPacketCharZoneAsset(chr.charId,chr.getZoneCount(),chr.getZoneAssets()).toJson());
@@ -678,90 +734,65 @@ public class GameRoom {
     	if( chr == null )
     		return;
     	
-    	if(chr.myturn == false)
-    	{
-    		Logger.debug("myturn is false chr = " + chr.charId);
-    		return;
-    	}
+    	charBankrupt(chr);
     	
+    }    
+    
+    private void charBankrupt(Character chr)
+    {
+    	boolean roundover = false;
+    	int nextCharId = 0;
+    	Character nextChr = null;
+    	//If my turn, check next player to start
+    	if(chr.myturn)
+    	{
+    		//check next char in advance
+    		int nextIndex = 0;
+    		for(int i=0; i < mCharIds.size(); i++)
+    		{
+    			if( mCharIds.get(i) == chr.charId )
+    			{
+    				if( i+1 <= mCharIds.size() - 1 )
+    					nextIndex = i+1;
+    				break;
+    			}
+    		}
+    		
+    		nextCharId = mCharIds.get(nextIndex);
+    		
+    		nextChr = mCharacters.get(nextCharId);
+    		if(nextChr == null)
+    		{
+    			Logger.debug("next turn char is null " + nextCharId);
+    			return;
+    		}
+    		
+    		if(mStartCharId == nextCharId)
+    			roundover = true;
+    		
+    		if(mStartCharId == chr.charId)
+    			mStartCharId = nextCharId;     
+    		
+    		if(roundover)
+    		{
+    			sendRoundOver(chr, true, mStartCharId);	
+    		}
+    		else if(chr.myturn)
+    		{
+    			sendTurnOver(chr);
+    			sendTurnStart(nextChr, false);
+    		}    		
+    	}
+
+		//Remove Char Info    	
     	for(int i = chr.mBuffs.size() - 1; i >=0; i--)
 		{
     		Buff buff = chr.mBuffs.get(i);
 			chr.mBuffs.remove(i);
 				
-			notifyAll(new ServerPacketCharDelBuff(pkt.sender,buff.id,buff.targetchar).toJson()); 
-		}
-    	
-    	boolean roundover = false;
-		if(mCurrentTurn + 1 >= mCharacters.size())
-		{
-			mCurrentTurn = 0;
-			roundover = true;
+			notifyAll(new ServerPacketCharDelBuff(chr.charId,buff.id,buff.targetchar).toJson()); 
 		}
 		
-		//check next char in advance
-		int nextIndex = 0;
-		for(int i=0; i < mCharIds.size(); i++)
-		{
-			if( mCharIds.get(i) == chr.charId )
-			{
-				if( i+1 <= mCharIds.size() - 1 )
-					nextIndex = i+1;
-				break;
-			}
-		}
-		
-		int nextCharId = mCharIds.get(nextIndex);
-		
-		Character nextChr = mCharacters.get(nextCharId);
-		if(nextChr == null)
-		{
-			Logger.debug("next turn char is null " + nextCharId);
-			return;
-		}
-		
-		if(mStartCharId == chr.charId)
-			mStartCharId = nextCharId;
-		
-		if(roundover)
-		{
-			for(ZoneInfo zoneInfo : mZones)
-    		{
-    			Buff buff = zoneInfo.getBuff();
-    			if(buff != null)
-    			{
-    				buff.turnOver();
-    				if(buff.isValid() == false)
-    				{
-    					Logger.info("remove zone buff..");
-    					notifyAll(new ServerPacketZoneDelBuff(pkt.sender,buff.id,buff.targetzone).toJson());
-    					zoneInfo.setBuff(null);
-    				}
-    			}
-    		}
-    		
-    		if( mCurrentRound == GameRule.getInstance().GAMEEND_MAX_TURN)
-    		{
-    			notifyAll(new ServerPacketGameOver(pkt.sender).toJson());
-    		}
-    		else
-    		{
-    			mCurrentRound++;
-    			
-    			sendRoundOver(pkt.sender, mStartCharId);
-    			//notifyAll(new ServerPacketRoundOver(pkt.sender,mStartCharId).toJson());
-    			
-    			sendTurnOver(chr);
-    		}			
-		}
-		else
-		{
-			
-			sendTurnOver(chr);
-			sendTurnStart(nextChr, false);
-		}
-		
-		//Remove Char Info
 		for(ZoneInfo zoneInfo : mZones)
     	{
     		if(zoneInfo.getChar() == chr.charId)
@@ -784,9 +815,9 @@ public class GameRoom {
 			}
 		}
     	
-    	notifyAll(new ServerPacketCharRemove(pkt.sender,chr.userId).toJson());		
+    	notifyAll(new ServerPacketCharRemove(chr.charId,chr.userId).toJson());		
     	
-    }    
+    }        
     
     private void onCharMove(JsonNode node)
     {
@@ -846,7 +877,7 @@ public class GameRoom {
     	chr.money -= zoneInfo.buyMoney();
 
     	float asset = zoneInfo.tollMoney();
-    	chr.addZoneAsset(zoneInfo.id, asset);
+    	chr.addZoneAsset(zoneInfo.id, asset, zoneInfo.sellMoney());
     	
     	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.zId,zoneInfo.getLevel(),chr.money,chr.getZoneCount(),chr.getZoneAssets(),true,true).toJson());
     	
@@ -926,60 +957,29 @@ public class GameRoom {
 			}
 		}
 		
-		boolean roundover = false;
-		mCurrentTurn++;
-		if(mCurrentTurn >= mCharacters.size())
+		int nextIndex = 0;
+		for(int i=0; i < mCharIds.size(); i++)
 		{
-			mCurrentTurn = 0;
-			roundover = true;
+			if( mCharIds.get(i) == chr.charId )
+			{
+				if( i+1 <= mCharIds.size() - 1 )
+					nextIndex = i+1;
+				break;
+			}
 		}
+		
+		int nextCharId = mCharIds.get(nextIndex);		
+		
+		boolean roundover = false;
+		if(mStartCharId == nextCharId)
+			roundover = true;
 		
 		if(roundover)
 		{
-			for(ZoneInfo zoneInfo : mZones)
-    		{
-    			Buff buff = zoneInfo.getBuff();
-    			if(buff != null)
-    			{
-    				buff.turnOver();
-    				if(buff.isValid() == false)
-    				{
-    					Logger.info("remove zone buff..");
-    					notifyAll(new ServerPacketZoneDelBuff(chr.charId,buff.id,buff.targetzone).toJson());
-    					zoneInfo.setBuff(null);
-    				}
-    			}
-    		}
-    		
-    		if( mCurrentRound == GameRule.getInstance().GAMEEND_MAX_TURN)
-    		{
-    			notifyAll(new ServerPacketGameOver(chr.charId).toJson());
-    		}
-    		else
-    		{
-    			mCurrentRound++;
-    			
-    			sendRoundOver(chr.charId,mStartCharId);
-    			//notifyAll(new ServerPacketRoundOver(chr.charId,mStartCharId).toJson());
-    			
-    			sendTurnOver(chr);
-    		}			
+			sendRoundOver(chr, false, mStartCharId);	
 		}
 		else
 		{
-	    	int nextIndex = 0;
-			for(int i=0; i < mCharIds.size(); i++)
-			{
-				if( mCharIds.get(i) == chr.charId )
-				{
-					if( i+1 <= mCharIds.size() - 1 )
-						nextIndex = i+1;
-					break;
-				}
-			}
-			
-			int nextCharId = mCharIds.get(nextIndex);
-			
 			Character nextChr = mCharacters.get(nextCharId);
 			if(nextChr == null)
 			{
@@ -1019,32 +1019,42 @@ public class GameRoom {
     	if(chr == null)
     		return;
     	
+    	Character targetChr = mCharacters.get(pkt.toId);
+    	
     	ZoneInfo zoneInfo = mZones.get(pkt.zId);
     	
     	if(zoneInfo == null)
     		return;
     	
-		chr.money += mZones.get(pkt.zId).sellMoney();
-   		sendMoneyChanged(chr,false);
-    	
-    	chr.removeZoneAsset(pkt.zId);
-    	zoneInfo.setChar(0);
-    	zoneInfo.setCardInfo(null);
-    	
-    	//check remove buff or not
-		Buff prevBuff = zoneInfo.getBuff();
-		if(prevBuff != null)
-		{
-			zoneInfo.setBuff(null);
-			notifyAll(new ServerPacketZoneDelBuff(chr.charId,prevBuff.id,prevBuff.targetzone).toJson());
-		}    	
-    	
-    	notifyAll( new ServerPacketCharZoneAsset(pkt.sender,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    	if(targetChr != null)
+    	{
+    		chr.removeZoneAsset(zoneInfo.id);
+    		targetChr.addZoneAsset(zoneInfo.id, zoneInfo.tollMoney(), zoneInfo.sellMoney());
+    		zoneInfo.setChar(targetChr.charId);
+    		notifyAll(new ServerPacketCharChangeOwner(targetChr.charId,zoneInfo.id,targetChr.charId,targetChr.getZoneCount(),targetChr.getZoneAssets(),chr.charId,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    	}
+    	else
+    	{
+    		chr.money += mZones.get(pkt.zId).sellMoney();
+       		sendMoneyChanged(chr,false);
+        	
+        	chr.removeZoneAsset(pkt.zId);
+        	zoneInfo.setChar(0);
+        	zoneInfo.setCardInfo(null);
+        	
+        	//check remove buff or not
+    		Buff prevBuff = zoneInfo.getBuff();
+    		if(prevBuff != null)
+    		{
+    			zoneInfo.setBuff(null);
+    			notifyAll(new ServerPacketZoneDelBuff(chr.charId,prevBuff.id,prevBuff.targetzone).toJson());
+    		}    	
+        	
+        	notifyAll( new ServerPacketCharZoneAsset(pkt.sender,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+        	notifyAll( new ServerPacketCharRemoveZone(pkt.sender,pkt.zId,true,false).toJson());    	
+    	}
     	
     	sendRanking();
-    	
-    	notifyAll( new ServerPacketCharRemoveZone(pkt.sender,pkt.zId,true,false).toJson());    	
-
     }
     
     private void onCharAddBuff(JsonNode node)
@@ -1104,7 +1114,7 @@ public class GameRoom {
     	zoneInfo.setChar(chr.charId);
     	zoneInfo.setCardInfo(cardInfo);
     	
-    	chr.addZoneAsset(zoneId, zoneInfo.tollMoney());
+    	chr.addZoneAsset(zoneId, zoneInfo.tollMoney(), zoneInfo.sellMoney());
     	
     	if(buy)
     	{
@@ -1422,7 +1432,7 @@ public class GameRoom {
         	zoneInfo.setLevel(zoneInfo.getLevel() + 1);
         	chr.money -= zoneInfo.buyMoney();
         	float asset = zoneInfo.tollMoney();
-        	chr.addZoneAsset(zoneInfo.id, asset);
+        	chr.addZoneAsset(zoneInfo.id, asset, zoneInfo.sellMoney());
         	
         	notifyAll(new ServerPacketCharEnhance(pkt.sender,pkt.targetzone,zoneInfo.getLevel(),chr.money,chr.getZoneCount(),chr.getZoneAssets(),false,false).toJson());
         	
@@ -1567,7 +1577,7 @@ public class GameRoom {
         	CardInfo cardInfo = CardTable.getInstance().getCard(mLastBattle.attackCard);
         	zoneInfo.setCardInfo(cardInfo);
         	
-        	attChr.addZoneAsset(zoneInfo.id, zoneInfo.tollMoney());        	
+        	attChr.addZoneAsset(zoneInfo.id, zoneInfo.tollMoney(), zoneInfo.sellMoney());        	
         	notifyAll( new ServerPacketCharAddZone(attChr.charId,mLastBattle.zoneId,mLastBattle.attackCard,attChr.charId,false,-1).toJson());
         	notifyAll( new ServerPacketCharZoneAsset(attChr.charId,attChr.getZoneCount(),attChr.getZoneAssets()).toJson());
         	

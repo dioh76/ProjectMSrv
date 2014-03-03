@@ -5,6 +5,7 @@ import protocol.ClientPacket;
 public class ClientPacketCharSellZone extends ClientPacket{
 	
 	public int zId;
+	public int toId;
 	
 	public ClientPacketCharSellZone()
 	{

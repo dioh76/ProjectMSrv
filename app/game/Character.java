@@ -50,7 +50,7 @@ public class Character {
 	public List<Integer> mPlayCards;
 	public List<Integer> mRemainCards;
 	
-	private List<ZoneAsset> mZoneAssets;
+	private List<ZoneValue> mZoneValues;
 	
 	public Character(User user, long userId, int charId, int charType, String userName, boolean userChar, float money, boolean checkdirection)
 	{
@@ -67,7 +67,7 @@ public class Character {
 		
 		mBuffs = new ArrayList<Buff>();
 		mEquipSpells = new ArrayList<Integer>();
-		mZoneAssets = new ArrayList<ZoneAsset>();
+		mZoneValues = new ArrayList<ZoneValue>();
 		mAllCards = new ArrayList<Integer>();
 		mPlayCards = new ArrayList<Integer>();
 	}
@@ -181,29 +181,30 @@ public class Character {
 		}		
 	}
 	
-	public void addZoneAsset( int zoneId, float value )
+	public void addZoneAsset( int zoneId, float value, float sell )
 	{
 		boolean bHasZone = false;
-		for(ZoneAsset asset : mZoneAssets)
+		for(ZoneValue asset : mZoneValues)
 		{
 			if(asset.zoneId == zoneId)
 			{
 				bHasZone = true;
-				asset.value = value;
+				asset.asset = value;
+				asset.sell = sell;
 			}
 		}
 		
 		if(bHasZone == false)
-			mZoneAssets.add(new ZoneAsset(zoneId, value));
+			mZoneValues.add(new ZoneValue(zoneId, value, sell));
 	}
 	
 	public void removeZoneAsset(int zoneId)
 	{
-		for(int i = 0; i < mZoneAssets.size(); i++)
+		for(int i = 0; i < mZoneValues.size(); i++)
 		{
-			if(mZoneAssets.get(i).zoneId == zoneId)
+			if(mZoneValues.get(i).zoneId == zoneId)
 			{
-				mZoneAssets.remove(i);
+				mZoneValues.remove(i);
 				break;
 			}
 		}
@@ -211,16 +212,35 @@ public class Character {
 	
 	public int getZoneCount()
 	{
-		return mZoneAssets.size();
+		return mZoneValues.size();
+	}
+	
+	public List<Integer> getOwnZones()
+	{
+		List<Integer> zoneIds = new ArrayList<Integer>();
+		
+		for(ZoneValue asset : mZoneValues)
+			zoneIds.add(asset.zoneId);
+		
+		return zoneIds;
 	}
 	
 	public float getZoneAssets()
 	{
 		float sum = 0;
-		for(ZoneAsset asset : mZoneAssets)
-			sum += asset.value;
+		for(ZoneValue asset : mZoneValues)
+			sum += asset.asset;
 		
 		return sum;
+	}
+	
+	public float getZoneSellSum()
+	{
+		float sum = 0;
+		for(ZoneValue asset : mZoneValues)
+			sum += asset.sell;
+		
+		return sum;		
 	}
 	
 	public void sendPacket(JsonNode node)
@@ -230,13 +250,14 @@ public class Character {
 	}
 }
 
-class ZoneAsset {
+class ZoneValue {
 	public int 	zoneId;
-	public float value;
+	public float asset;
+	public float sell;
 	
-	public ZoneAsset(int zoneId, float value)
+	public ZoneValue(int zoneId, float asset, float sell)
 	{
 		this.zoneId = zoneId;
-		this.value = value;
+		this.asset = asset;
 	}
 }

@@ -35,8 +35,10 @@ public class SpellDonation extends Spell {
     	zoneInfo1.setChar(targetChr.charId);
     	
     	float asset = zoneInfo1.tollMoney();
-    	targetChr.addZoneAsset(zoneInfo1.id, asset);
+    	targetChr.addZoneAsset(zoneInfo1.id, asset, zoneInfo1.sellMoney());
+    	zoneInfo1.setChar(targetChr.charId);
     	castChr.removeZoneAsset(zoneInfo1.id);
+    	
     	
     	room.notifyAll(new ServerPacketCharChangeOwner(castChr.charId,zoneInfo1.id,targetChr.charId,targetChr.getZoneCount(),targetChr.getZoneAssets(),castChr.charId,castChr.getZoneCount(),castChr.getZoneAssets()).toJson());
     	room.sendRanking();		
