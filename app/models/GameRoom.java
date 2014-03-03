@@ -277,6 +277,14 @@ public class GameRoom {
 		return zones;    	
     }
     
+    public Character getCharacter(int charId)
+    {
+    	synchronized(mCharacters)
+    	{
+    		return mCharacters.get(charId);
+    	}
+    }
+    
     public List<Character> getAllCharacters()
     {
     	synchronized(mCharacters)
@@ -516,6 +524,12 @@ public class GameRoom {
 				    	notifyAll(new ServerPacketCharChangeOwner(defChr.charId,sellZoneInfo.id,defChr.charId,defChr.getZoneCount(),defChr.getZoneAssets(),attChr.charId,attChr.getZoneCount(),attChr.getZoneAssets()).toJson());
 					}
 					
+					float attRemain = attChr.money;
+					defChr.money += attRemain;
+			    	sendMoneyChanged(defChr,true);
+			    	attChr.money = 0;
+			    	sendMoneyChanged(attChr, true);
+					
 					//process bankrupt
 					charBankrupt(attChr);
 					
@@ -523,7 +537,13 @@ public class GameRoom {
 				}
 				else
 				{
-					attChr.sendPacket(new ServerPacketCharSellZone(attChr.charId,defChr.charId,sumPay).toJson());
+					float attRemain = attChr.money;
+					defChr.money += attRemain;
+			    	sendMoneyChanged(defChr,true);
+			    	attChr.money = 0;
+			    	sendMoneyChanged(attChr, true);
+			    	
+					attChr.sendPacket(new ServerPacketCharSellZone(attChr.charId,defChr.charId,sumPay - attRemain).toJson());
 				}
 				
 				return;

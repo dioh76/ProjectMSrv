@@ -259,5 +259,6 @@ class ZoneValue {
 	{
 		this.zoneId = zoneId;
 		this.asset = asset;
+		this.sell = sell;
 	}
 }

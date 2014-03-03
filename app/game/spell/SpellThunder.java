@@ -32,12 +32,15 @@ public class SpellThunder extends Spell {
 		if(zoneInfo1 == null)
 			return true;
 		
+		Character ownChr = room.getCharacter(zoneInfo1.getChar());
+		if(ownChr == null)
+			return true;		
 		
-		castChr.money += zoneInfo1.sellMoney();
-		room.sendMoneyChanged(castChr,false);
+		ownChr.money += zoneInfo1.sellMoney();
+		room.sendMoneyChanged(ownChr,false);
     	
     	
-		castChr.removeZoneAsset(zoneInfo1.id);
+		ownChr.removeZoneAsset(zoneInfo1.id);
 		zoneInfo1.setChar(0);
 		zoneInfo1.setCardInfo(null);
     	
@@ -46,14 +49,14 @@ public class SpellThunder extends Spell {
 		if(prevBuff != null)
 		{
 			zoneInfo1.setBuff(null);
-			room.notifyAll(new ServerPacketZoneDelBuff(castChr.charId,prevBuff.id,prevBuff.targetzone).toJson());
+			room.notifyAll(new ServerPacketZoneDelBuff(ownChr.charId,prevBuff.id,prevBuff.targetzone).toJson());
 		}
     	
-    	room.notifyAll( new ServerPacketCharZoneAsset(castChr.charId,castChr.getZoneCount(),castChr.getZoneAssets()).toJson());
+    	room.notifyAll( new ServerPacketCharZoneAsset(ownChr.charId,ownChr.getZoneCount(),ownChr.getZoneAssets()).toJson());
     	
     	room.sendRanking();
     	
-    	room.notifyAll( new ServerPacketCharRemoveZone(castChr.charId,zoneInfo1.id,true,false).toJson());
+    	room.notifyAll( new ServerPacketCharRemoveZone(ownChr.charId,zoneInfo1.id,true,false).toJson());
     	
     	return true;
 	}
