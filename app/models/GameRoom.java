@@ -386,6 +386,17 @@ public class GameRoom {
     	Collections.shuffle(mSpellCards);
     }
     
+    private boolean checkGameEnd()
+    {
+    	if(mCurrentRound == GameRule.getInstance().GAMEEND_MAX_TURN)
+    		return true;
+    	
+    	if(mCharacters.size() <= 1)
+    		return true;
+    	
+    	return false;
+    }
+    
     public void sendRanking()
     {
     	List<AssetRank> ranks = new ArrayList<AssetRank>();
@@ -480,9 +491,10 @@ public class GameRoom {
 			}
 		}
 		
-		if( mCurrentRound == GameRule.getInstance().GAMEEND_MAX_TURN)
+		if(checkGameEnd())
 		{
 			notifyAll(new ServerPacketGameOver(chr.charId).toJson());
+			return;
 		}
 		else
 		{
