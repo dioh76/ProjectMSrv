@@ -1745,7 +1745,10 @@ public class GameRoom {
     	mLastBattleArena.arenaCount = pkt.membercount;
     	mLastBattleArena.arenaStarter = pkt.startPlayer;
     	
-    	notifyAll(new ServerPacketEventArenaReq(pkt.sender,pkt.startPlayer,pkt.membercount).toJson());    	   	
+    	final Random random = new Random();
+    	mLastBattleArena.arenaType = random.nextInt(4);
+    	
+    	notifyAll(new ServerPacketEventArenaReq(pkt.sender,pkt.startPlayer,pkt.membercount, mLastBattleArena.arenaType).toJson());    	   	
     }
     
     public void onEventArenaUse(JsonNode node)
@@ -1755,12 +1758,7 @@ public class GameRoom {
     	final Random random = new Random();
     	int dice = 1;//random.nextInt(3) + 1;
     	CardInfo info = CardTable.getInstance().getCard(pkt.card);
-    	int total = 0;
-    	
-    	if(info != null)
-    	{
-    		total = (int)info.st * dice;
-    	}
+    	int total = mLastBattleArena.getTotalSt(info.race, info.st);
     	
     	notifyAll(new ServerPacketEventArenaUse(pkt.sender,pkt.index,pkt.card,dice).toJson());
     	
@@ -2012,9 +2010,36 @@ public class GameRoom {
     }
     
     class BattleArena {
-    	public int arenaCount;
-    	public int arenaStarter;
+    	public int	arenaCount;
+    	public int	arenaStarter;
+    	public int	arenaType;
     	public List<BattleArenaScore> mArenaScores = new ArrayList<BattleArenaScore>();
+    	
+    	public int getTotalSt(int race, float st)
+    	{
+    		if(arenaType == BattleField.CHOC_RED)
+    		{
+    			if(race == Race.CHOC) return (int)(st * 1.2f);
+    			else return (int)st;
+    		}
+    		else if(arenaType == BattleField.WEI_GUANDU)
+    		{
+    			if(race == Race.WEI) return (int)(st * 1.2f);
+    			else return (int)st;
+    		}
+    		else if(arenaType == BattleField.OH_YILING)
+    		{
+    			if(race == Race.OH) return (int)(st * 1.2f);
+    			else return (int)st;
+    		}
+    		else if(arenaType == BattleField.NEUTRAL_YELLOW)
+    		{
+    			if(race == Race.NEUTRAL) return (int)(st * 1.2f);
+    			else return (int)st;
+    		}
+    		
+    		return (int)st;
+    	}
     }
     
     class BattleArenaScore implements Comparable<BattleArenaScore>{
