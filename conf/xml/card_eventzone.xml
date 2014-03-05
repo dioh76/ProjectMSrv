@@ -26,7 +26,7 @@
 		<card id="2400500" weight="100" />
 		<card id="4099900" weight="1000" />
 	</wei_cards>
-	<o_cards>
+	<oh_cards>
 		<card id="3300100" weight="200" />
 		<card id="3300200" weight="100" />
 		<card id="3300300" weight="100" />
@@ -38,5 +38,5 @@
 		<card id="3400400" weight="100" />
 		<card id="3400500" weight="100" />
 		<card id="4099900" weight="1000" />
-	</o_cards>
+	</oh_cards>
 </card_eventzone>

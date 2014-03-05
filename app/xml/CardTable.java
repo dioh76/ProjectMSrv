@@ -248,21 +248,21 @@ public class CardTable {
 		}
 		mCardEvents.put(Race.WEI, cardEventWei);	
 		
-		child = elem.getElementsByTagName("o_cards");
+		child = elem.getElementsByTagName("oh_cards");
 		if (child == null)
 			return;
 		
-		Element elemO = (Element)child.item(0);
-		if(elemO == null)
+		Element elemOh = (Element)child.item(0);
+		if(elemOh == null)
 			return;
 		
-		NodeList childO = elemO.getElementsByTagName("card");
+		NodeList childOh = elemOh.getElementsByTagName("card");
 
 		current = null;
 		totalweight = 0;
-		ArrayList<CardEventInfo> cardEventO = new ArrayList<CardEventInfo>();
-		for (int i = 0; i < childO.getLength(); i++) {
-			current = childO.item(i);
+		ArrayList<CardEventInfo> cardEventOh = new ArrayList<CardEventInfo>();
+		for (int i = 0; i < childOh.getLength(); i++) {
+			current = childOh.item(i);
 			if (current.getNodeType() == Node.ELEMENT_NODE) {
 				Element childElem = (Element) current;
 
@@ -271,10 +271,10 @@ public class CardTable {
 				totalweight += Integer.parseInt(childElem.getAttribute("weight"));
 				info.weight = totalweight;
 
-				cardEventO.add(info);
+				cardEventOh.add(info);
 			}
 		}
-		mCardEvents.put(Race.O, cardEventO);		
+		mCardEvents.put(Race.OH, cardEventOh);		
 		
 		
 	}
