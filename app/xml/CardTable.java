@@ -2,18 +2,21 @@ package xml;
 
 import game.CardInfo;
 import game.CardOption;
+import game.Race;
 
 import java.io.*;
 import java.util.*;
 
 import org.w3c.dom.*;
+
 import play.libs.XML;
 
 public class CardTable {
 
 	private Map<Integer, CardInfo> mCards = new HashMap<Integer, CardInfo>();
 	private Map<Integer, ArrayList<Integer>> mCardGrades = new HashMap<Integer, ArrayList<Integer>>();
-	private List<CardEventInfo> mCardEvents = new ArrayList<CardEventInfo>();
+	private Map<Integer, ArrayList<CardEventInfo>> mCardEvents = new HashMap<Integer, ArrayList<CardEventInfo>>();
+	//private List<CardEventInfo> mCardEvents = new ArrayList<CardEventInfo>();
 	private Map<Integer, CardOption> mCardOptions = new HashMap<Integer, CardOption>();
 
 	public void initCard(InputStream in) {
@@ -136,15 +139,17 @@ public class CardTable {
 		return cards;
 	}
 
-	public int getEventCard() {
+	public int getEventCard(int race) {
 		final Random random = new Random();
+		
+		ArrayList<CardEventInfo> cardEvents = mCardEvents.get(race);
 
-		if (mCardEvents.size() == 0)
+		if (cardEvents.size() == 0)
 			return -1;
 
-		int nProb = random.nextInt(mCardEvents.get(mCardEvents.size() - 1).weight);
+		int nProb = random.nextInt(cardEvents.get(cardEvents.size() - 1).weight);
 
-		for (CardEventInfo info : mCardEvents) {
+		for (CardEventInfo info : cardEvents) {
 			if (nProb <= info.weight)
 				return info.cardId;
 		}
@@ -187,14 +192,21 @@ public class CardTable {
 	}
 
 	private void readCardEvents(Element elem) {
-		NodeList child = elem.getElementsByTagName("card");
+		NodeList child = elem.getElementsByTagName("choc_cards");
 		if (child == null)
 			return;
+		
+		Element elemChoc = (Element)child.item(0);
+		if(elemChoc == null)
+			return;
+		
+		NodeList childChoc = elemChoc.getElementsByTagName("card");
 
 		Node current = null;
 		int totalweight = 0;
-		for (int i = 0; i < child.getLength(); i++) {
-			current = child.item(i);
+		ArrayList<CardEventInfo> cardEventChoc = new ArrayList<CardEventInfo>();
+		for (int i = 0; i < childChoc.getLength(); i++) {
+			current = childChoc.item(i);
 			if (current.getNodeType() == Node.ELEMENT_NODE) {
 				Element childElem = (Element) current;
 
@@ -203,9 +215,68 @@ public class CardTable {
 				totalweight += Integer.parseInt(childElem.getAttribute("weight"));
 				info.weight = totalweight;
 
-				mCardEvents.add(info);
+				cardEventChoc.add(info);
 			}
 		}
+		mCardEvents.put(Race.CHOC, cardEventChoc);
+		
+		child = elem.getElementsByTagName("wei_cards");
+		if (child == null)
+			return;
+		
+		Element elemWei = (Element)child.item(0);
+		if(elemWei == null)
+			return;
+		
+		NodeList childWei = elemWei.getElementsByTagName("card");
+
+		current = null;
+		totalweight = 0;
+		ArrayList<CardEventInfo> cardEventWei = new ArrayList<CardEventInfo>();
+		for (int i = 0; i < childWei.getLength(); i++) {
+			current = childWei.item(i);
+			if (current.getNodeType() == Node.ELEMENT_NODE) {
+				Element childElem = (Element) current;
+
+				CardEventInfo info = new CardEventInfo();
+				info.cardId = Integer.parseInt(childElem.getAttribute("id"));
+				totalweight += Integer.parseInt(childElem.getAttribute("weight"));
+				info.weight = totalweight;
+
+				cardEventWei.add(info);
+			}
+		}
+		mCardEvents.put(Race.WEI, cardEventWei);	
+		
+		child = elem.getElementsByTagName("o_cards");
+		if (child == null)
+			return;
+		
+		Element elemO = (Element)child.item(0);
+		if(elemO == null)
+			return;
+		
+		NodeList childO = elemO.getElementsByTagName("card");
+
+		current = null;
+		totalweight = 0;
+		ArrayList<CardEventInfo> cardEventO = new ArrayList<CardEventInfo>();
+		for (int i = 0; i < childO.getLength(); i++) {
+			current = childO.item(i);
+			if (current.getNodeType() == Node.ELEMENT_NODE) {
+				Element childElem = (Element) current;
+
+				CardEventInfo info = new CardEventInfo();
+				info.cardId = Integer.parseInt(childElem.getAttribute("id"));
+				totalweight += Integer.parseInt(childElem.getAttribute("weight"));
+				info.weight = totalweight;
+
+				cardEventO.add(info);
+			}
+		}
+		mCardEvents.put(Race.O, cardEventO);		
+		
+		
 	}
 	
 	private void readCardOption(Element elem) {

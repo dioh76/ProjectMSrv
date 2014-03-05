@@ -4,7 +4,7 @@ import protocol.ClientPacket;
 
 public class ClientPacketEventGamble extends ClientPacket{
 	
-	public int index;
+	public int race;
 	
 	public ClientPacketEventGamble()
 	{

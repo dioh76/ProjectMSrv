@@ -1,17 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <card_eventzone>
-	<cards>
-		<card id="1000100" weight="200" />
-		<card id="1200400" weight="100" />
+	<choc_cards>
+		<card id="1300100" weight="200" />
+		<card id="1300200" weight="100" />
+		<card id="1300300" weight="100" />
+		<card id="1300400" weight="100" />
+		<card id="1300500" weight="200" />
+		<card id="1400100" weight="100" />
+		<card id="1400200" weight="100" />
+		<card id="1400300" weight="100" />
+		<card id="1400400" weight="100" />
 		<card id="1400500" weight="100" />
-		<card id="2100300" weight="100" />
-		<card id="2200700" weight="200" />
-		<card id="2300500" weight="100" />
+		<card id="4099900" weight="1000" />
+	</choc_cards>
+	<wei_cards>
+		<card id="2300100" weight="200" />
+		<card id="2300200" weight="100" />
+		<card id="2300300" weight="100" />
+		<card id="2300400" weight="100" />
+		<card id="2300500" weight="200" />
 		<card id="2400100" weight="100" />
-		<card id="3000100" weight="100" />
-		<card id="3100200" weight="100" />
-		<card id="3200700" weight="100" />
-		<card id="3300500" weight="100" />
+		<card id="2400200" weight="100" />
+		<card id="2400300" weight="100" />
+		<card id="2400400" weight="100" />
+		<card id="2400500" weight="100" />
+		<card id="4099900" weight="1000" />
+	</wei_cards>
+	<o_cards>
+		<card id="3300100" weight="200" />
+		<card id="3300200" weight="100" />
+		<card id="3300300" weight="100" />
+		<card id="3300400" weight="100" />
+		<card id="3300500" weight="200" />
 		<card id="3400100" weight="100" />
-	</cards>
+		<card id="3400200" weight="100" />
+		<card id="3400300" weight="100" />
+		<card id="3400400" weight="100" />
+		<card id="3400500" weight="100" />
+		<card id="4099900" weight="1000" />
+	</o_cards>
 </card_eventzone>

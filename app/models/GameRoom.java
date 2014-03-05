@@ -1485,7 +1485,7 @@ public class GameRoom {
     	chr.money -= 30;
     	sendMoneyChanged(chr,false);
     	
-    	int card = CardTable.getInstance().getEventCard();
+    	int card = CardTable.getInstance().getEventCard(pkt.race);
     	CardInfo info = CardTable.getInstance().getCard(card);
     	if(info != null)
     	{
@@ -1498,7 +1498,7 @@ public class GameRoom {
     	if(card != -1)
     		chr.addCard(card);
     	
-    	notifyAll(new ServerPacketEventGamble(pkt.sender, pkt.index, card).toJson());    	
+    	notifyAll(new ServerPacketEventGamble(pkt.sender, pkt.race, card).toJson());    	
     }
     
     public void onBattle(JsonNode node)

@@ -4,14 +4,14 @@ import protocol.ServerPacket;
 
 public class ServerPacketEventGamble extends ServerPacket{
 	
-	public int index;
+	public int race;
 	public int card;
 	
-	public ServerPacketEventGamble( int sender, int index, int card )
+	public ServerPacketEventGamble( int sender, int race, int card )
 	{
 		this.sender = sender;
 		this.proto = ServerPacket.MSP_EVENT_GAMBLE;
-		this.index = index;
+		this.race = race;
 		this.card = card;
 	}
 }
