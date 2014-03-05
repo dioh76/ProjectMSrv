@@ -186,5 +186,6 @@
 		<card id="4300500" name="진궁" grade="3" cost="400" type="4" hp="90" st="72" model="character/creature02" atlas="general_etc" spr="N43005"/>
 		<card id="4300600" name="화웅" grade="3" cost="400" type="4" hp="77" st="91" model="character/creature02" atlas="general_etc" spr="N43006"/>
 		<card id="4400100" name="여포" grade="4" cost="500" type="4" hp="82" st="100" model="character/creature02" atlas="general_etc" spr="N44001"/>
+        <card id="5100100" name="이민족" grade="2" cost="300" type="5" hp="71" st="72" model="character/babarian_01" atlas="general_etc" spr="N44001"/>
 	</cards>
 </card_table>
