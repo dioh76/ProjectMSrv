@@ -537,7 +537,7 @@ public class GameRoom {
     
     private void processTribute ()
     {
-    	List<Integer> obeyKeys = new ArrayList<Integer>(mCharacters.keySet());
+    	List<Integer> obeyKeys = new ArrayList<Integer>(mObeys.keySet());
     	for(int zId : obeyKeys)
     	{
 			ZoneInfo zoneInfo = getZone (zId);
