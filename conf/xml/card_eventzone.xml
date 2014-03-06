@@ -11,7 +11,7 @@
 		<card id="1400300" weight="100" />
 		<card id="1400400" weight="100" />
 		<card id="1400500" weight="100" />
-		<card id="4099900" weight="1000" />
+		<card id="4099900" weight="1800" />
 	</choc_cards>
 	<wei_cards>
 		<card id="2300100" weight="200" />
@@ -24,7 +24,7 @@
 		<card id="2400300" weight="100" />
 		<card id="2400400" weight="100" />
 		<card id="2400500" weight="100" />
-		<card id="4099900" weight="1000" />
+		<card id="4099900" weight="1800" />
 	</wei_cards>
 	<oh_cards>
 		<card id="3300100" weight="200" />
@@ -37,6 +37,6 @@
 		<card id="3400300" weight="100" />
 		<card id="3400400" weight="100" />
 		<card id="3400500" weight="100" />
-		<card id="4099900" weight="1000" />
+		<card id="4099900" weight="1800" />
 	</oh_cards>
 </card_eventzone>
