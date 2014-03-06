@@ -4,9 +4,7 @@ import protocol.ServerPacket;
 
 public class ServerPacketSimulatorOn extends ServerPacket{
 
-	public int 		charId;
-	public int		charType;
-	public String 	name;
+	public String name;
 
 	
 	public ServerPacketSimulatorOn( int sender, String name )

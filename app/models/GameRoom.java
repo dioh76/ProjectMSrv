@@ -715,7 +715,7 @@ public class GameRoom {
     {
     	ClientPacketSimulatorOn pkt = Json.fromJson(node, ClientPacketSimulatorOn.class);
 
-    	notifyAll (new ServerPacketSimulatorOn (0, pkt.name).toJson());
+    	notifyAll (new ServerPacketSimulatorOn (pkt.sender, pkt.name).toJson());
     }
     private void onCharAdd(JsonNode node)
     {
