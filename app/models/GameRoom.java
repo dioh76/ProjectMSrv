@@ -48,7 +48,7 @@ public class GameRoom {
 	private int mCharIdSeq = 100;
 	
 	private Character tribeCharacter;
-	private Map<Integer, Integer> obeyList = new HashMap<Integer, Integer> ();
+	private Map<Integer, Integer> mObeys = new HashMap<Integer, Integer> ();
 	
 	public GameRoom(long roomId, int maxuser)
 	{
@@ -498,7 +498,7 @@ public class GameRoom {
     
     private void sendRoundOver(Character chr, boolean chrBankrupt, int nextChrId)
     {
-    	ProcessTribute ();
+    	processTribute ();
     	for(ZoneInfo zoneInfo : mZones)
 		{
 			Buff buff = zoneInfo.getBuff();
@@ -535,37 +535,35 @@ public class GameRoom {
     	notifyAll(new ServerPacketRoundOver(chr.charId,nextChrId).toJson());
     }
     
-    private void ProcessTribute ()
+    private void processTribute ()
     {
-		for (int i = 0; i < 28; i++)	
-		{
-			if (obeyList.containsKey (i))
+    	List<Integer> obeyKeys = new ArrayList<Integer>(mCharacters.keySet());
+    	for(int zId : obeyKeys)
+    	{
+			ZoneInfo zoneInfo = getZone (zId);
+			Character chr = getCharacter (zoneInfo.getChar());
+			
+			if (mObeys.get(zId) > 0)
 			{
-				ZoneInfo zoneInfo = getZone (i);
-				Character chr = getCharacter (zoneInfo.getChar());
+				chr.money += zoneInfo.getCardInfo().cost;
 				
-				if (obeyList.get(i) > 0)
-				{
-					chr.money += zoneInfo.getCardInfo().cost;
-					
-					sendMoneyChanged (chr, true);
-					
-					notifyAll(new ServerPacketNotifyTribute (chr.charId, chr.charId, zoneInfo.id).toJson());
-					
-					int newVal = obeyList.get(i);
-					newVal--;
-					obeyList.put(i, newVal);
-				}
-				else
-				{
-					obeyList.remove (i);
-					zoneInfo.setChar(tribeCharacter.charId);
-					//TODO : Notify uprising
-					
-					notifyAll(new ServerPacketTribeUprising (chr.charId, zoneInfo.id).toJson());
-				}
+				sendMoneyChanged (chr, true);
+				
+				notifyAll(new ServerPacketNotifyTribute (chr.charId, chr.charId, zoneInfo.id).toJson());
+				
+				int newVal = mObeys.get(zId);
+				newVal--;
+				mObeys.put(zId, newVal);
 			}
-		}
+			else
+			{
+				mObeys.remove (zId);
+				zoneInfo.setChar(tribeCharacter.charId);
+				//TODO : Notify uprising
+				
+				notifyAll(new ServerPacketTribeUprising (chr.charId, zoneInfo.id).toJson());
+			}
+    	}
     }
     
 	private void AddTribeCharacter ()
@@ -585,12 +583,12 @@ public class GameRoom {
 
 	}
 
-	private void AddToObeyList (int zId)
+	private void addToObeyList (int zId)
 	{
-		if (obeyList.containsKey (zId))
-			obeyList.remove (zId);
+		if (mObeys.containsKey (zId))
+			mObeys.remove (zId);
 		
-		obeyList.put (zId, 5);
+		mObeys.put (zId, 5);
 	}
 
     
@@ -1715,9 +1713,9 @@ public class GameRoom {
     		//change zone owner
     		if (prevChr.charId == -1)
     		{
+    			zoneInfo.setChar(mLastBattle.charId);
     			notifyAll (new ServerPacketZoneChangeOwner (attChr.charId, attChr.charId, zoneInfo.id).toJson());
-    			attChr.removeCard (mLastBattle.attackCard);
-    			AddToObeyList (zoneInfo.id);
+    			addToObeyList (zoneInfo.id);
     		}
     		else
     		{
