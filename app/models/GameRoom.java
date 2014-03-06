@@ -1711,7 +1711,7 @@ public class GameRoom {
     		//occupy
     		
     		//change zone owner
-    		if (prevChr.charId == -1)
+    		if (zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
     		{
     			zoneInfo.setChar(mLastBattle.charId);
     			notifyAll (new ServerPacketZoneChangeOwner (attChr.charId, attChr.charId, zoneInfo.id).toJson());
