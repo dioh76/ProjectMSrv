@@ -1676,31 +1676,7 @@ public class GameRoom {
     		return;
     	
     	int defenseChrId = zoneInfo.getChar();
-    	
-//		if (zoneInfo.type == enZoneMainType.Tribe)
-//		{
-//			if (mLastBattle.attackWin)
-//			{
-//				ServerPacketZoneChangeOwner sPkt = new ServerPacketZoneChangeOwner ();
-//				sPkt.sender = attChr.charId;
-//				sPkt.cId = attChr.charId;
-//				sPkt.zId = zoneInfo.mZoneId;
-//				SendPacket (sPkt);
-//				
-//				attChr.RemoveCard (mLastBattle.attackCard);
-//				AddToObeyList (zoneInfo.mZoneId);
-//				return;
-//			}
-//			else
-//			{
-//				SendBattleLose(attChr,tribeChar,zoneInfo,false,0);
-//				return;
-//			}
-//			
-//		}
-
-    	
-    	
+   
     	
 		Character prevChr = getCharacter (zoneInfo.getChar());//mCharacters.get(zoneInfo.getChar());
 		if(prevChr == null)
@@ -1716,6 +1692,8 @@ public class GameRoom {
     			zoneInfo.setChar(mLastBattle.charId);
     			notifyAll (new ServerPacketZoneChangeOwner (attChr.charId, attChr.charId, zoneInfo.id).toJson());
     			addToObeyList (zoneInfo.id);
+    			
+    			mLastBattle = null;
     		}
     		else
     		{
