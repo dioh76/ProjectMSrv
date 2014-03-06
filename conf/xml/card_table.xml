@@ -185,7 +185,17 @@
 		<card id="4300400" name="전풍" grade="3" cost="400" type="4" hp="90" st="75" model="character/creature02" atlas="general_etc" spr="N43004"/>
 		<card id="4300500" name="진궁" grade="3" cost="400" type="4" hp="90" st="72" model="character/creature02" atlas="general_etc" spr="N43005"/>
 		<card id="4300600" name="화웅" grade="3" cost="400" type="4" hp="77" st="91" model="character/creature02" atlas="general_etc" spr="N43006"/>
-		<card id="4400100" name="여포" grade="4" cost="500" type="4" hp="82" st="100" model="character/creature02" atlas="general_etc" spr="N44001"/>
-        <card id="5100100" name="이민족" grade="2" cost="300" type="5" hp="71" st="72" model="character/babarian_01" atlas="general_etc" spr="N44001"/>
+		<card id="4400100" name="여포" grade="4" cost="500" type="4" hp="90" st="105" model="character/creature02" atlas="general_etc" spr="N44001"/>
+		<card id="4400110" name="여포" grade="4" cost="500" type="4" hp="90" st="105" model="character/creature02" atlas="general_etc" spr="N44001"/>
+		<card id="4400111" name="여포" grade="4" cost="500" type="4" hp="90" st="105" model="character/creature02" atlas="general_etc" spr="N44001"/>
+		<card id="4400112" name="여포" grade="4" cost="500" type="4" hp="90" st="105" model="character/creature02" atlas="general_etc" spr="N44001"/>
+		<card id="4400113" name="여포" grade="4" cost="500" type="4" hp="90" st="105" model="character/creature02" atlas="general_etc" spr="N44001"/>
+		<card id="4400130" name="여포" grade="4" cost="500" type="4" hp="90" st="115" model="character/creature02" atlas="general_etc" spr="N44001"/>
+		<card id="4400131" name="여포" grade="4" cost="500" type="4" hp="90" st="115" model="character/creature02" atlas="general_etc" spr="N44001"/>
+		<card id="4400132" name="여포" grade="4" cost="500" type="4" hp="90" st="115" model="character/creature02" atlas="general_etc" spr="N44001"/>
+		<card id="4400140" name="여포" grade="4" cost="500" type="4" hp="90" st="115" model="character/creature02" atlas="general_etc" spr="N44001"/>
+		<card id="4400141" name="여포" grade="4" cost="500" type="4" hp="90" st="115" model="character/creature02" atlas="general_etc" spr="N44001"/>
+		<card id="4400142" name="여포" grade="4" cost="500" type="4" hp="90" st="115" model="character/creature02" atlas="general_etc" spr="N44001"/>
+                <card id="5100100" name="이민족" grade="2" cost="300" type="5" hp="71" st="72" model="character/babarian_01" atlas="general_etc" spr="N44001"/>
 	</cards>
 </card_table>

@@ -62,7 +62,7 @@ public class GameRoom {
 		maporders.add(ZoneInfo.ZONE_RACE_DEVIL);
 		maporders.add(ZoneInfo.ZONE_RACE_ANGEL);
 		//Collections.shuffle(maporders);
-		
+//		AddTribeCharacter ();
 		initZones();
 	}
 	
@@ -131,7 +131,8 @@ public class GameRoom {
 			notifyAll(new ServerPacketUserList(0,userIds,userNames).toJson());
 			
 	    	//initialize map for this user when user joins
-	    	user.sendPacket(new ServerPacketInitZone(0, maporders).toJson());
+			user.sendPacket(new ServerPacketInitZone(0, maporders).toJson());
+	    	
 		}
     	
 		addCharacter(user);
@@ -322,7 +323,7 @@ public class GameRoom {
     
     private void initZones()
     {	
-    	AddTribeCharacter ();
+//    	AddTribeCharacter ();
     	for(int i = 0; i < ZoneTable.getInstance().getZoneCount(); i++)
     	{
     		ZonePosInfo posInfo = ZoneTable.getInstance().getZonePosInfo(i);
@@ -351,14 +352,14 @@ public class GameRoom {
        		
     		mZones.add(zoneInfo);
     		
-    		if (zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
-    		{
-    			
-    			charAddZone (tribeCharacter, zoneInfo.id, 5100100, false, -1 );
-//    			CardInfo cardInfo = CardTable.getInstance().getCard(5100100);
-//    			zoneInfo.setCardInfo(cardInfo);
-//    			zoneInfo.setChar(tribeCharacter.charId);
-    		}
+//    		if (zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
+//    		{
+//    			
+//    			charAddZone (tribeCharacter, zoneInfo.id, 5100100, false, -1 );
+////    			CardInfo cardInfo = CardTable.getInstance().getCard(5100100);
+////    			zoneInfo.setCardInfo(cardInfo);
+////    			zoneInfo.setChar(tribeCharacter.charId);
+//    		}
     	}
     }
     
@@ -373,6 +374,8 @@ public class GameRoom {
 			addRandomAICharacter(4 - mCharacters.size());
     	}
     	
+		AddTribeCharacter ();
+		
     	//init char
 		
 		for( Character chr : mCharacters.values())
@@ -567,12 +570,24 @@ public class GameRoom {
     
 	private void AddTribeCharacter ()
 	{
-		Character chr = new Character( null, -1, -1, 0, "Tribe", false, 100000, true);
+		Character chr = new Character( null, -1, -1, 1, "Tribe", false, 100000, true);
 		tribeCharacter = chr;
 		
 		notifyAll(new ServerPacketSystemCharAdd (chr.charId, chr.charId, chr.charType, chr.userName).toJson());
+//		user.sendPacket(new ServerPacketSystemCharAdd (chr.charId, chr.charId, chr.charType, chr.userName).toJson());
 		
-//		mCharacters.put(tribeCharacter.charId, tribeCharacter);
+		Logger.info("AddTribeCharacter on server");
+//		for(int i = 0; i < ZoneTable.getInstance().getZoneCount(); i++)
+//    	{
+//			
+//    	}
+		for (ZoneInfo zoneInfo : mZones)
+		{
+			if (zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
+				charAddZone (tribeCharacter, zoneInfo.id, 5100100, false, -1 );
+		}
+		
+
 	}
 
 	private void AddToObeyList (int zId)

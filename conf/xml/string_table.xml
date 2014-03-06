@@ -104,6 +104,11 @@
 	<string id="1103" type="0" value="위나라"/>
 	<string id="1104" type="0" value="중립지역"/>
 	
+	<string id="1200" type="0" value="적벽대전(촉)"/>
+	<string id="1201" type="0" value="관도대전(위)"/>
+	<string id="1202" type="0" value="이릉대전(오)"/>
+	<string id="1203" type="0" value="황건적의난(중립)"/>
+	
 	<string id="2000" type="0" value="{0}턴"/>
 	<string id="2001" type="0" value="교체할 카드를 선택해주세요."/>
 	<string id="2002" type="0" value="전투할 카드를 선택해주세요."/>
