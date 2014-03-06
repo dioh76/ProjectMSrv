@@ -549,7 +549,7 @@ public class GameRoom {
 				
 				sendMoneyChanged (chr, true);
 				
-				notifyAll(new ServerPacketNotifyTribute (chr.charId, chr.charId, zoneInfo.id).toJson());
+				chr.sendPacket(new ServerPacketNotifyTribute (chr.charId, chr.charId, zoneInfo.id).toJson());
 				
 				int newVal = mObeys.get(zId);
 				newVal--;
