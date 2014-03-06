@@ -87,6 +87,8 @@ public class ServerPacket
 	public static final int MSP_USER_LIST = 1403;
 	public static final int MSP_GAME_INITDECKS = 1404;
 	
+	public static final int MSP_SIMULATOR_ON = 1501;
+	
 	public int proto;
 	public int sender;
 	

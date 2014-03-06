@@ -574,13 +574,8 @@ public class GameRoom {
 		tribeCharacter = chr;
 		
 		notifyAll(new ServerPacketSystemCharAdd (chr.charId, chr.charId, chr.charType, chr.userName).toJson());
-//		user.sendPacket(new ServerPacketSystemCharAdd (chr.charId, chr.charId, chr.charType, chr.userName).toJson());
-		
-		Logger.info("AddTribeCharacter on server");
-//		for(int i = 0; i < ZoneTable.getInstance().getZoneCount(); i++)
-//    	{
-//			
-//    	}
+
+
 		for (ZoneInfo zoneInfo : mZones)
 		{
 			if (zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
@@ -697,6 +692,7 @@ public class GameRoom {
     	case ClientPacket.MCP_START_ENHANCE: onStartEnhance(node); break;
     	case ClientPacket.MCP_GAME_READY: onGameReady(node); break;
     	case ClientPacket.MCP_GAME_INITDECKS: onGameInitDecks(node); break;
+    	case ClientPacket.MCP_SIMULATOR_ON:	onSimulatorOn(node); break;
     	}
     }
     
@@ -715,7 +711,12 @@ public class GameRoom {
     }
     
     //Packet Handle
-    
+    private void onSimulatorOn (JsonNode node)
+    {
+    	ClientPacketSimulatorOn pkt = Json.fromJson(node, ClientPacketSimulatorOn.class);
+
+    	notifyAll (new ServerPacketSimulatorOn (0, pkt.name).toJson());
+    }
     private void onCharAdd(JsonNode node)
     {
     	//not to be used in server
@@ -965,13 +966,10 @@ public class GameRoom {
     		return;
     	
     	chr.curzone = pkt.zId;
-    	Logger.info("cardInfo : " + zoneInfo.getCardInfo() + " / character : " + zoneInfo.getChar());
     	if(zoneInfo.getCardInfo()!= null && zoneInfo.getChar() != pkt.sender)
     	{
-    		Logger.info("battle with : " + zoneInfo.getChar());
     		notifyAll(new ServerPacketCharBattleNotify(pkt.sender,chr.charId,zoneInfo.getChar()).toJson());
     	}
-    	Logger.info("just moved...");
 		chr.sendPacket(new ServerPacketCharMoved(pkt.sender,pkt.zId).toJson());
     }  
     

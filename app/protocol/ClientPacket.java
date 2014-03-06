@@ -47,6 +47,8 @@ public class ClientPacket
 	public static final int MCP_GAME_READY = 400;
 	public static final int MCP_GAME_INITDECKS = 401;
 	
+	public static final int MCP_SIMULATOR_ON = 501;
+	
 	public int proto;
 	public int sender;
 }	
