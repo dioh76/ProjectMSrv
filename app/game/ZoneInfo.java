@@ -171,9 +171,11 @@ public class ZoneInfo {
 			
 			zoneToll = zoneToll * (1 + GameRule.getInstance().getStartEnhance(mStartEnhance));
 			if(allOccupyLinkedZone())
-				return zoneToll * 2.0f * mTollRate/100.0f;
+				zoneToll = zoneToll * 2.0f * mTollRate/100.0f;
 			else
-				return zoneToll * mTollRate/100.0f;
+				zoneToll = zoneToll * mTollRate/100.0f;
+			
+			return (int)(zoneToll / 10) * 10;
 		}
 	}
 	
