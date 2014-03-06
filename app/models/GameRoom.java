@@ -47,6 +47,9 @@ public class GameRoom {
 
 	private int mCharIdSeq = 100;
 	
+	private Character tribeCharacter;
+	private Map<Integer, Integer> obeyList = new HashMap<Integer, Integer> ();
+	
 	public GameRoom(long roomId, int maxuser)
 	{
 		mCreatedTime = System.currentTimeMillis();
@@ -59,7 +62,7 @@ public class GameRoom {
 		maporders.add(ZoneInfo.ZONE_RACE_DEVIL);
 		maporders.add(ZoneInfo.ZONE_RACE_ANGEL);
 		//Collections.shuffle(maporders);
-		
+//		AddTribeCharacter ();
 		initZones();
 	}
 	
@@ -128,7 +131,8 @@ public class GameRoom {
 			notifyAll(new ServerPacketUserList(0,userIds,userNames).toJson());
 			
 	    	//initialize map for this user when user joins
-	    	user.sendPacket(new ServerPacketInitZone(0, maporders).toJson());
+			user.sendPacket(new ServerPacketInitZone(0, maporders).toJson());
+	    	
 		}
     	
 		addCharacter(user);
@@ -279,6 +283,8 @@ public class GameRoom {
     
     public Character getCharacter(int charId)
     {
+    	if (charId == -1)
+    		return tribeCharacter;
     	synchronized(mCharacters)
     	{
     		return mCharacters.get(charId);
@@ -317,6 +323,7 @@ public class GameRoom {
     
     private void initZones()
     {	
+//    	AddTribeCharacter ();
     	for(int i = 0; i < ZoneTable.getInstance().getZoneCount(); i++)
     	{
     		ZonePosInfo posInfo = ZoneTable.getInstance().getZonePosInfo(i);
@@ -340,8 +347,19 @@ public class GameRoom {
     		{
     			zoneInfo.mLinkedZones = ZoneTable.getInstance().getLinkedZones(zoneInfo.id);
     		}
+    		
+    		
        		
     		mZones.add(zoneInfo);
+    		
+//    		if (zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
+//    		{
+//    			
+//    			charAddZone (tribeCharacter, zoneInfo.id, 5100100, false, -1 );
+////    			CardInfo cardInfo = CardTable.getInstance().getCard(5100100);
+////    			zoneInfo.setCardInfo(cardInfo);
+////    			zoneInfo.setChar(tribeCharacter.charId);
+//    		}
     	}
     }
     
@@ -356,6 +374,8 @@ public class GameRoom {
 			addRandomAICharacter(4 - mCharacters.size());
     	}
     	
+		AddTribeCharacter ();
+		
     	//init char
 		
 		for( Character chr : mCharacters.values())
@@ -370,6 +390,8 @@ public class GameRoom {
 		initSpellCards();
 		
 		notifyAll(new ServerPacketGameReady(0, mCharIds).toJson());
+		
+		
     }
     
     private void initSpellCards()
@@ -476,6 +498,7 @@ public class GameRoom {
     
     private void sendRoundOver(Character chr, boolean chrBankrupt, int nextChrId)
     {
+    	ProcessTribute ();
     	for(ZoneInfo zoneInfo : mZones)
 		{
 			Buff buff = zoneInfo.getBuff();
@@ -511,6 +534,70 @@ public class GameRoom {
    	
     	notifyAll(new ServerPacketRoundOver(chr.charId,nextChrId).toJson());
     }
+    
+    private void ProcessTribute ()
+    {
+		for (int i = 0; i < 28; i++)	
+		{
+			if (obeyList.containsKey (i))
+			{
+				ZoneInfo zoneInfo = getZone (i);
+				Character chr = getCharacter (zoneInfo.getChar());
+				
+				if (obeyList.get(i) > 0)
+				{
+					chr.money += zoneInfo.getCardInfo().cost;
+					
+					sendMoneyChanged (chr, true);
+					
+					notifyAll(new ServerPacketNotifyTribute (chr.charId, chr.charId, zoneInfo.id).toJson());
+					
+					int newVal = obeyList.get(i);
+					newVal--;
+					obeyList.put(i, newVal);
+				}
+				else
+				{
+					obeyList.remove (i);
+					zoneInfo.setChar(tribeCharacter.charId);
+					//TODO : Notify uprising
+					
+					notifyAll(new ServerPacketTribeUprising (chr.charId, zoneInfo.id).toJson());
+				}
+			}
+		}
+    }
+    
+	private void AddTribeCharacter ()
+	{
+		Character chr = new Character( null, -1, -1, 1, "Tribe", false, 100000, true);
+		tribeCharacter = chr;
+		
+		notifyAll(new ServerPacketSystemCharAdd (chr.charId, chr.charId, chr.charType, chr.userName).toJson());
+//		user.sendPacket(new ServerPacketSystemCharAdd (chr.charId, chr.charId, chr.charType, chr.userName).toJson());
+		
+		Logger.info("AddTribeCharacter on server");
+//		for(int i = 0; i < ZoneTable.getInstance().getZoneCount(); i++)
+//    	{
+//			
+//    	}
+		for (ZoneInfo zoneInfo : mZones)
+		{
+			if (zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
+				charAddZone (tribeCharacter, zoneInfo.id, 5100100, false, -1 );
+		}
+		
+
+	}
+
+	private void AddToObeyList (int zId)
+	{
+		if (obeyList.containsKey (zId))
+			obeyList.remove (zId);
+		
+		obeyList.put (zId, 5);
+	}
+
     
     private void sendBattleLose(Character attChr, Character defChr, ZoneInfo zoneInfo, boolean useSpell, int value)
     {
@@ -869,7 +956,7 @@ public class GameRoom {
     {
     	ClientPacketCharMoved pkt = Json.fromJson(node, ClientPacketCharMoved.class);
     	
-    	Character chr = mCharacters.get(pkt.sender);
+    	Character chr = getCharacter (pkt.sender);//mCharacters.get(pkt.sender);
     	if( chr == null )
     		return;
     	
@@ -878,12 +965,13 @@ public class GameRoom {
     		return;
     	
     	chr.curzone = pkt.zId;
-    	
+    	Logger.info("cardInfo : " + zoneInfo.getCardInfo() + " / character : " + zoneInfo.getChar());
     	if(zoneInfo.getCardInfo()!= null && zoneInfo.getChar() != pkt.sender)
     	{
+    		Logger.info("battle with : " + zoneInfo.getChar());
     		notifyAll(new ServerPacketCharBattleNotify(pkt.sender,chr.charId,zoneInfo.getChar()).toJson());
     	}
-    	
+    	Logger.info("just moved...");
 		chr.sendPacket(new ServerPacketCharMoved(pkt.sender,pkt.zId).toJson());
     }  
     
@@ -1154,7 +1242,8 @@ public class GameRoom {
 			sendMoneyChanged(chr,false);
     	}
     	
-    	notifyAll( new ServerPacketCharZoneAsset(chr.charId,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    	if (zoneInfo.type != ZoneInfo.ZONE_MAINTYPE_TRIBE)
+	    	notifyAll( new ServerPacketCharZoneAsset(chr.charId,chr.getZoneCount(),chr.getZoneAssets()).toJson());
     	
     	sendRanking(); 
     	
@@ -1519,7 +1608,7 @@ public class GameRoom {
     	ZoneInfo zoneInfo = mZones.get(pkt.zId);
     	
     	//defense character
-    	Character chrDef = mCharacters.get(zoneInfo.getChar());
+    	Character chrDef = getCharacter (zoneInfo.getChar());//mCharacters.get(zoneInfo.getChar());
     	if(chrDef == null)
     		return;
     	
@@ -1592,7 +1681,32 @@ public class GameRoom {
     	
     	int defenseChrId = zoneInfo.getChar();
     	
-		Character prevChr = mCharacters.get(zoneInfo.getChar());
+//		if (zoneInfo.type == enZoneMainType.Tribe)
+//		{
+//			if (mLastBattle.attackWin)
+//			{
+//				ServerPacketZoneChangeOwner sPkt = new ServerPacketZoneChangeOwner ();
+//				sPkt.sender = attChr.charId;
+//				sPkt.cId = attChr.charId;
+//				sPkt.zId = zoneInfo.mZoneId;
+//				SendPacket (sPkt);
+//				
+//				attChr.RemoveCard (mLastBattle.attackCard);
+//				AddToObeyList (zoneInfo.mZoneId);
+//				return;
+//			}
+//			else
+//			{
+//				SendBattleLose(attChr,tribeChar,zoneInfo,false,0);
+//				return;
+//			}
+//			
+//		}
+
+    	
+    	
+    	
+		Character prevChr = getCharacter (zoneInfo.getChar());//mCharacters.get(zoneInfo.getChar());
 		if(prevChr == null)
 			return;
 		
@@ -1601,23 +1715,32 @@ public class GameRoom {
     		//occupy
     		
     		//change zone owner
-        	prevChr.removeZoneAsset(zoneInfo.id);
-        	notifyAll( new ServerPacketCharRemoveZone(prevChr.charId,zoneInfo.id,false,true).toJson());
-        	notifyAll( new ServerPacketCharZoneAsset(prevChr.charId,prevChr.getZoneCount(),prevChr.getZoneAssets()).toJson());
-        	
-        	zoneInfo.setChar(mLastBattle.charId);
-        	CardInfo cardInfo = CardTable.getInstance().getCard(mLastBattle.attackCard);
-        	zoneInfo.setCardInfo(cardInfo);
-        	
-        	attChr.addZoneAsset(zoneInfo.id, zoneInfo.tollMoney(), zoneInfo.sellMoney());        	
-        	notifyAll( new ServerPacketCharAddZone(attChr.charId,mLastBattle.zoneId,mLastBattle.attackCard,attChr.charId,false,-1).toJson());
-        	notifyAll( new ServerPacketCharZoneAsset(attChr.charId,attChr.getZoneCount(),attChr.getZoneAssets()).toJson());
-        	
-        	sendRanking();
-    		
-    		notifyAll( new ServerPacketCharBattleWin(mLastBattle.charId,defenseChrId,zoneInfo.id,mLastBattle.attackCard).toJson());
-    		
-    		mLastBattle = null;
+    		if (prevChr.charId == -1)
+    		{
+    			notifyAll (new ServerPacketZoneChangeOwner (attChr.charId, attChr.charId, zoneInfo.id).toJson());
+    			attChr.removeCard (mLastBattle.attackCard);
+    			AddToObeyList (zoneInfo.id);
+    		}
+    		else
+    		{
+	        	prevChr.removeZoneAsset(zoneInfo.id);
+	        	notifyAll( new ServerPacketCharRemoveZone(prevChr.charId,zoneInfo.id,false,true).toJson());
+	        	notifyAll( new ServerPacketCharZoneAsset(prevChr.charId,prevChr.getZoneCount(),prevChr.getZoneAssets()).toJson());
+	        	
+	        	zoneInfo.setChar(mLastBattle.charId);
+	        	CardInfo cardInfo = CardTable.getInstance().getCard(mLastBattle.attackCard);
+	        	zoneInfo.setCardInfo(cardInfo);
+	        	
+	        	attChr.addZoneAsset(zoneInfo.id, zoneInfo.tollMoney(), zoneInfo.sellMoney());        	
+	        	notifyAll( new ServerPacketCharAddZone(attChr.charId,mLastBattle.zoneId,mLastBattle.attackCard,attChr.charId,false,-1).toJson());
+	        	notifyAll( new ServerPacketCharZoneAsset(attChr.charId,attChr.getZoneCount(),attChr.getZoneAssets()).toJson());
+	        	
+	        	sendRanking();
+	    		
+	    		notifyAll( new ServerPacketCharBattleWin(mLastBattle.charId,defenseChrId,zoneInfo.id,mLastBattle.attackCard).toJson());
+	    		
+	    		mLastBattle = null;
+    		}
     	}
     	else
     	{

@@ -58,6 +58,11 @@ public class ServerPacket
 	//related char turn over
 	public static final int MSP_BUFF_USE_REQ = 1210;
 	
+	public static final int MSP_ZONE_CHANGE_OWNER = 1211;
+	public static final int MSP_NOTIFY_TRIBUTE = 1212;
+	public static final int MSP_TRIBE_UPRISING = 1213;
+	public static final int MSP_SYSTEM_CHAR_ADD	= 1214;
+	
 	public static final int MSP_START_REWARD = 1300;
 	public static final int MSP_EVENT_GAMBLE = 1301;
 	public static final int MSP_CHAR_BATTLE = 1302;

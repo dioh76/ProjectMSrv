@@ -21,6 +21,7 @@ public class ZoneInfo {
 	public static final int ZONE_MAINTYPE_PORTAL = 4;
 	public static final int ZONE_MAINTYPE_EVENT2 = 5;
 	public static final int ZONE_MAINTYPE_EVENT3 = 6;
+	public static final int ZONE_MAINTYPE_TRIBE = 7;
 	
 	public int 	id;
 	public int 	type;
