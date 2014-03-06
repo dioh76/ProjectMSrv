@@ -27,7 +27,10 @@ public class SpellPlague extends Spell {
 			return true;
 		
 		if(zoneInfo1 == null)
-    		return true;    	
+    		return true;
+		
+		if(zoneInfo1.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
+			return true;		
 
 		room.zoneAddBuff(castChr.charId, Buff.PLUS_TOLL, zoneInfo1.id, value1, value2, spellId);
 		

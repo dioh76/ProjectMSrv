@@ -32,6 +32,9 @@ public class SpellThunder extends Spell {
 		if(zoneInfo1 == null)
 			return true;
 		
+		if(zoneInfo1.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
+			return true;		
+		
 		Character ownChr = room.getCharacter(zoneInfo1.getChar());
 		if(ownChr == null)
 			return true;		

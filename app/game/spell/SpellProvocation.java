@@ -40,7 +40,7 @@ public class SpellProvocation extends Spell {
 			ZoneInfo zoneInfo = room.getZone(i);
 			if(zoneInfo != null)
 			{
-				if(zoneInfo.getChar() == castChr.charId)
+				if(zoneInfo.type != ZoneInfo.ZONE_MAINTYPE_TRIBE && zoneInfo.getChar() == castChr.charId)
 					break;
 			}
 			

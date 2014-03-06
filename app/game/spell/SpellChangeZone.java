@@ -33,6 +33,9 @@ public class SpellChangeZone extends Spell {
 		if(zoneInfo1 == null)
 			return true;
 		
+		if(zoneInfo1.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
+			return true;
+		
 		if(targetChr == null)
 			return true;
 
