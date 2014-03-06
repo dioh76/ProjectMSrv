@@ -17,9 +17,6 @@
 		<card id="4001410" att="1" def="0" cards="40015" regions=""/>
 		<card id="4100810" att="1" def="0" cards="42005" regions=""/>
 		<card id="4400110" att="1" def="0" cards="13004,24005,33003" regions=""/>
-		<card id="4400111" att="1" def="0" cards="14005,14003" regions=""/>
-		<card id="4400112" att="1" def="0" cards="24001,24002" regions=""/>
-		<card id="4400113" att="1" def="0" cards="34004,34005" regions=""/>
 
 		<card id="1200230" att="1" def="0" cards="" regions="4"/>
 		<card id="1400130" att="1" def="0" cards="" regions="18"/>
@@ -37,9 +34,6 @@
 		<card id="4100430" att="1" def="0" cards="" regions="18"/>
 		<card id="4100830" att="1" def="0" cards="" regions="1"/>
 		<card id="4200430" att="1" def="0" cards="" regions="6"/>
-		<card id="4400130" att="1" def="0" cards="" regions="3,4"/>
-		<card id="4400131" att="1" def="0" cards="" regions="7,8"/>
-		<card id="4400132" att="1" def="0" cards="" regions="13,14"/>
 
 		<card id="1200140" att="0" def="1" cards="" regions="5"/>
 		<card id="1300240" att="0" def="1" cards="" regions="3"/>
@@ -60,10 +54,6 @@
 		<card id="4200240" att="0" def="1" cards="" regions="7"/>
 		<card id="4200340" att="0" def="1" cards="" regions="10"/>
 		<card id="4200640" att="0" def="1" cards="" regions="10"/>
-		<card id="4400140" att="0" def="1" cards="" regions="10,17"/>
-		<card id="4400141" att="0" def="1" cards="" regions="14,16"/>
-		<card id="4400142" att="0" def="1" cards="" regions="5,19"/>
-
 
 	</cards>
 </card_option_table>
