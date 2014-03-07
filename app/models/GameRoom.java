@@ -592,7 +592,7 @@ public class GameRoom {
 		if (mObeys.containsKey (zId))
 			mObeys.remove (zId);
 		
-		mObeys.put (zId, 5);
+		mObeys.put (zId, GameRule.getInstance().TRIBE_UPRISE_TURN);
 	}
 
     
@@ -822,6 +822,8 @@ public class GameRoom {
     	if(zoneInfo.getCardInfo() == null)
     		return;
     	
+    	if(zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
+    		return;
     	
     	//no return cost
     	int prevCard = zoneInfo.getCardInfo().cardId;
@@ -1145,6 +1147,9 @@ public class GameRoom {
     	
     	if(zoneInfo == null)
     		return;
+    	
+    	if(zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
+    		return;    	
     	
     	if(targetChr != null)
     	{

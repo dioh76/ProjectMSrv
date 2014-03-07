@@ -23,6 +23,7 @@ public class GameRule {
 	public float 	START_BONUS_MONEY = 30;
 	public int		GAMEEND_MAX_TURN = 30;
 	public int		START_ENHANCE_ROUND = 3;
+	public int		TRIBE_UPRISE_TURN = 5;
 	public static final int	INITIAL_CARDDECK_SIZE = 4;
 	public static final int	SPELL_ID_BATTLE_ARENA_WIN = 1002;
 	public static final int	SPELL_ID_BATTLE_ARENA_LOSE = 1001;
@@ -155,6 +156,16 @@ public class GameRule {
 			return;
 		
 		GAMEEND_MAX_TURN = Integer.parseInt(elemChild.getAttribute("maxturn"));
+		
+		child = elem.getElementsByTagName("tribe");
+		if(child == null)
+			return;
+		
+		elemChild = (Element)child.item(0);
+		if(elemChild == null)
+			return;
+		
+		TRIBE_UPRISE_TURN = Integer.parseInt(elemChild.getAttribute("upriseturn"));
 		
 	}
 
