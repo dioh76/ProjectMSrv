@@ -187,6 +187,15 @@
 		<card id="4300600" name="화웅" grade="3" cost="400" type="4" hp="77" st="91" model="character/creature02" atlas="general_etc" spr="N43006"/>
 		<card id="4400100" name="여포" grade="4" cost="500" type="4" hp="90" st="105" model="character/creature02" atlas="general_etc" spr="N44001"/>
 		<card id="4400110" name="여포" grade="4" cost="500" type="4" hp="90" st="105" model="character/creature02" atlas="general_etc" spr="N44001"/>
-                <card id="5100100" name="이민족장" grade="3" cost="100" type="5" hp="90" st="72" model="character/babarian_01" atlas="general_etc" spr="N51001"/>
+                <card id="5100100" name="남만족병사" grade="1" cost="30" type="5" hp="81" st="60" model="character/babarian_01" atlas="general_E" spr="E51001"/>
+                <card id="5100200" name="오환족병사" grade="1" cost="30" type="5" hp="82" st="61" model="character/babarian_01" atlas="general_E" spr="E51002"/>
+                <card id="5100300" name="산월족병사" grade="1" cost="30" type="5" hp="83" st="62" model="character/babarian_01" atlas="general_E" spr="E51003"/>
+                <card id="5200100" name="남만족병장" grade="2" cost="50" type="5" hp="85" st="65" model="character/babarian_01" atlas="general_E" spr="E52001"/>
+                <card id="5200200" name="오환족병장" grade="2" cost="50" type="5" hp="86" st="66" model="character/babarian_01" atlas="general_E" spr="E52002"/>
+                <card id="5200300" name="산월족병장" grade="2" cost="50" type="5" hp="87" st="67" model="character/babarian_01" atlas="general_E" spr="E52003"/>
+                <card id="5300100" name="남만족족장" grade="3" cost="100" type="5" hp="90" st="70" model="character/babarian_01" atlas="general_E" spr="E53001"/>
+                <card id="5300200" name="오환족족장" grade="3" cost="100" type="5" hp="91" st="71" model="character/babarian_01" atlas="general_E" spr="E53002"/>
+                <card id="5300300" name="산월족족장" grade="3" cost="100" type="5" hp="92" st="72" model="character/babarian_01" atlas="general_E" spr="E53003"/>
+
 	</cards>
 </card_table>
