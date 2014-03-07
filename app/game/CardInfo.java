@@ -7,6 +7,8 @@ public class CardInfo {
 	public static final int CARD_GRADE_B = 2;
 	public static final int CARD_GRADE_A = 3;
 	public static final int CARD_GRADE_S = 4;
+	
+	public static final int SYSTEM_CARD_NUM = 5000000;
 
 	public int cardId;
 	public String cardName;

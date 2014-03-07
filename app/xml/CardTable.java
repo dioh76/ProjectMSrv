@@ -201,12 +201,15 @@ public class CardTable {
 
 				mCards.put(cardInfo.cardId, cardInfo);
 
-				if (mCardGrades.containsKey(cardInfo.grade) == false) {
-					ArrayList<Integer> cards = new ArrayList<Integer>();
-					cards.add(cardInfo.cardId);
-					mCardGrades.put(cardInfo.grade, cards);
-				} else {
-					mCardGrades.get(cardInfo.grade).add(cardInfo.cardId);
+				if(cardInfo.cardId < CardInfo.SYSTEM_CARD_NUM)
+				{
+					if (mCardGrades.containsKey(cardInfo.grade) == false) {
+						ArrayList<Integer> cards = new ArrayList<Integer>();
+						cards.add(cardInfo.cardId);
+						mCardGrades.put(cardInfo.grade, cards);
+					} else {
+						mCardGrades.get(cardInfo.grade).add(cardInfo.cardId);
+					}
 				}
 			}
 		}
