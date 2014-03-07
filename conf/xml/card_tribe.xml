@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<card_tribe>
+	<tribe id="1">
+		<card id="5100100" />
+		<card id="5200100" />
+		<card id="5300100" />
+	</tribe>
+	<tribe id="2">
+		<card id="5100200" />
+		<card id="5200200" />
+		<card id="5300200" />
+	</tribe>
+	<tribe id="3">
+		<card id="5100300" />
+		<card id="5200300" />
+		<card id="5300300" />
+	</tribe>
+</card_tribe>

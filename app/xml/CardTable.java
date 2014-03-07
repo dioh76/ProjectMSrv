@@ -18,6 +18,7 @@ public class CardTable {
 	private Map<Integer, ArrayList<CardEventInfo>> mCardEvents = new HashMap<Integer, ArrayList<CardEventInfo>>();
 	//private List<CardEventInfo> mCardEvents = new ArrayList<CardEventInfo>();
 	private Map<Integer, CardOption> mCardOptions = new HashMap<Integer, CardOption>();
+	private Map<Integer, ArrayList<Integer>> mCardTribes = new HashMap<Integer, ArrayList<Integer>>();
 
 	public void initCard(InputStream in) {
 		try {
@@ -51,6 +52,17 @@ public class CardTable {
 			e.printStackTrace();
 		}
 	}
+	
+	public void initCardTribe(InputStream in) {
+		try {
+			Document doc = XML.fromInputStream(in, "UTF-8");
+
+			readCardTribe(doc.getDocumentElement());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 	public CardInfo getCard(int cardId) {
 		if (mCards.containsKey(cardId) == false)
@@ -64,6 +76,15 @@ public class CardTable {
 			return null;
 		
 		return mCardOptions.get(cardId);
+	}
+	
+	public int getCardTribe(int tribe) {
+		if(mCardTribes.containsKey(tribe) == false)
+			return -1;
+		List<Integer> cards = mCardTribes.get(tribe);
+		final Random random = new Random();
+		
+		return cards.get(random.nextInt(cards.size()));
 	}
 
 	public ArrayList<Integer> getSystemDeck(int type) {
@@ -312,7 +333,42 @@ public class CardTable {
 				mCardOptions.put(info.cardId, info);
 			}
 		}
-	}	
+	}
+	
+	private void readCardTribe(Element elem) {
+		NodeList child = elem.getElementsByTagName("tribe");
+		if (child == null)
+			return;
+
+		Node current = null;
+		for (int i = 0; i < child.getLength(); i++) {
+			current = child.item(i);
+			if (current.getNodeType() == Node.ELEMENT_NODE) {
+				Element childElem = (Element) current;
+
+				int tribe = Integer.parseInt(childElem.getAttribute("id"));
+				ArrayList<Integer> cards = new ArrayList<Integer>();
+				
+				NodeList child2 = childElem.getElementsByTagName("card");
+				if(childElem != null)
+				{
+					Node current2 = null;
+					
+					for(int j = 0; j < child2.getLength(); j++) {
+						current2 = child2.item(j);
+						if (current2.getNodeType() == Node.ELEMENT_NODE) {
+							Element childElem2 = (Element) current2;
+						
+							int cardId = Integer.parseInt(childElem2.getAttribute("id"));
+							cards.add(cardId);
+						}
+					}
+				}
+				
+				mCardTribes.put(tribe, cards);
+			}
+		}		
+	}
 
 	private static class Holder {
 		private static final CardTable Instance = new CardTable();

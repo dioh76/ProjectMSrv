@@ -8,6 +8,7 @@ public class ZoneBasicInfo
 	public int id;
 	public String name;
 	public int race;
+	public int tribe;
 	public boolean enhancable;
 	public List<ZoneValueInfo> values = new ArrayList<ZoneValueInfo>();
 }

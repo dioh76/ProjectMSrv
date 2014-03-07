@@ -129,6 +129,7 @@ public class ZoneTable {
 				bInfo.id = Integer.parseInt(childElem.getAttribute("id"));
 				bInfo.race = Integer.parseInt(childElem.getAttribute("race"));
 				bInfo.name = childElem.getAttribute("name");
+				bInfo.tribe = Integer.parseInt(childElem.getAttribute("tribe"));
 				bInfo.enhancable = Integer.parseInt(childElem.getAttribute("enhance")) == 1 ? true : false;
 				
 				mZoneInfos.put(bInfo.id, bInfo);

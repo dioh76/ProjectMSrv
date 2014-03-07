@@ -335,6 +335,7 @@ public class GameRoom {
     		{
     			ZoneBasicInfo basicInfo = ZoneTable.getInstance().getZoneBasicInfo(posInfo.info);
     			zoneInfo.race = basicInfo.race;
+    			zoneInfo.tribe = basicInfo.tribe;
     			zoneInfo.enhancable = basicInfo.enhancable;
     			zoneInfo.values = basicInfo.values;
     		}
@@ -374,7 +375,7 @@ public class GameRoom {
 			addRandomAICharacter(4 - mCharacters.size());
     	}
     	
-		AddTribeCharacter ();
+		addTribeChar ();
 		
     	//init char
 		
@@ -566,7 +567,7 @@ public class GameRoom {
     	}
     }
     
-	private void AddTribeCharacter ()
+	private void addTribeChar ()
 	{
 		Character chr = new Character( null, -1, -1, 1, "Tribe", false, 100000, true);
 		tribeCharacter = chr;
@@ -577,10 +578,13 @@ public class GameRoom {
 		for (ZoneInfo zoneInfo : mZones)
 		{
 			if (zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
-				charAddZone (tribeCharacter, zoneInfo.id, 5100100, false, -1 );
+			{
+				int cardId = CardTable.getInstance().getCardTribe(zoneInfo.tribe);
+				charAddZone (tribeCharacter, zoneInfo.id, cardId, false, -1 );
+				
+				Logger.debug("tribe zone "+ zoneInfo.id + ", card="+cardId);
+			}
 		}
-		
-
 	}
 
 	private void addToObeyList (int zId)
