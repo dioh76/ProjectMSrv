@@ -609,16 +609,29 @@ public class GameRoom {
 				if(sumPay > attChr.money + sellSum)
 				{
 					//bankrupt and hand over all zone
-					List<Integer> attZones = attChr.getOwnZones();
-					for(int zoneId : attZones)
+					if(zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
 					{
-						ZoneInfo sellZoneInfo = getZone(zoneId);
-						float asset = sellZoneInfo.tollMoney();
-				    	defChr.addZoneAsset(sellZoneInfo.id, asset, sellZoneInfo.sellMoney());
-				    	sellZoneInfo.setChar(defChr.charId);
-				    	attChr.removeZoneAsset(sellZoneInfo.id);
-				    	notifyAll(new ServerPacketCharChangeOwner(defChr.charId,sellZoneInfo.id,defChr.charId,defChr.getZoneCount(),defChr.getZoneAssets(),attChr.charId,attChr.getZoneCount(),attChr.getZoneAssets()).toJson());
+						List<Integer> attZones = attChr.getOwnZones();
+						for(int zoneId : attZones)
+						{
+							attChr.removeZoneAsset(zoneId);
+					    	notifyAll( new ServerPacketCharRemoveZone(attChr.charId,zoneId,false,false).toJson());
+						}
 					}
+					else
+					{
+						List<Integer> attZones = attChr.getOwnZones();
+						for(int zoneId : attZones)
+						{
+							ZoneInfo sellZoneInfo = getZone(zoneId);
+							float asset = sellZoneInfo.tollMoney();
+					    	defChr.addZoneAsset(sellZoneInfo.id, asset, sellZoneInfo.sellMoney());
+					    	sellZoneInfo.setChar(defChr.charId);
+					    	attChr.removeZoneAsset(sellZoneInfo.id);
+					    	notifyAll(new ServerPacketCharChangeOwner(defChr.charId,sellZoneInfo.id,defChr.charId,defChr.getZoneCount(),defChr.getZoneAssets(),attChr.charId,attChr.getZoneCount(),attChr.getZoneAssets()).toJson());
+						}
+					}
+
 					
 					float attRemain = attChr.money;
 					defChr.money += attRemain;
@@ -1148,15 +1161,20 @@ public class GameRoom {
     	if(zoneInfo == null)
     		return;
     	
-    	if(zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
-    		return;    	
-    	
     	if(targetChr != null)
     	{
-    		chr.removeZoneAsset(zoneInfo.id);
-    		targetChr.addZoneAsset(zoneInfo.id, zoneInfo.tollMoney(), zoneInfo.sellMoney());
-    		zoneInfo.setChar(targetChr.charId);
-    		notifyAll(new ServerPacketCharChangeOwner(targetChr.charId,zoneInfo.id,targetChr.charId,targetChr.getZoneCount(),targetChr.getZoneAssets(),chr.charId,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    		if(zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
+    		{
+    			chr.removeZoneAsset(zoneInfo.id);
+    			notifyAll( new ServerPacketCharRemoveZone(chr.charId,zoneInfo.id,false,false).toJson());
+    		}
+    		else
+    		{
+	    		chr.removeZoneAsset(zoneInfo.id);
+	    		targetChr.addZoneAsset(zoneInfo.id, zoneInfo.tollMoney(), zoneInfo.sellMoney());
+	    		zoneInfo.setChar(targetChr.charId);
+	    		notifyAll(new ServerPacketCharChangeOwner(targetChr.charId,zoneInfo.id,targetChr.charId,targetChr.getZoneCount(),targetChr.getZoneAssets(),chr.charId,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    		}
     	}
     	else
     	{
