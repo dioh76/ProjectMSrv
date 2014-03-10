@@ -1887,7 +1887,12 @@ public class GameRoom {
     	final Random random = new Random();
     	int deckType = random.nextInt(6);
     	
-    	chr.mAllCards = CardTable.getInstance().getSystemDeck(deckType);
+    	if (pkt.hasDeck)
+    		chr.mAllCards = new ArrayList<Integer>(pkt.cards);
+    	else
+    		chr.mAllCards = CardTable.getInstance().getSystemDeck(deckType);
+    		
+    	
     	chr.mRemainCards = new ArrayList<Integer>(chr.mAllCards);
     	
     	for(int i = 0; i < GameRule.INITIAL_CARDDECK_SIZE; i++)
