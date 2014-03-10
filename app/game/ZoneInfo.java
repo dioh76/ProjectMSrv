@@ -32,6 +32,7 @@ public class ZoneInfo {
 	
 	private int	mLevel;
 	private int	mCharId;
+	private int mLordId;
 	private float mTollRate;
 	private boolean mAmbush;
 	private int mAmbushOwner;
@@ -63,6 +64,16 @@ public class ZoneInfo {
 	{
 		return mCharId;
 	}
+	
+	public void setLordChar(int charId)
+	{
+		mLordId = charId;
+	}
+		
+	public int getLordChar()
+	{
+		return mLordId;
+	}	
 	
 	public void setTollRate(float rate)
 	{

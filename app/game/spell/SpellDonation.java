@@ -31,9 +31,6 @@ public class SpellDonation extends Spell {
 
 		if(targetChr == null)
     		return true;
-		
-		if(zoneInfo1.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
-			return true;
     	
     	zoneInfo1.setChar(targetChr.charId);
     	

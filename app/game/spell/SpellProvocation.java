@@ -37,17 +37,17 @@ public class SpellProvocation extends Spell {
 		int i = pos + 1;
 		while(i != pos)
 		{
+			if(i >= ZoneTable.getInstance().getZoneCount())
+				i = 0;
+
 			ZoneInfo zoneInfo = room.getZone(i);
 			if(zoneInfo != null)
 			{
-				if(zoneInfo.type != ZoneInfo.ZONE_MAINTYPE_TRIBE && zoneInfo.getChar() == castChr.charId)
+				if(zoneInfo.getChar() == castChr.charId)
 					break;
 			}
 			
 			i++;
-			
-			if(i >= ZoneTable.getInstance().getZoneCount())
-				i = 0;
 			
 	    	targetChr.controlled = true;
 	    	targetChr.spellcaster = castChr.charId;

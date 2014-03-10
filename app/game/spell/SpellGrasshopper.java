@@ -35,10 +35,6 @@ public class SpellGrasshopper extends Spell {
 		
 		for(int zoneId : zones)
 		{
-			ZoneInfo zoneInfo = room.getZone(zoneId);
-			if(zoneInfo.type == ZoneInfo.ZONE_MAINTYPE_TRIBE)
-				continue;
-			
 			room.zoneAddBuff(castChr.charId, Buff.PLUS_TOLL, zoneId, value1, value2, spellId);
 		}
 		

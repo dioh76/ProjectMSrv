@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <game_rule>
-	<char soul="2000" />
+	<char soul="800" />
 	<bonus start="300" />
 	<startenhance round="3" rate0="0" rate1="0.3" rate2="0.5" rate3="1" />
 	<gameend maxturn="30" />
