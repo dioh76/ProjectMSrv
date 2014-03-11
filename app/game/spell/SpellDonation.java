@@ -1,6 +1,7 @@
 package game.spell;
 
 import protocol.server.ServerPacketCharChangeOwner;
+import protocol.server.ServerPacketSpellDonation;
 import game.Character;
 import game.ZoneInfo;
 import models.GameRoom;
@@ -39,8 +40,7 @@ public class SpellDonation extends Spell {
     	zoneInfo1.setChar(targetChr.charId);
     	castChr.removeZoneAsset(zoneInfo1.id);
     	
-    	
-    	room.notifyAll(new ServerPacketCharChangeOwner(castChr.charId,zoneInfo1.id,targetChr.charId,targetChr.getZoneCount(),targetChr.getZoneAssets(),castChr.charId,castChr.getZoneCount(),castChr.getZoneAssets()).toJson());
+    	room.notifyAll(new ServerPacketSpellDonation(castChr.charId,spellId,zoneInfo1.id,castChr.getZoneAssets(),targetChr.charId,targetChr.getZoneAssets(),room.getRanks()).toJson());
     	room.sendRanking();		
 		
 		return true;

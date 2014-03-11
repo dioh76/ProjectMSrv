@@ -320,6 +320,29 @@ public class GameRoom {
     	return zoneId;
     }
     
+    public List<Integer> getRanks()
+    {
+    	List<AssetRank> ranks = new ArrayList<AssetRank>();
+    	synchronized(mCharacters)
+    	{
+    		for(Character srvChr : mCharacters.values())
+    		{
+    			ranks.add(new AssetRank(srvChr.charId,srvChr.getZoneAssets() + srvChr.money));
+    		}
+    	}
+    	
+    	Collections.sort(ranks);
+    	
+    	List<Integer> sendRanks = new ArrayList<Integer>();
+    	for(AssetRank rank : ranks)
+    		sendRanks.add(rank.charId);
+    	
+    	
+    	notifyAll( new ServerPacketCharRankAsset(0,sendRanks).toJson());
+    	
+    	return sendRanks;
+    }
+    
     private void initZones()
     {	
 //    	AddTribeCharacter ();
@@ -613,10 +636,22 @@ public class GameRoom {
 					{
 						ZoneInfo sellZoneInfo = getZone(zoneId);
 						float asset = sellZoneInfo.tollMoney();
-				    	defChr.addZoneAsset(sellZoneInfo.id, asset, sellZoneInfo.sellMoney());
-				    	sellZoneInfo.setChar(defChr.charId);
-				    	attChr.removeZoneAsset(sellZoneInfo.id);
-				    	notifyAll(new ServerPacketCharChangeOwner(defChr.charId,sellZoneInfo.id,defChr.charId,defChr.getZoneCount(),defChr.getZoneAssets(),attChr.charId,attChr.getZoneCount(),attChr.getZoneAssets()).toJson());
+						//if defense character is tribe
+						if(defChr.charId == -1)
+						{
+					    	sellZoneInfo.setChar(0);
+					    	attChr.removeZoneAsset(sellZoneInfo.id);
+					    					        	
+				        	notifyAll( new ServerPacketCharZoneAsset(attChr.charId,attChr.getZoneCount(),attChr.getZoneAssets()).toJson());
+				        	notifyAll( new ServerPacketCharRemoveZone(attChr.charId,sellZoneInfo.id,true,false).toJson()); 
+						}
+						else
+						{
+					    	defChr.addZoneAsset(sellZoneInfo.id, asset, sellZoneInfo.sellMoney());
+					    	sellZoneInfo.setChar(defChr.charId);
+					    	attChr.removeZoneAsset(sellZoneInfo.id);
+					    	notifyAll(new ServerPacketCharChangeOwner(defChr.charId,sellZoneInfo.id,defChr.charId,defChr.getZoneCount(),defChr.getZoneAssets(),attChr.charId,attChr.getZoneCount(),attChr.getZoneAssets()).toJson());
+						}
 					}
 					
 					float attRemain = attChr.money;
@@ -1100,14 +1135,14 @@ public class GameRoom {
     	if(chr == null)
     		return;
     	
-    	Character targetChr = mCharacters.get(pkt.toId);
+    	Character targetChr = getCharacter(pkt.toId);
     	
     	ZoneInfo zoneInfo = mZones.get(pkt.zId);
     	
     	if(zoneInfo == null)
     		return;
     	
-    	if(targetChr != null)
+    	if(targetChr != null && targetChr.charId != -1)
     	{
     		chr.removeZoneAsset(zoneInfo.id);
     		targetChr.addZoneAsset(zoneInfo.id, zoneInfo.tollMoney(), zoneInfo.sellMoney());
@@ -1814,9 +1849,10 @@ public class GameRoom {
     	if(zoneInfo == null)
     		return;
     	
-		Character prevChr = mCharacters.get(zoneInfo.getChar());
+		Character prevChr = getCharacter(zoneInfo.getChar());
+		
 		if(prevChr == null)
-			return;    	
+			return;
     	
     	if(pkt.use == true)
     	{

@@ -3,6 +3,7 @@ package game.spell;
 import protocol.server.ServerPacketCharAddZone;
 import protocol.server.ServerPacketCharRemoveZone;
 import protocol.server.ServerPacketCharZoneAsset;
+import protocol.server.ServerPacketSpellChangeZone;
 import xml.CardTable;
 import game.CardInfo;
 import game.Character;
@@ -41,15 +42,11 @@ public class SpellChangeZone extends Spell {
 			return true;
 		
 		targetChr.removeZoneAsset(zoneInfo1.id);
-		room.notifyAll( new ServerPacketCharRemoveZone(targetChr.charId,zoneInfo1.id,false,true).toJson());
     	
     	zoneInfo1.setCardInfo(cardInfo);
     	targetChr.addZoneAsset(zoneInfo1.id, zoneInfo1.tollMoney(), zoneInfo1.sellMoney());
-    	room.notifyAll( new ServerPacketCharAddZone(targetChr.charId,zoneInfo1.id,cardInfo.cardId,targetChr.charId,false,-1).toJson());    
-		
-    	room.notifyAll( new ServerPacketCharZoneAsset(targetChr.charId,targetChr.getZoneCount(),targetChr.getZoneAssets()).toJson());
     	
-    	room.sendRanking();
+    	room.notifyAll(new ServerPacketSpellChangeZone(castChr.charId,spellId,zoneInfo1.id,targetChr.charId,cardInfo.cardId,targetChr.getZoneAssets(),room.getRanks()).toJson());
 		
 		return true;
 	}

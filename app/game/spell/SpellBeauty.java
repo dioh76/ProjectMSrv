@@ -1,6 +1,6 @@
 package game.spell;
 
-import protocol.server.ServerPacketCharChangeOwner;
+import protocol.server.ServerPacketSpellBeauty;
 import game.Character;
 import game.ZoneInfo;
 import models.GameRoom;
@@ -39,10 +39,9 @@ public class SpellBeauty extends Spell {
     	zoneInfo1.setChar(castChr.charId);
     	targetChr.removeZoneAsset(zoneInfo1.id);
     	
-    	room.notifyAll(new ServerPacketCharChangeOwner(castChr.charId,zoneInfo1.id,castChr.charId,castChr.getZoneCount(),castChr.getZoneAssets(),targetChr.charId,targetChr.getZoneCount(),targetChr.getZoneAssets()).toJson());
-    	room.sendRanking();		
+    	room.notifyAll(new ServerPacketSpellBeauty(castChr.charId,spellId,zoneInfo1.id,castChr.charId,castChr.getZoneAssets(),targetChr.charId,targetChr.getZoneAssets(),room.getRanks()).toJson());
+    	//room.sendRanking();		
 		
 		return true;
 	}
-
 }
