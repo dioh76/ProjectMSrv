@@ -67,6 +67,7 @@ public class ServerPacket
 	public static final int MSP_SPELL_BEAUTY = 1215;
 	public static final int MSP_SPELL_CHANGEZONE = 1216;
 	public static final int MSP_SPELL_DONATION = 1217;
+	public static final int MSP_SPELL_THUNDER = 1218;
 	
 	public static final int MSP_START_REWARD = 1300;
 	public static final int MSP_EVENT_GAMBLE = 1301;

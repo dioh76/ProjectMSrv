@@ -2,6 +2,7 @@ package game.spell;
 
 import protocol.server.ServerPacketCharRemoveZone;
 import protocol.server.ServerPacketCharZoneAsset;
+import protocol.server.ServerPacketSpellThunder;
 import protocol.server.ServerPacketZoneDelBuff;
 import game.Buff;
 import game.Character;
@@ -52,11 +53,7 @@ public class SpellThunder extends Spell {
 			room.notifyAll(new ServerPacketZoneDelBuff(ownChr.charId,prevBuff.id,prevBuff.targetzone).toJson());
 		}
     	
-    	room.notifyAll( new ServerPacketCharZoneAsset(ownChr.charId,ownChr.getZoneCount(),ownChr.getZoneAssets()).toJson());
-    	
-    	room.sendRanking();
-    	
-    	room.notifyAll( new ServerPacketCharRemoveZone(ownChr.charId,zoneInfo1.id,true,false).toJson());
+		room.notifyAll(new ServerPacketSpellThunder(castChr.charId,spellId,zoneInfo1.id,ownChr.charId,ownChr.getZoneAssets(),room.getRanks()).toJson());
     	
     	return true;
 	}
