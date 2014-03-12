@@ -16,7 +16,7 @@ public class ServerPacketSpellDonation extends ServerPacket{
 	public ServerPacketSpellDonation(int sender, int spellId, int zoneId, float asset, int toCharId, float tasset, List<Integer> ranks)
 	{
 		this.sender = sender;
-		this.proto = ServerPacket.MSP_SPELL_BEAUTY;
+		this.proto = ServerPacket.MSP_SPELL_DONATION;
 		this.sId = spellId;
 		this.zId = zoneId;
 		this.asset = asset;
