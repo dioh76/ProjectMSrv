@@ -914,13 +914,6 @@ public class GameRoom {
     		mStartCharId = mCharTurns.get(idx);
     	}
     	
-    	//remove immediately in turn sequence if not my turn
-    	if(chr.charId != mCharTurns.get(0))
-    		mCharTurns.remove(new Integer(chr.charId));
-    	
-    	//turn over
-    	charTurnOver(true);
-
 		//Remove Char Info    	
     	for(int i = chr.mBuffs.size() - 1; i >=0; i--)
 		{
@@ -928,7 +921,14 @@ public class GameRoom {
     		chr.mBuffs.remove(i);
 				
 			notifyAll(new ServerPacketCharDelBuff(chr.charId,buff.id,buff.targetchar).toJson()); 
-		}
+		}    	
+    	
+    	//remove immediately in turn sequence if not my turn
+    	if(chr.charId != mCharTurns.get(0))
+    		mCharTurns.remove(new Integer(chr.charId));
+    	
+    	//turn over
+    	charTurnOver(true);
 		
 		for(ZoneInfo zoneInfo : mZones)
     	{
@@ -1051,34 +1051,38 @@ public class GameRoom {
     {
     	Character chr = mCharacters.get(mCharTurns.get(0));
     	
-    	//check bankrupt
-    	if(chr.money < 0)
-		{
-			chr.sendPacket(new ServerPacketCharBankruptReq(chr.charId).toJson());
-			return;
-		}
-    	
-    	if(chr.doubledice != 0)
+    	//if char is already bankrupt, pass below logic
+    	if(bankrupt == false)
     	{
-    		sendTurnStart(chr, true);
-    		return;
-    	}
-    	
-    	//buff remove for char turn;
-		for(int i = chr.mBuffs.size() - 1; i >=0; i--)
-		{
-			Buff buff = chr.mBuffs.get(i);
-			
-			//turn skip buff is checked in sendTurnStart func
-			if(buff.buffType != Buff.TURN_SKIP)
-				buff.turnOver();
-			
-			if(buff.isValid() == false)
+	    	//check bankrupt
+	    	if(chr.money < 0)
 			{
-				chr.mBuffs.remove(i);				
-				notifyAll(new ServerPacketCharDelBuff(chr.charId,buff.id,buff.targetchar).toJson()); 
+				chr.sendPacket(new ServerPacketCharBankruptReq(chr.charId).toJson());
+				return;
 			}
-		}
+	    	
+	    	if(chr.doubledice != 0)
+	    	{
+	    		sendTurnStart(chr, true);
+	    		return;
+	    	}
+	    	
+	    	//buff remove for char turn;
+			for(int i = chr.mBuffs.size() - 1; i >=0; i--)
+			{
+				Buff buff = chr.mBuffs.get(i);
+				
+				//turn skip buff is checked in sendTurnStart func
+				if(buff.buffType != Buff.TURN_SKIP)
+					buff.turnOver();
+				
+				if(buff.isValid() == false)
+				{
+					chr.mBuffs.remove(i);				
+					notifyAll(new ServerPacketCharDelBuff(chr.charId,buff.id,buff.targetchar).toJson()); 
+				}
+			}
+    	}
 		
 		//turn over
 		mCharTurns.remove(0);
