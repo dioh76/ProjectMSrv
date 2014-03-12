@@ -206,6 +206,13 @@ public class Character {
 		}
 	}
 	
+	public boolean isTribeChar()
+	{
+		if(charId == GameRule.CHAR_ID_TRIBE)
+			return true;
+		else return false;
+	}
+	
 	public int getZoneCount()
 	{
 		return mZoneValues.size();

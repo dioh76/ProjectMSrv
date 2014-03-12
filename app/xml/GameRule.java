@@ -19,6 +19,7 @@ import play.libs.XML;
 
 public class GameRule {
 	
+	
 	public float 	CHAR_INIT_MONEY = 30;
 	public float 	START_BONUS_MONEY = 30;
 	public int		GAMEEND_MAX_TURN = 30;
@@ -27,6 +28,7 @@ public class GameRule {
 	public static final int	INITIAL_CARDDECK_SIZE = 4;
 	public static final int	SPELL_ID_BATTLE_ARENA_WIN = 1002;
 	public static final int	SPELL_ID_BATTLE_ARENA_LOSE = 1001;
+	public static final int	CHAR_ID_TRIBE = 200;
 	
 	private ArrayList<Float> mStartEnhance = new ArrayList<Float>();
 	private Map<Integer, List<ZoneBuff>> mZoneBuffs = new HashMap<Integer, List<ZoneBuff>>();

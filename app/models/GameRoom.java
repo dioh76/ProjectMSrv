@@ -282,7 +282,7 @@ public class GameRoom {
     
     public Character getCharacter(int charId)
     {
-    	if (charId == -1)
+    	if (charId == GameRule.CHAR_ID_TRIBE)
     		return tribeCharacter;
     	synchronized(mCharacters)
     	{
@@ -591,7 +591,7 @@ public class GameRoom {
     
 	private void addTribeChar ()
 	{
-		Character chr = new Character( null, -1, -1, 1, "Tribe", false, 100000, true);
+		Character chr = new Character( null, -1, GameRule.CHAR_ID_TRIBE, 1, "Tribe", false, 100000, true);
 		tribeCharacter = chr;
 		
 		notifyAll(new ServerPacketSystemCharAdd (chr.charId, chr.charId, chr.charType, chr.userName).toJson());
@@ -637,7 +637,7 @@ public class GameRoom {
 						ZoneInfo sellZoneInfo = getZone(zoneId);
 						float asset = sellZoneInfo.tollMoney();
 						//if defense character is tribe
-						if(defChr.charId == -1)
+						if(defChr.isTribeChar())
 						{
 					    	sellZoneInfo.setChar(0);
 					    	attChr.removeZoneAsset(sellZoneInfo.id);
@@ -1142,7 +1142,7 @@ public class GameRoom {
     	if(zoneInfo == null)
     		return;
     	
-    	if(targetChr != null && targetChr.charId != -1)
+    	if(targetChr != null && targetChr.isTribeChar() == false)
     	{
     		chr.removeZoneAsset(zoneInfo.id);
     		targetChr.addZoneAsset(zoneInfo.id, zoneInfo.tollMoney(), zoneInfo.sellMoney());
