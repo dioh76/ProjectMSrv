@@ -37,10 +37,6 @@ public class Character {
 	public int		dice2;
 	public int		doubledice;
 	
-	//character is controlled by spell
-	public boolean	controlled;
-	public int		spellcaster;
-	
 	//casted spell to me
 	public SpellCasted lastspell;
 	

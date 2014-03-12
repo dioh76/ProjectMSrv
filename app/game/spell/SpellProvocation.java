@@ -1,7 +1,10 @@
 package game.spell;
 
+import protocol.server.ServerPacketBuffUse;
+import protocol.server.ServerPacketCharDelBuff;
 import protocol.server.ServerPacketCharMoveZone;
 import xml.ZoneTable;
+import game.Buff;
 import game.Character;
 import game.ZoneInfo;
 import models.GameRoom;
@@ -48,10 +51,18 @@ public class SpellProvocation extends Spell {
 			}
 			
 			i++;
-			
-	    	targetChr.controlled = true;
-	    	targetChr.spellcaster = castChr.charId;
 		}
+		
+		//if character in portal area, remove portal buff
+		for( int j = targetChr.mBuffs.size() - 1; j >= 0 ; j-- )
+    	{
+    		Buff buff = targetChr.mBuffs.get(j);
+    		if(buff.buffType == Buff.SPELL_USE)
+    		{
+    			targetChr.mBuffs.remove(j);
+    			room.notifyAll(new ServerPacketCharDelBuff(buff.targetchar, buff.id, buff.targetchar).toJson());
+    		}
+    	}   	
 		
 		room.notifyAll(new ServerPacketCharMoveZone(targetChr.charId,i).toJson());
 		
