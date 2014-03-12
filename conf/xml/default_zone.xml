@@ -14,7 +14,7 @@
 		<zone id="9" type="1" info="7" x="-12.36" y="-1.39" z="20.09" pricedeck="2"/>
 		<zone id="10" type="2" info="0" x="-7.160002" y="-1.39" z="20.09" pricedeck="0"/>
 		<zone id="11" type="1" info="8" x="-1.960002" y="-1.39" z="20.09" pricedeck="2"/>
-		<zone id="12" type="7" info="9" x="3.239998" y="-1.39" z="20.09" pricedeck="2"/>
+		<zone id="12" type="5" info="0" x="3.239998" y="-1.39" z="20.09" pricedeck="0"/>
 		<zone id="13" type="1" info="10" x="8.439998" y="-1.39" z="20.09" pricedeck="2"/>
 
 		<zone id="14" type="6" info="0" x="14.22" y="-1.39" z="20.6" pricedeck="0"/>
@@ -30,8 +30,8 @@
 		<zone id="23" type="1" info="17" x="3.239997" y="-1.39" z="-16.31" pricedeck="4"/>
 		<zone id="24" type="2" info="0" x="-1.960003" y="-1.39" z="-16.31" pricedeck="0"/>
 		<zone id="25" type="1" info="18" x="-7.160003" y="-1.39" z="-16.31" pricedeck="4"/>
-		<zone id="26" type="5" info="0" x="-12.36" y="-1.39" z="-16.31" pricedeck="0"/>
-		<zone id="27" type="1" info="19" x="-17.56" y="-1.39" z="-16.31" pricedeck="4"/>
+		<zone id="26" type="1" info="19" x="-12.36" y="-1.39" z="-16.31" pricedeck="4"/>
+		<zone id="27" type="1" info="20" x="-17.56" y="-1.39" z="-16.31" pricedeck="4"/>
 	</zones>
 	<zoneLinked>
 		<link id="1" value="5,6"/>
@@ -65,5 +65,8 @@
 		<info id="17" race="2" tribe="0" enhance="1" model="board/zone_wei06" name="허창" buy1="240" sell1="240" toll1="270" buy2="210" sell2="450" toll2="480" buy3="350" sell3="800" toll3="1100"/>
 		<info id="18" race="1" tribe="0" enhance="1" model="board/zone_choc06" name="양양" buy1="280" sell1="280" toll1="300" buy2="240" sell2="520" toll2="550" buy3="400" sell3="920" toll3="1250"/>
 		<info id="19" race="1" tribe="0" enhance="1" model="board/zone_choc07" name="성도" buy1="300" sell1="300" toll1="350" buy2="240" sell2="540" toll2="600" buy3="400" sell3="940" toll3="1300"/>
+		<info id="20" race="4" tribe="0" enhance="1" model="board/zone_Gold01" name="황궁" buy1="500" sell1="500" toll1="500" buy2="240" sell2="540" toll2="600" buy3="400" sell3="940" toll3="1300"/>
+
+
 	</zoneInfos>
 </default_zone>
