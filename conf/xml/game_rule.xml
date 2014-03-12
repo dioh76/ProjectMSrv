@@ -9,19 +9,19 @@
 		<buff zonerace = "1" creaturerace="1" value="1.2"/>
 		<buff zonerace = "1" creaturerace="2" value="1"/>
 		<buff zonerace = "1" creaturerace="3" value="1"/>
-		<buff zonerace = "1" creaturerace="4" value="1.05"/>
+		<buff zonerace = "1" creaturerace="4" value="1"/>
 		<buff zonerace = "2" creaturerace="1" value="1"/>
 		<buff zonerace = "2" creaturerace="2" value="1.2"/>
 		<buff zonerace = "2" creaturerace="3" value="1"/>
-		<buff zonerace = "2" creaturerace="4" value="1.05"/>
+		<buff zonerace = "2" creaturerace="4" value="1"/>
 		<buff zonerace = "3" creaturerace="1" value="1"/>
 		<buff zonerace = "3" creaturerace="2" value="1"/>
 		<buff zonerace = "3" creaturerace="3" value="1.2"/>
-		<buff zonerace = "3" creaturerace="4" value="1.05"/>
-		<buff zonerace = "4" creaturerace="1" value="1.05"/>
-		<buff zonerace = "4" creaturerace="2" value="1.05"/>
-		<buff zonerace = "4" creaturerace="3" value="1.05"/>
-		<buff zonerace = "4" creaturerace="4" value="1.05"/>
+		<buff zonerace = "3" creaturerace="4" value="1"/>
+		<buff zonerace = "4" creaturerace="1" value="1"/>
+		<buff zonerace = "4" creaturerace="2" value="1"/>
+		<buff zonerace = "4" creaturerace="3" value="1"/>
+		<buff zonerace = "4" creaturerace="4" value="1"/>
 	</zonebuff>
 	<zonelvbuff>
 		<buff lv="0" value="1.0"/>
