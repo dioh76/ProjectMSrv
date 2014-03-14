@@ -548,13 +548,6 @@ public class GameRoom {
 			sendTurnOver(chr);
 		}		
 		
-		for( Character srvChr : mCharacters.values() )
-    	{
-			if(chrBankrupt && srvChr.charId == chr.charId)
-				continue;
-    		srvChr.addCard();
-    	}    		
-   	
     	notifyAll(new ServerPacketRoundOver(chr.charId,nextChrId).toJson());
     }
     
@@ -566,7 +559,7 @@ public class GameRoom {
 			ZoneInfo zoneInfo = getZone (zId);
 			Character chr = getCharacter (zoneInfo.getLordChar());
 			
-			if (mObeys.get(zId) > 0)
+			if (mObeys.get(zId) > 0 && chr != null)
 			{
 				chr.money += zoneInfo.getCardInfo().cost;
 				
@@ -584,7 +577,7 @@ public class GameRoom {
 				zoneInfo.setLordChar(0);
 				//TODO : Notify uprising
 				
-				notifyAll(new ServerPacketTribeUprising (chr.charId, zoneInfo.id).toJson());
+				notifyAll(new ServerPacketTribeUprising (0, zoneInfo.id).toJson());
 			}
     	}
     }
@@ -1109,7 +1102,10 @@ public class GameRoom {
 			
 			sendTurnOver(chr);
 			sendTurnStart(nextChr, false);
-		}    	
+		}
+		
+		if(bankrupt == false)
+    		chr.addCard();
     }
     
     private void onRoundStart(JsonNode node)
