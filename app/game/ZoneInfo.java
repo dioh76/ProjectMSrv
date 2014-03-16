@@ -165,7 +165,7 @@ public class ZoneInfo {
 		else return values.get(mLevel).sell;*/
 		
 		if(mCardInfo != null)
-			return mCardInfo.cost / 2;
+			return mCardInfo.cost * GameRule.getInstance().CARD_SELL_COST_RATE / 100;
 		else 
 			return 0;
 	}

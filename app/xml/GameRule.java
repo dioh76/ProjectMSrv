@@ -25,6 +25,7 @@ public class GameRule {
 	public int		GAMEEND_MAX_TURN = 30;
 	public int		START_ENHANCE_ROUND = 3;
 	public int		TRIBE_UPRISE_TURN = 5;
+	public float	CARD_SELL_COST_RATE = 50;
 	public static final int	INITIAL_CARDDECK_SIZE = 4;
 	public static final int	SPELL_ID_BATTLE_ARENA_WIN = 1002;
 	public static final int	SPELL_ID_BATTLE_ARENA_LOSE = 1001;
@@ -169,6 +170,15 @@ public class GameRule {
 		
 		TRIBE_UPRISE_TURN = Integer.parseInt(elemChild.getAttribute("upriseturn"));
 		
+		child = elem.getElementsByTagName("cardsellcost");
+		if(child == null)
+			return;
+		
+		elemChild = (Element)child.item(0);
+		if(elemChild == null)
+			return;
+		
+		CARD_SELL_COST_RATE = Float.parseFloat(elemChild.getAttribute("rate"));		
 	}
 
 	private static class Holder {

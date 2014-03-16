@@ -5,6 +5,7 @@
 	<startenhance round="3" rate0="0" rate1="0.3" rate2="0.5" rate3="1" />
 	<gameend maxturn="30" />
 	<tribe upriseturn="30" />
+	<cardsellcost rate="100" />
 	<zonebuff>
 		<buff zonerace = "1" creaturerace="1" value="1.2"/>
 		<buff zonerace = "1" creaturerace="2" value="1"/>
