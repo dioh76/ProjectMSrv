@@ -6,6 +6,7 @@ public class ClientPacketCharSellZone extends ClientPacket{
 	
 	public int zId;
 	public int toId;
+	public float sumpay;
 	
 	public ClientPacketCharSellZone()
 	{

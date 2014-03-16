@@ -1147,6 +1147,12 @@ public class GameRoom {
     		targetChr.addZoneAsset(zoneInfo.id, zoneInfo.tollMoney(), zoneInfo.sellMoney());
     		zoneInfo.setChar(targetChr.charId);
     		notifyAll(new ServerPacketCharChangeOwner(targetChr.charId,zoneInfo.id,targetChr.charId,targetChr.getZoneCount(),targetChr.getZoneAssets(),chr.charId,chr.getZoneCount(),chr.getZoneAssets()).toJson());
+    		
+    		if(pkt.sumpay < 0)
+    		{
+    			chr.money += pkt.sumpay * -1;
+    			sendMoneyChanged(chr,true);
+    		}
     	}
     	else
     	{
